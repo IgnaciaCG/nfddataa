@@ -1,1 +1,1 @@
-Esta es la segundo repo que creamos
+Este es la segundo repo que creamos
