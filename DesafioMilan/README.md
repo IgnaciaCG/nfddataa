@@ -103,6 +103,8 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ### **Flujo Diario en la Nube (02:00 AM)**
 
+![Texto alternativo de la imagen](nfddataa\Milan\images\FlujoDiarioNube.png)
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  AZURE AUTOMATION - Schedule Diario 02:00 AM           │
@@ -196,7 +198,7 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  AZURE AUTOMATION - Schedule Semanal Viernes 20:00     │
+│  AZURE AUTOMATION - Schedule Semanal Viernes 02:00 AM   │
 └────────────────────┬────────────────────────────────────┘
                      │
                      │ Job dispatch via HTTPS
@@ -220,10 +222,7 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
                    ▼
          ┌─────────────────────┐
          │  HDD LOCAL          │
-         │  E:\Backups\        │
-         │  - pp-backup/       │
-         │  - sp-backup/       │
-         │  - logs/            │
+         │              │
          └─────────────────────┘
 ```
 
@@ -292,13 +291,13 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ## **Costos y Presupuesto**
 
-| Servicio                        | Detalle                               | Costo Mensual   |
-| ------------------------------- | ------------------------------------- | --------------- |
-| Azure Storage Account           | Cool tier, ~50GB, 30 días retención | $1.50 - $3.00   |
-| Azure Automation                | 3 runbooks, ~650 min/mes              | $1.30 - $2.00   |
-| **Hybrid Runbook Worker** | **Agente gratuito**             | **$0.00** |
-| Data Transfer Out               | ~50GB/mes descarga semanal            | $1.00 - $2.00   |
-| Logs & Monitoring               | Application Insights básico          | $0.50 - $1.00   |
+| Servicio              | Detalle                               | Costo Mensual |
+| --------------------- | ------------------------------------- | ------------- |
+| Azure Storage Account | Cool tier, ~50GB, 30 días retención | $1.50 - $3.00 |
+| Azure Automation      | 3 runbooks, ~650 min/mes              | $1.30 - $2.00 |
+| Hybrid Runbook Worker | Agente gratuito                       | $0.00         |
+| Data Transfer Out     | ~50GB/mes descarga semanal            | $1.00 - $2.00 |
+| Logs & Monitoring     | Application Insights básico          | $0.50 - $1.00 |
 
 **TOTAL:** $4.30 - $8.00/mes (7-13% del presupuesto de $60/mes)
 **AHORRO vs. Manual:** $80/mes ($960/año)
@@ -332,18 +331,12 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ## **Monitoreo y Alertas**
 
-### **KPIs**
-
-- Tasa de éxito de backups: ≥ 99%
-- Duración promedio: ≤ 15 minutos
-- Tamaño de backup: Incremento ≤ 20%/mes
-
 ### **Alertas Configuradas**
 
-- ⚠️ Fallo de runbook diario
-- ⚠️ Fallo de Hybrid Worker
-- ⚠️ Exceso de presupuesto (>80% de $60)
-- ⚠️ Errores de API throttling
+- Fallo de runbook diario
+- Fallo de Hybrid Worker
+- Exceso de presupuesto (>80% de $60)
+- Errores de API throttling
 
 ---
 
@@ -419,12 +412,3 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 - [ ] Migración a ambiente productivo
 - [ ] Monitoreo intensivo (2 semanas)
 - [ ] Ajustes basados en métricas
-
----
-
-## **Contacto y Soporte**
-
-**Arquitecto:** Milan Kurte
-**Email:** milan.kurte@nofrontiersdata.com
-**Proyecto:** Sistema de Respaldo NFD Data
-**Última actualización:** Diciembre 2025
