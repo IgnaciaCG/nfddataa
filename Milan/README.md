@@ -3,7 +3,6 @@
 **Autor:** Milan Kurte
 **Proyecto:** Desafío de Arquitectura NFD Data
 **Fecha:** Diciembre 2025
-**Versión:** 2.0 (con Hybrid Runbook Worker)
 
 ---
 
@@ -17,11 +16,11 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ### **Características Principales**
 
-- ✅ **Automatización 100%** - Sin intervención manual (diaria o semanal)
-- ✅ **RPO: 24 horas** - Pérdida máxima de un día de datos
-- ✅ **RTO: 6 horas** - Recuperación en menos de media jornada laboral
-- ✅ **Costo: $4-8/mes** - 7-13% del presupuesto disponible ($60/mes)
-- ✅ **Ahorro: $960/año** - Vs. proceso manual tradicional
+- **Automatización 100%** - Sin intervención manual (diaria o semanal)
+- **RPO: 24 horas** - Pérdida máxima de un día de datos
+- **RTO: 6 horas** - Recuperación en menos de media jornada laboral
+- **Costo: $4-8/mes** - 7-13% del presupuesto disponible ($60/mes)
+- **Ahorro: $960/año** - Vs. proceso manual tradicional
 
 ---
 
@@ -59,7 +58,7 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 - **Runbooks:**
   - `Backup-PowerPlatform.ps1` → Diario 02:00 AM (nube)
   - `Backup-SharePoint.ps1` → Diario 02:10 AM (nube)
-  - `Backup-FisicoSemanal.ps1` → Semanal viernes 20:00 (Hybrid Worker)
+  - `Backup-FisicoSemanal.ps1` → Semanal domingo 02:00 AM (Hybrid Worker)
 - **Schedules:** Programación automática sin intervención humana
 - **Jobs:** Trazabilidad completa de ejecuciones
 
