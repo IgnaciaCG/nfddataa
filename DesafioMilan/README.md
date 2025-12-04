@@ -24,13 +24,15 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ---
 
-## **Arquitectura de Componentes**
+# **Arquitectura de Componentes**
 
-### **Capa 1: Plataformas M365**
+![Texto alternativo de la imagen](images\ComponentesFlujoBackup.png)
+
+## **Capa 1: Plataformas M365**
 
 #### **Power Platform**
 
-- Ambiente productivo con aplicaciones Canvas/Model-Driven
+- Ambiente productivo con aplicaciones
 - Flujos de Power Automate
 - Soluciones completas empaquetadas
 - Tablas críticas de Dataverse
@@ -43,21 +45,21 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ---
 
-### **Capa 2: Azure (Orquestación y Almacenamiento)**
+## **Capa 2: Azure (Orquestación y Almacenamiento)**
 
 #### **Microsoft Entra ID (Azure AD)**
 
 - **Función:** Identity & Access Management (IAM)
 - **Managed Identity:** Autenticación segura para runbooks en la nube
 - **SAS Tokens:** Acceso de solo lectura para Hybrid Worker
-- **RBAC:** Control granular de permisos (mínimo privilegio)
+- **RBAC:** Control por roles de permisos (mínimo privilegio)
 
 #### **Azure Automation Account**
 
 - **Función:** Orquestador central de procesos automatizados
 - **Runbooks:**
   - `Backup-PowerPlatform.ps1` → Diario 02:00 AM (nube)
-  - `Backup-SharePoint.ps1` → Diario 02:10 AM (nube)
+  - `Backup-SharePoint.ps1` → Diario 03:00 AM (nube)
   - `Backup-FisicoSemanal.ps1` → Semanal domingo 02:00 AM (Hybrid Worker)
 - **Schedules:** Programación automática sin intervención humana
 - **Jobs:** Trazabilidad completa de ejecuciones
@@ -103,36 +105,7 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ### **Flujo Diario en la Nube (02:00 AM)**
 
-![Texto alternativo de la imagen](nfddataa\Milan\images\FlujoDiarioNube.png)
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  AZURE AUTOMATION - Schedule Diario 02:00 AM           │
-└────────────────────┬────────────────────────────────────┘
-                     │
-         ┌───────────┴───────────┐
-         ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐
-│ Runbook PP      │     │ Runbook SP      │
-│ (Managed ID)    │     │ (Managed ID)    │
-└────────┬────────┘     └────────┬────────┘
-         │                       │
-         ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐
-│ Power Platform  │     │ SharePoint      │
-│ - Export Sol.   │     │ - Download Lib  │
-│ - Export Data   │     │ - Compress      │
-└────────┬────────┘     └────────┬────────┘
-         │                       │
-         └───────────┬───────────┘
-                     ▼
-         ┌─────────────────────┐
-         │  AZURE STORAGE      │
-         │  - pp-backup/       │
-         │  - sp-backup/       │
-         │  - logs/            │
-         └─────────────────────┘
-```
+![Texto alternativo de la imagen](images\FlujoDiarioNube.png)
 
 **Pasos:**
 
@@ -196,35 +169,7 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ## **Flujo Semanal On-Premise (Viernes 20:00) - AUTOMATIZADO**
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  AZURE AUTOMATION - Schedule Semanal Viernes 02:00 AM   │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     │ Job dispatch via HTTPS
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│  HYBRID RUNBOOK WORKER (PC On-Premise)                  │
-│  - Agent instalado en PC local                         │
-│  - Ejecuta Backup-FisicoSemanal.ps1                    │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     │ AzCopy sync (SAS token read-only)
-                     ▼
-         ┌─────────────────────┐
-         │  AZURE STORAGE      │
-         │  - pp-backup/       │
-         │  - sp-backup/       │
-         │  - logs/            │
-         └─────────┬───────────┘
-                   │
-                   │ Sincronización
-                   ▼
-         ┌─────────────────────┐
-         │  HDD LOCAL          │
-         │              │
-         └─────────────────────┘
-```
+![Texto alternativo de la imagen](images\FlujoSemanalOn-Premise.png)
 
 **Pasos (100% Automatizados):**
 
@@ -300,7 +245,6 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 | Logs & Monitoring     | Application Insights básico          | $0.50 - $1.00 |
 
 **TOTAL:** $4.30 - $8.00/mes (7-13% del presupuesto de $60/mes)
-**AHORRO vs. Manual:** $80/mes ($960/año)
 
 ---
 
@@ -386,28 +330,28 @@ Sistema de respaldo automatizado de **3 capas** para proteger soluciones product
 
 ## **Próximos Pasos**
 
-### **Fase 1: Preparación (Semana 1)**
+### **Fase 1: Preparación**
 
 - [X] Diseño de arquitectura
 - [ ] Aprovisionamiento de recursos Azure
 - [ ] Creación de Managed Identity
 - [ ] Asignación de permisos RBAC
 
-### **Fase 2: Desarrollo (Semanas 2-3)**
+### **Fase 2: Desarrollo**
 
 - [ ] Desarrollo runbooks Power Platform y SharePoint
 - [ ] Desarrollo runbook Hybrid Worker
 - [ ] Configuración de schedules
 - [ ] Implementación de logs estructurados
 
-### **Fase 3: Pruebas (Semana 4)**
+### **Fase 3: Pruebas**
 
 - [ ] Instalación Hybrid Worker en PC
 - [ ] Pruebas de respaldo en ambiente dev
 - [ ] Simulacro de restauración completa
 - [ ] Validación RPO/RTO
 
-### **Fase 4: Producción (Semana 5)**
+### **Fase 4: Producción**
 
 - [ ] Migración a ambiente productivo
 - [ ] Monitoreo intensivo (2 semanas)
