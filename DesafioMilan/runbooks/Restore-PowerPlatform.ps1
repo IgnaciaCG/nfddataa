@@ -3,42 +3,78 @@
     Runbook para restaurar soluciones de Power Platform desde Azure Storage
 
 .DESCRIPTION
-    Este runbook restaura SOLAMENTE SOLUCIONES desde un backup ZIP almacenado en Azure Storage.
-    NO restaura datos de tablas - solo la solución (metadata, forms, views, PCF, etc).
+    Este runbook restaura SOLUCIONES Y DATOS desde un backup ZIP almacenado en Azure Storage.
+    Restaura la solución (metadata, forms, views, PCF) y datos de ~46 tablas Dataverse.
     
     Utiliza Azure Automation con Managed Identity y Service Principal para autenticación.
     
     TRES MODOS DE OPERACIÓN:
     
-    1. NewEnvironment - Restaura en un entorno completamente diferente
-       - Usa TargetEnvironment para especificar el destino
-       - Importa la solución como nueva
-       - Ideal para: Prod → Dev, backups de disaster recovery
+    1. NewEnvironment - Restaura en un entorno completamente diferente (LIMPIO)
+       - OPCIÓN A: Especifica TargetEnvironment (GUID de environment existente)
+       - OPCIÓN B: Proporciona NewEnvironmentName para AUTO-CREAR environment
+       - Importa solución como nueva
+       - Restaura TODOS los datos SIN marcadores (environment vacío)
+       - Ideal para: Prod → Dev, Disaster Recovery, environment nuevo
     
-    2. UpdateCurrent - Actualiza la solución actual en el mismo entorno (DESTRUCTIVO)
+    2. UpdateCurrent - Actualiza solución y datos con marcadores (SEMI-DESTRUCTIVO)
        - Sobrescribe la solución existente
-       - Reemplaza todas las customizaciones
-       - Ideal para: Rollback a versión anterior
+       - Inserta datos NUEVOS con marcadores (cr8df_backupid, cr8df_fecharestore)
+       - Datos originales permanecen (permite comparación)
+       - Crea campos marcadores automáticamente si no existen
+       - Ideal para: Rollback con comparación, validación de backup
     
-    3. CreateCopy - Crea una copia paralela con sufijo "_Restored_YYYYMMDD" (NO DESTRUCTIVO)
-       - Solución original intacta
-       - Nueva versión para comparar
-       - Crea automáticamente campos marcadores en tablas si no existen
-       - Ideal para: Comparación lado a lado, testing
+    3. CreateCopy - Crea copia paralela con marcadores (NO DESTRUCTIVO)
+       - Solución original intacta (metadata update)
+       - Inserta datos NUEVOS con marcadores
+       - Permite comparación lado a lado completa
+       - Crea campos marcadores automáticamente si no existen
+       - Ideal para: Testing, auditoría, comparación detallada
 
 .PARAMETER BackupFileName
     Nombre del archivo ZIP de backup en Azure Storage
     Ejemplo: "PowerPlatform_Backup_11-12-2025 13-31-13.zip"
 
 .PARAMETER RestoreMode
-    Modo de restore (requerido):
-    - "NewEnvironment": Restaura en otro entorno (requiere TargetEnvironment)
-    - "UpdateCurrent": Sobrescribe solución actual (destructivo)
-    - "CreateCopy": Crea copia con sufijo (no destructivo, crea campos automáticamente)
+    Modo de restore (requerido) - VALORES VÁLIDOS:
+    • "NewEnvironment" - Restaura en otro entorno (requiere TargetEnvironment O NewEnvironmentName)
+    • "UpdateCurrent" - Sobrescribe solución actual (destructivo)
+    • "CreateCopy" - Crea copia con sufijo (no destructivo, crea campos automáticamente)
+    
+    IMPORTANTE: Escribir exactamente como se muestra (case-sensitive)
 
 .PARAMETER TargetEnvironment
-    GUID del environment destino (requerido si RestoreMode = "NewEnvironment")
+    GUID del environment destino EXISTENTE (opcional si RestoreMode = "NewEnvironment")
+    Si no se proporciona, se creará un nuevo environment usando NewEnvironmentName
     Ejemplo: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+
+.PARAMETER NewEnvironmentName
+    Nombre del nuevo environment a crear (solo si RestoreMode = "NewEnvironment" y TargetEnvironment vacío)
+    El runbook creará automáticamente el environment y obtendrá su GUID
+    Ejemplo: "Dev-Restore-20251211"
+
+.PARAMETER NewEnvironmentRegion
+    Región del nuevo environment (solo si se crea automáticamente)
+    Default: "unitedstates"
+    
+    VALORES VÁLIDOS:
+    • "unitedstates"    • "europe"         • "asia"           • "australia"
+    • "india"           • "japan"          • "canada"         • "southamerica"
+    • "unitedkingdom"   • "france"         • "germany"        • "switzerland"
+    • "norway"          • "korea"          • "southafrica"    • "uae"
+    • "brazil"
+    
+    IMPORTANTE: Debe coincidir con región del backup para evitar problemas
+
+.PARAMETER NewEnvironmentType
+    Tipo de environment a crear (solo si se crea automáticamente)
+    Default: "Sandbox"
+    
+    VALORES VÁLIDOS:
+    • "Sandbox"      - Entorno de pruebas (recomendado)
+    • "Production"   - Entorno productivo
+    • "Trial"        - Entorno de prueba temporal
+    • "Developer"    - Entorno de desarrollo individual
 
 .PARAMETER CreateBackupBeforeRestore
     Crea un backup preventivo antes de restaurar:
@@ -51,11 +87,20 @@
     - $true: Ejecuta directamente sin confirmación (para scripts automatizados)
 
 .EXAMPLE
-    # Modo 1: Restore en nuevo entorno (Prod → Dev)
+    # Modo 1A: Restore en entorno existente (Prod → Dev existente)
     .\Restore-PowerPlatform.ps1 `
         -BackupFileName "PowerPlatform_Backup_PROD_11-12-2025.zip" `
         -RestoreMode "NewEnvironment" `
         -TargetEnvironment "dev-env-guid-123"
+
+.EXAMPLE
+    # Modo 1B: Restore auto-creando nuevo entorno
+    .\Restore-PowerPlatform.ps1 `
+        -BackupFileName "PowerPlatform_Backup_PROD_11-12-2025.zip" `
+        -RestoreMode "NewEnvironment" `
+        -NewEnvironmentName "Dev-Restore-20251211" `
+        -NewEnvironmentRegion "unitedstates" `
+        -NewEnvironmentType "Sandbox"
 
 .EXAMPLE
     # Modo 2: Actualizar solución actual (Rollback destructivo)
@@ -83,10 +128,12 @@
     Fecha: 11-12-2025
     
     Cambios v4.0:
-    - Eliminado restore de tablas (solo soluciones)
+    - Restore completo: Soluciones + Datos (~46 tablas)
     - 3 modos de operación flexibles
-    - Auto-creación de campos marcadores en modo CreateCopy
-    - Proceso simplificado a 8 pasos
+    - Auto-creación de campos marcadores (UpdateCurrent y CreateCopy)
+    - NewEnvironment: Datos limpios sin marcadores
+    - UpdateCurrent/CreateCopy: Datos con marcadores para comparación
+    - Proceso completo en 9 pasos
     
     Requisitos:
     - Azure Automation Account con Managed Identity habilitado
@@ -94,31 +141,41 @@
     - Módulos PowerShell: Az.Accounts, Az.Storage, Microsoft.PowerApps.Administration.PowerShell
     
     Variables de Automation requeridas:
-    - TenantId: GUID del tenant Azure AD
-    - EnvironmentName: GUID del environment Power Platform
+    - PP-ServicePrincipal-TenantId: GUID del tenant Azure AD
+    - PP-EnvironmentName: GUID del environment Power Platform
     - StorageAccountName: Nombre del Storage Account
-    - StorageAccountKey: Access Key del Storage Account
-    - DataverseUrl: URL del environment Dataverse (ej: https://org12345.crm2.dynamics.com)
+    - StorageAccountKey: Access Key del Storage Account (encriptada)
     
     Credential de Automation requerida:
     - PP-ServicePrincipal (username = AppId, password = ClientSecret)
 #>
 
 param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true, HelpMessage="Nombre del archivo ZIP de backup en Azure Storage")]
     [string]$BackupFileName,
     
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$true, HelpMessage="Modo de restore: NewEnvironment, UpdateCurrent, o CreateCopy")]
     [ValidateSet("NewEnvironment", "UpdateCurrent", "CreateCopy")]
     [string]$RestoreMode,
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$false, HelpMessage="GUID del environment destino (solo NewEnvironment)")]
     [string]$TargetEnvironment = "",
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$false, HelpMessage="Nombre para auto-crear environment (solo NewEnvironment)")]
+    [string]$NewEnvironmentName = "",
+    
+    [Parameter(Mandatory=$false, HelpMessage="Región del nuevo environment")]
+    [ValidateSet("unitedstates", "europe", "asia", "australia", "india", "japan", "canada", "southamerica", "unitedkingdom", "france", "germany", "switzerland", "norway", "korea", "southafrica", "uae", "brazil")]
+    [string]$NewEnvironmentRegion = "unitedstates",
+    
+    [Parameter(Mandatory=$false, HelpMessage="Tipo de environment: Sandbox, Production, Trial, o Developer")]
+    [ValidateSet("Sandbox", "Production", "Trial", "Developer")]
+    [string]$NewEnvironmentType = "Sandbox",
+    
+    [Parameter(Mandatory=$false, HelpMessage="Crear backup preventivo antes de restaurar")]
     [bool]$CreateBackupBeforeRestore = $true,
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory=$false, HelpMessage="Omitir confirmación interactiva")]
     [bool]$Force = $false
 )
 
@@ -135,13 +192,23 @@ $script:restoreStats = @{
     backupFileName = $BackupFileName
     restoreMode = $RestoreMode
     targetEnvironment = $TargetEnvironment
+    newEnvironmentName = $NewEnvironmentName
+    newEnvironmentRegion = $NewEnvironmentRegion
+    newEnvironmentType = $NewEnvironmentType
+    newEnvironmentCreated = $false
     createBackupBeforeRestore = $CreateBackupBeforeRestore
+    backupId = [guid]::NewGuid().ToString()
     solutionImported = $false
     solutionName = ""
     solutionVersion = ""
     solutionDisplayName = ""
     fieldsCreated = 0
     tablesUpdated = 0
+    tablesProcessed = 0
+    tablesSuccess = 0
+    tablesError = 0
+    recordsRestored = 0
+    recordsError = 0
 }
 
 Write-Output "=========================================="
@@ -150,7 +217,19 @@ Write-Output "=========================================="
 Write-Output "Fecha/Hora: $(Get-Date -Format 'dd-MM-yyyy HH:mm:ss')"
 Write-Output "Backup File: $BackupFileName"
 Write-Output "Modo Restore: $RestoreMode"
-Write-Output "Target Environment: $(if ($TargetEnvironment) { $TargetEnvironment } else { 'Same as backup' })"
+
+if ($RestoreMode -eq "NewEnvironment") {
+    if (-not [string]::IsNullOrWhiteSpace($TargetEnvironment)) {
+        Write-Output "Target Environment: $TargetEnvironment (existente)"
+    } elseif (-not [string]::IsNullOrWhiteSpace($NewEnvironmentName)) {
+        Write-Output "New Environment: $NewEnvironmentName (auto-crear)"
+        Write-Output "  Region: $NewEnvironmentRegion"
+        Write-Output "  Type: $NewEnvironmentType"
+    }
+} else {
+    Write-Output "Target Environment: Same as backup"
+}
+
 Write-Output "Create Backup Before: $CreateBackupBeforeRestore"
 Write-Output "Force: $Force"
 Write-Output "=========================================="
@@ -218,12 +297,27 @@ try {
     }
     
     # Validar parámetros según modo
-    if ($RestoreMode -eq "NewEnvironment" -and [string]::IsNullOrWhiteSpace($TargetEnvironment)) {
-        throw "Modo 'NewEnvironment' requiere el parámetro TargetEnvironment"
+    if ($RestoreMode -eq "NewEnvironment") {
+        # Requiere TargetEnvironment O NewEnvironmentName
+        if ([string]::IsNullOrWhiteSpace($TargetEnvironment) -and [string]::IsNullOrWhiteSpace($NewEnvironmentName)) {
+            throw "Modo 'NewEnvironment' requiere TargetEnvironment (GUID existente) O NewEnvironmentName (crear nuevo)"
+        }
+        
+        # Si se proporcionan ambos, TargetEnvironment tiene prioridad
+        if (-not [string]::IsNullOrWhiteSpace($TargetEnvironment) -and -not [string]::IsNullOrWhiteSpace($NewEnvironmentName)) {
+            Write-Output "  ⚠ WARNING: Se proporcionaron TargetEnvironment y NewEnvironmentName"
+            Write-Output "  → Usando TargetEnvironment (environment existente)"
+            Write-Output "  → NewEnvironmentName será ignorado"
+        }
     }
     
-    if ($RestoreMode -ne "NewEnvironment" -and -not [string]::IsNullOrWhiteSpace($TargetEnvironment)) {
-        Write-Output "  ⚠ WARNING: TargetEnvironment será ignorado (solo aplica en modo NewEnvironment)"
+    if ($RestoreMode -ne "NewEnvironment") {
+        if (-not [string]::IsNullOrWhiteSpace($TargetEnvironment)) {
+            Write-Output "  ⚠ WARNING: TargetEnvironment será ignorado (solo aplica en modo NewEnvironment)"
+        }
+        if (-not [string]::IsNullOrWhiteSpace($NewEnvironmentName)) {
+            Write-Output "  ⚠ WARNING: NewEnvironmentName será ignorado (solo aplica en modo NewEnvironment)"
+        }
     }
     
     Write-Output ""
@@ -255,18 +349,20 @@ try {
     $appId = $spCredential.UserName
     $clientSecret = $spCredential.GetNetworkCredential().Password
     
-    # Leer variables
-    $tenantId = Get-AutomationVariable -Name "TenantId"
-    $environmentName = Get-AutomationVariable -Name "EnvironmentName"
+    # Leer variables con nombres correctos
+    $tenantId = Get-AutomationVariable -Name "PP-ServicePrincipal-TenantId"
+    $environmentName = Get-AutomationVariable -Name "PP-EnvironmentName"
     $storageAccountName = Get-AutomationVariable -Name "StorageAccountName"
     $storageAccountKey = Get-AutomationVariable -Name "StorageAccountKey"
-    $dataverseUrl = Get-AutomationVariable -Name "DataverseUrl"
     
     Write-Output "  ✓ Credenciales leídas: $appId"
     Write-Output "  ✓ Tenant ID: $tenantId"
     Write-Output "  ✓ Environment: $environmentName"
     Write-Output "  ✓ Storage Account: $storageAccountName"
-    Write-Output "  ✓ Dataverse URL: $dataverseUrl"
+    Write-Output ""
+    
+    # DataverseUrl se obtendrá después de autenticar en Power Platform
+    $dataverseUrl = ""
     
     Write-DetailedLog "Automation variables loaded successfully" "INFO"
     
@@ -295,6 +391,18 @@ try {
     Write-Output "Autenticando en Power Platform con Service Principal..."
     Add-PowerAppsAccount -TenantID $tenantId -ApplicationId $appId -ClientSecret $clientSecret | Out-Null
     Write-Output "  ✓ Power Platform autenticado"
+    
+    # Para modos UpdateCurrent y CreateCopy, obtener Dataverse URL del environment actual
+    if ($RestoreMode -in @("UpdateCurrent", "CreateCopy")) {
+        Write-Output ""
+        Write-Output "Obteniendo Dataverse URL del environment actual..."
+        $currentEnv = Get-AdminPowerAppEnvironment -EnvironmentName $environmentName
+        $dataverseUrl = $currentEnv.Internal.properties.linkedEnvironmentMetadata.instanceUrl
+        Write-Output "  ✓ Dataverse URL: $dataverseUrl"
+    }
+    # Para NewEnvironment, el Dataverse URL se obtendrá en PASO 5 después de crear/validar el environment destino
+    
+    Write-Output ""
     
     Write-DetailedLog "Authentication successful (Azure + Power Platform)" "INFO"
     
@@ -408,17 +516,139 @@ Write-Output "PASO 5: DATAVERSE URL Y TOKEN"
 Write-Output "=========================================="
 
 try {
-    # Si modo es NewEnvironment, usar TargetEnvironment
+    # Si modo es NewEnvironment, determinar environment destino
     if ($RestoreMode -eq "NewEnvironment") {
-        Write-Output "Obteniendo URL del environment destino..."
-        $environment = Get-AdminPowerAppEnvironment -EnvironmentName $TargetEnvironment
-        if (-not $environment) {
-            throw "No se pudo obtener información del environment destino: $TargetEnvironment"
+        
+        # OPCIÓN A: TargetEnvironment proporcionado (environment EXISTENTE)
+        if (-not [string]::IsNullOrWhiteSpace($TargetEnvironment)) {
+            Write-Output "Obteniendo URL del environment destino (existente)..."
+            $environment = Get-AdminPowerAppEnvironment -EnvironmentName $TargetEnvironment
+            if (-not $environment) {
+                throw "No se pudo obtener información del environment destino: $TargetEnvironment"
+            }
+            
+            # Actualizar Dataverse URL para el environment existente
+            $dataverseUrl = $environment.Internal.properties.linkedEnvironmentMetadata.instanceUrl
+            Write-Output "  ✓ Environment destino: $TargetEnvironment"
+            Write-Output "  ✓ Dataverse URL (Target): $dataverseUrl"
+            
+            $script:restoreStats.targetEnvironment = $TargetEnvironment
+        }
+        # OPCIÓN B: NewEnvironmentName proporcionado (AUTO-CREAR environment)
+        else {
+            Write-Output "AUTO-CREANDO nuevo environment..."
+            Write-Output "  Nombre: $NewEnvironmentName"
+            Write-Output "  Región: $NewEnvironmentRegion"
+            Write-Output "  Tipo: $NewEnvironmentType"
+            Write-Output ""
+            
+            # Crear nuevo environment con Dataverse database
+            Write-Output "  [5a] Creando environment..."
+            Write-Output "      Parámetros:"
+            Write-Output "        DisplayName: $NewEnvironmentName"
+            Write-Output "        EnvironmentSku: $NewEnvironmentType"
+            Write-Output "        LocationName: $NewEnvironmentRegion"
+            Write-Output "        ProvisionDatabase: True"
+            Write-Output ""
+            
+            try {
+                $newEnvParams = @{
+                    DisplayName = $NewEnvironmentName
+                    EnvironmentSku = $NewEnvironmentType
+                    LocationName = $NewEnvironmentRegion
+                    ProvisionDatabase = $true
+                }
+                
+                $newEnvironment = New-AdminPowerAppEnvironment @newEnvParams -ErrorAction Stop
+                
+                if (-not $newEnvironment) {
+                    throw "New-AdminPowerAppEnvironment retornó null"
+                }
+                
+                if (-not $newEnvironment.EnvironmentName) {
+                    throw "Environment creado pero sin EnvironmentName (GUID). Objeto retornado: $($newEnvironment | ConvertTo-Json -Depth 2)"
+                }
+                
+                $newEnvironmentId = $newEnvironment.EnvironmentName
+                
+                Write-Output "  ✓ Environment creado exitosamente"
+                Write-Output "      ID: $newEnvironmentId"
+                Write-Output "      Display Name: $($newEnvironment.DisplayName)"
+                Write-Output ""
+                
+            } catch {
+                Write-Output ""
+                Write-Output "  ✗ ERROR creando environment"
+                Write-Output "      Mensaje: $($_.Exception.Message)"
+                Write-Output "      Tipo de error: $($_.Exception.GetType().FullName)"
+                Write-Output ""
+                Write-Output "  POSIBLES CAUSAS:"
+                Write-Output "    1. Región inválida: $NewEnvironmentRegion"
+                Write-Output "    2. Nombre duplicado: Ya existe un environment llamado '$NewEnvironmentName'"
+                Write-Output "    3. Permisos insuficientes del Service Principal"
+                Write-Output "    4. Tipo de environment no permitido: $NewEnvironmentType"
+                Write-Output ""
+                throw
+            }
+            
+            # Esperar a que el environment esté completamente provisionado
+            Write-Output ""
+            Write-Output "  [5b] Esperando provisionamiento de Dataverse..."
+            Write-Output "      (Esto puede tomar 5-15 minutos, a veces hasta 20)"
+            Write-Output "      Environment ID: $newEnvironmentId"
+            Write-Output ""
+            
+            $maxWaitMinutes = 20
+            $waitSeconds = 0
+            $provisioningComplete = $false
+            
+            while ($waitSeconds -lt ($maxWaitMinutes * 60) -and -not $provisioningComplete) {
+                Start-Sleep -Seconds 30
+                $waitSeconds += 30
+                
+                $checkEnv = Get-AdminPowerAppEnvironment -EnvironmentName $newEnvironmentId
+                
+                if ($checkEnv.Internal.properties.linkedEnvironmentMetadata.instanceUrl) {
+                    $provisioningComplete = $true
+                    Write-Output "  ✓ Dataverse provisionado ($([math]::Round($waitSeconds/60, 1)) min)"
+                } else {
+                    Write-Output "      ... provisionando ($([math]::Round($waitSeconds/60, 1)) min transcurridos)"
+                }
+            }
+            
+            if (-not $provisioningComplete) {
+                Write-Output ""
+                Write-Output "  ⚠ WARNING: Timeout después de $maxWaitMinutes minutos"
+                Write-Output "  El environment fue creado: $newEnvironmentId"
+                Write-Output "  Pero Dataverse aún está provisionando"
+                Write-Output ""
+                Write-Output "  OPCIONES:"
+                Write-Output "    1. Espera 5-10 minutos más y ejecuta el restore nuevamente"
+                Write-Output "       usando: -TargetEnvironment '$newEnvironmentId'"
+                Write-Output "    2. Verifica el estado en Power Platform Admin Center"
+                Write-Output ""
+                throw "Timeout esperando provisionamiento de Dataverse ($maxWaitMinutes minutos). Environment ID: $newEnvironmentId"
+            }
+            
+            # Obtener URL de Dataverse del nuevo environment
+            $environment = Get-AdminPowerAppEnvironment -EnvironmentName $newEnvironmentId
+            $dataverseUrl = $environment.Internal.properties.linkedEnvironmentMetadata.instanceUrl
+            
+            Write-Output ""
+            Write-Output "  ✓ Nuevo environment listo:"
+            Write-Output "    ID: $newEnvironmentId"
+            Write-Output "    Nombre: $NewEnvironmentName"
+            Write-Output "    Dataverse URL: $dataverseUrl"
+            
+            # Actualizar TargetEnvironment con el nuevo GUID
+            $TargetEnvironment = $newEnvironmentId
+            $script:restoreStats.targetEnvironment = $newEnvironmentId
+            $script:restoreStats.newEnvironmentCreated = $true
+            $script:restoreStats.newEnvironmentName = $NewEnvironmentName
+            
+            Write-DetailedLog "New environment created: $newEnvironmentId ($NewEnvironmentName)" "INFO"
         }
         
-        # Actualizar Dataverse URL para el nuevo environment
-        $dataverseUrl = $environment.Internal.properties.linkedEnvironmentMetadata.instanceUrl
-        Write-Output "  ✓ Dataverse URL (Target): $dataverseUrl"
     } else {
         Write-Output "  ✓ Dataverse URL (Current): $dataverseUrl"
     }
@@ -497,19 +727,30 @@ if (-not $Force) {
     Write-Output ""
     Write-Output "QUÉ SE VA A RESTAURAR:"
     Write-Output "  ✓ Solución (metadata, forms, views, PCF, workflows, etc.)"
-    Write-Output "  ✗ Datos de tablas (no incluido en este restore)"
+    Write-Output "  ✓ Datos de ~46 tablas Dataverse"
+    if ($RestoreMode -eq "NewEnvironment") {
+        Write-Output "    → Datos limpios SIN marcadores (environment nuevo)"
+    } else {
+        Write-Output "    → Datos CON marcadores (cr8df_backupid, cr8df_fecharestore)"
+    }
     
     Write-Output ""
     Write-Output "⚠ ADVERTENCIAS:"
     if ($RestoreMode -eq "UpdateCurrent") {
-        Write-Output "  • MODO DESTRUCTIVO: Sobrescribirá la solución actual"
-        Write-Output "  • Customizaciones no publicadas se perderán"
+        Write-Output "  • MODO SEMI-DESTRUCTIVO: Sobrescribirá la solución actual"
+        Write-Output "  • Datos se insertarán como nuevos registros con marcadores"
+        Write-Output "  • Datos originales NO se eliminan (permite comparación)"
+    }
+    if ($RestoreMode -eq "NewEnvironment") {
+        Write-Output "  • Datos se insertarán sin marcadores (environment limpio)"
+        Write-Output "  • Asegurar que environment destino esté vacío o preparado"
     }
     if (-not $CreateBackupBeforeRestore) {
         Write-Output "  • No se creará backup preventivo"
     }
-    if ($RestoreMode -eq "CreateCopy") {
+    if ($RestoreMode -in @("CreateCopy", "UpdateCurrent")) {
         Write-Output "  • Se crearán campos cr8df_backupid y cr8df_fecharestore automáticamente"
+        Write-Output "  • Datos originales permanecen para comparación"
     }
     
     Write-Output ""
@@ -616,15 +857,15 @@ try {
 }
 
 # ==========================================
-# PASO 7.5: CREAR CAMPOS MARCADORES (SOLO CreateCopy)
+# PASO 7.5: CREAR CAMPOS MARCADORES (UpdateCurrent y CreateCopy)
 # ==========================================
 
-if ($RestoreMode -eq "CreateCopy") {
+if ($RestoreMode -in @("UpdateCurrent", "CreateCopy")) {
     Write-Output ""
     Write-Output "=========================================="
     Write-Output "PASO 7.5: CREAR CAMPOS MARCADORES"
     Write-Output "=========================================="
-    Write-Output "  (Solo necesario para modo CreateCopy)"
+    Write-Output "  (Necesario para modos UpdateCurrent y CreateCopy)"
     Write-Output ""
     
     try {
@@ -805,16 +1046,214 @@ if ($RestoreMode -eq "CreateCopy") {
     Write-Output "=========================================="
     Write-Output "PASO 7.5: CREAR CAMPOS MARCADORES"
     Write-Output "=========================================="
-    Write-Output "  ℹ Paso omitido (solo necesario en modo CreateCopy)"
+    Write-Output "  ℹ Paso omitido (solo necesario en modos UpdateCurrent y CreateCopy)"
+    Write-Output "  ℹ Modo NewEnvironment: Datos sin marcadores (environment limpio)"
 }
 
 # ==========================================
-# PASO 8: GENERAR REPORTE FINAL
+# PASO 8: RESTAURAR DATOS DE TABLAS
 # ==========================================
 
 Write-Output ""
 Write-Output "=========================================="
-Write-Output "PASO 8: REPORTE FINAL"
+Write-Output "PASO 8: RESTAURAR DATOS DE TABLAS"
+Write-Output "=========================================="
+
+try {
+    # Buscar directorio dataverse en el backup
+    $dataversePath = Get-ChildItem -Path $extractPath -Directory -Filter "dataverse" -Recurse | Select-Object -First 1
+    
+    if (-not $dataversePath) {
+        Write-Output "  ⚠ No se encontró directorio 'dataverse' en el backup"
+        Write-Output "  El backup puede no contener datos de tablas"
+        Write-Output "  Continuando sin restaurar datos..."
+    } else {
+        Write-Output "  Directorio dataverse encontrado: $($dataversePath.FullName)"
+        
+        # Obtener todos los archivos JSON (cada uno es una tabla)
+        $dataFiles = Get-ChildItem -Path $dataversePath.FullName -Filter "*.json"
+        $totalTables = $dataFiles.Count
+        
+        Write-Output "  Tablas encontradas: $totalTables"
+        Write-Output ""
+        
+        if ($totalTables -eq 0) {
+            Write-Output "  ⚠ No se encontraron archivos JSON de tablas"
+            Write-Output "  Continuando sin restaurar datos..."
+        } else {
+            # Obtener mapa de LogicalName → EntitySetName para todas las tablas
+            Write-Output "  [8a] Obteniendo EntitySetNames de tablas..."
+            $tableNameMap = @{}
+            
+            foreach ($dataFile in $dataFiles) {
+                $logicalName = [System.IO.Path]::GetFileNameWithoutExtension($dataFile.Name)
+                
+                try {
+                    $metadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$logicalName')?`$select=EntitySetName"
+                    $entityDef = Invoke-RestMethod -Uri $metadataUrl -Method Get -Headers $script:headers -ErrorAction Stop
+                    $tableNameMap[$logicalName] = $entityDef.EntitySetName
+                } catch {
+                    # Fallback: asumir plural
+                    $tableNameMap[$logicalName] = "${logicalName}s"
+                    Write-Output "    ⚠ $logicalName → ${logicalName}s (fallback)"
+                }
+            }
+            
+            Write-Output "  ✓ Mapeo de nombres completado"
+            Write-Output ""
+            Write-Output "  [8b] Restaurando datos de tablas..."
+            
+            # Determinar si usar marcadores según el modo
+            $useMarkers = $RestoreMode -in @("UpdateCurrent", "CreateCopy")
+            
+            if ($useMarkers) {
+                Write-Output "  → Modo: Insertar con MARCADORES (cr8df_backupid, cr8df_fecharestore)"
+                Write-Output "  → Backup ID: $($script:restoreStats.backupId)"
+            } else {
+                Write-Output "  → Modo: Insertar SIN marcadores (datos limpios)"
+            }
+            Write-Output ""
+            
+            $tablesProcessed = 0
+            $tablesSuccess = 0
+            $tablesError = 0
+            $totalRecordsRestored = 0
+            $totalRecordsError = 0
+            
+            foreach ($dataFile in $dataFiles) {
+                $logicalName = [System.IO.Path]::GetFileNameWithoutExtension($dataFile.Name)
+                $entitySetName = $tableNameMap[$logicalName]
+                
+                Write-Output "  [$($tablesProcessed + 1)/$totalTables] $logicalName → $entitySetName"
+                $tablesProcessed++
+                
+                try {
+                    # Leer datos del archivo JSON
+                    $jsonContent = Get-Content $dataFile.FullName -Raw -Encoding UTF8
+                    $records = $jsonContent | ConvertFrom-Json
+                    
+                    if (-not $records -or $records.Count -eq 0) {
+                        Write-Output "      ℹ Sin registros (skip)"
+                        $tablesSuccess++
+                        continue
+                    }
+                    
+                    $recordCount = $records.Count
+                    Write-Output "      Registros: $recordCount"
+                    
+                    $successCount = 0
+                    $errorCount = 0
+                    
+                    # URL de la API para esta tabla
+                    $apiUrl = "$dataverseUrl/api/data/v9.2/$entitySetName"
+                    
+                    foreach ($record in $records) {
+                        try {
+                            # Crear nuevo registro (excluir ID y metadata OData)
+                            $newRecord = @{}
+                            
+                            foreach ($prop in $record.PSObject.Properties) {
+                                # Excluir propiedades del sistema y metadata
+                                if ($prop.Name -notlike '@*' -and 
+                                    $prop.Name -notlike '_*_value' -and 
+                                    $prop.Name -ne 'id' -and 
+                                    $null -ne $prop.Value) {
+                                    $newRecord[$prop.Name] = $prop.Value
+                                }
+                            }
+                            
+                            # AGREGAR MARCADORES si el modo lo requiere
+                            if ($useMarkers) {
+                                $newRecord['cr8df_backupid'] = $script:restoreStats.backupId
+                                $newRecord['cr8df_fecharestore'] = (Get-Date).ToUniversalTime().ToString("o")
+                            }
+                            
+                            # Convertir a JSON y hacer POST (siempre INSERT, nunca UPDATE)
+                            $recordJson = $newRecord | ConvertTo-Json -Depth 10 -Compress
+                            
+                            Invoke-RestMethod -Uri $apiUrl -Method Post -Headers $script:headers -Body $recordJson -ContentType "application/json" | Out-Null
+                            
+                            $successCount++
+                            $totalRecordsRestored++
+                            
+                        } catch {
+                            $errorCount++
+                            $totalRecordsError++
+                            
+                            # Solo mostrar primeros 3 errores por tabla para no saturar log
+                            if ($errorCount -le 3) {
+                                Write-Output "        ⚠ Error registro: $($_.Exception.Message)"
+                            }
+                        }
+                    }
+                    
+                    if ($errorCount -eq 0) {
+                        Write-Output "      ✓ $successCount/$recordCount registros restaurados"
+                        $tablesSuccess++
+                    } else {
+                        Write-Output "      ⚠ $successCount/$recordCount registros restaurados, $errorCount errores"
+                        if ($errorCount -gt 3) {
+                            Write-Output "        (solo se muestran primeros 3 errores)"
+                        }
+                        $tablesError++
+                    }
+                    
+                    Write-DetailedLog "Table restored: $logicalName ($successCount/$recordCount records)" "INFO"
+                    
+                } catch {
+                    Write-Output "      ✗ Error procesando tabla: $($_.Exception.Message)"
+                    Write-ErrorDetail $_ "RestoreTable_$logicalName"
+                    $tablesError++
+                }
+                
+                Write-Output ""
+            }
+            
+            # Actualizar estadísticas
+            $script:restoreStats.tablesProcessed = $tablesProcessed
+            $script:restoreStats.tablesSuccess = $tablesSuccess
+            $script:restoreStats.tablesError = $tablesError
+            $script:restoreStats.recordsRestored = $totalRecordsRestored
+            $script:restoreStats.recordsError = $totalRecordsError
+            
+            Write-Output "=========================================="
+            Write-Output "RESUMEN RESTORE DE TABLAS:"
+            Write-Output "  Tablas procesadas: $tablesProcessed"
+            Write-Output "    ✓ Exitosas: $tablesSuccess"
+            Write-Output "    ✗ Con errores: $tablesError"
+            Write-Output "  Registros totales: $totalRecordsRestored restaurados, $totalRecordsError errores"
+            if ($useMarkers) {
+                Write-Output "  Backup ID (para filtros): $($script:restoreStats.backupId)"
+            }
+            Write-Output "=========================================="
+            
+            if ($tablesError -eq $tablesProcessed -and $tablesProcessed -gt 0) {
+                throw "Todas las tablas fallaron durante el restore"
+            }
+            
+            Write-DetailedLog "Data restore completed: $totalRecordsRestored records in $tablesSuccess tables" "INFO"
+        }
+    }
+    
+} catch {
+    $errorMsg = "Error restaurando datos de tablas: $($_.Exception.Message)"
+    Write-Output ""
+    Write-Output "  ✗ $errorMsg"
+    Write-ErrorDetail $_ "RestoreTables"
+    $script:errors += $errorMsg
+    
+    # No lanzar error fatal - continuar con el reporte
+    Write-Output "  ⚠ Restore de datos falló, pero solución fue importada"
+    Write-Output "  Revisa los logs para más detalles"
+}
+
+# ==========================================
+# PASO 9: GENERAR REPORTE FINAL
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 9: REPORTE FINAL"
 Write-Output "=========================================="
 
 try {
@@ -895,9 +1334,24 @@ Write-Output "RESULTADOS:"
 Write-Output "  ✓ Solución importada: $($script:restoreStats.solutionName)"
 Write-Output "  ✓ Modo: $RestoreMode"
 
-if ($RestoreMode -eq "CreateCopy") {
-    Write-Output "  ✓ Campos creados: $($script:restoreStats.fieldsCreated)"
-    Write-Output "  ✓ Tablas actualizadas: $($script:restoreStats.tablesUpdated)"
+if ($script:restoreStats.newEnvironmentCreated) {
+    Write-Output "  ✓ Nuevo environment creado:"
+    Write-Output "    → ID: $($script:restoreStats.targetEnvironment)"
+    Write-Output "    → Nombre: $($script:restoreStats.newEnvironmentName)"
+    Write-Output "    → Región: $($script:restoreStats.newEnvironmentRegion)"
+    Write-Output "    → Tipo: $($script:restoreStats.newEnvironmentType)"
+} elseif ($RestoreMode -eq "NewEnvironment") {
+    Write-Output "  ✓ Environment destino: $($script:restoreStats.targetEnvironment)"
+}
+
+Write-Output "  ✓ Tablas procesadas: $($script:restoreStats.tablesProcessed)"
+Write-Output "    → Exitosas: $($script:restoreStats.tablesSuccess)"
+Write-Output "    → Con errores: $($script:restoreStats.tablesError)"
+Write-Output "  ✓ Registros restaurados: $($script:restoreStats.recordsRestored)"
+
+if ($RestoreMode -in @("UpdateCurrent", "CreateCopy")) {
+    Write-Output "  ✓ Campos marcadores creados: $($script:restoreStats.fieldsCreated)"
+    Write-Output "  ✓ Backup ID: $($script:restoreStats.backupId)"
 }
 
 if ($script:errors.Count -gt 0) {
@@ -911,13 +1365,22 @@ Write-Output ""
 Write-Output "PRÓXIMOS PASOS:"
 if ($RestoreMode -eq "CreateCopy") {
     Write-Output "  1. Verifica la solución en Power Apps Maker Portal"
-    Write-Output "  2. Compara la solución original vs restaurada"
+    Write-Output "  2. Compara datos originales vs restaurados:"
+    Write-Output "     Filter(tabla, !IsBlank(cr8df_backupid)) → Datos del backup"
+    Write-Output "     Filter(tabla, IsBlank(cr8df_backupid)) → Datos originales"
     Write-Output "  3. Prueba funcionalidades críticas"
     Write-Output "  4. Si todo está OK, considera actualizar la versión actual"
+} elseif ($RestoreMode -eq "UpdateCurrent") {
+    Write-Output "  1. Verifica la solución en Power Apps Maker Portal"
+    Write-Output "  2. Compara datos originales vs backup:"
+    Write-Output "     Backup ID para filtros: $($script:restoreStats.backupId)"
+    Write-Output "  3. Prueba funcionalidades críticas"
+    Write-Output "  4. Si hay problemas, elimina registros con cr8df_backupid = '$($script:restoreStats.backupId)'"
 } else {
     Write-Output "  1. Verifica la solución en Power Apps Maker Portal"
-    Write-Output "  2. Prueba funcionalidades críticas"
-    Write-Output "  3. Comunica a los usuarios sobre los cambios"
+    Write-Output "  2. Verifica que los datos se importaron correctamente"
+    Write-Output "  3. Prueba funcionalidades críticas en el nuevo environment"
+    Write-Output "  4. Configura permisos y usuarios según sea necesario"
 }
 
 Write-Output "=========================================="

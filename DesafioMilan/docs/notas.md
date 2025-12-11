@@ -52,17 +52,9 @@ Pros:
 4. Asignar rol: Power Platform Administrator
 5. Esperar 15-30 min propagación
 
-# CONFIGURACIÓN DEFAULT RECOMENDADA:
 
-- Destino: Mismo environment (Opción A)
-- Soluciones: Sobrescribir/Upgrade (Opción A)
-- Datos: Update/Insert (Opción A)
-- Tablas: Solo críticas + parent lookups (Opción B mejorada)
-- Validaciones: Todas excepto dry-run
-- Parámetros: TargetEnvironment opcional (default = source)
-- Errores: Stop y reportar (Opción B)
-- Orden: Solución → Tablas críticas → Relacionadas
-- Post-restore: Reporte de comparación + validación básica
+
+
 
 | Aspecto                     | Azure Automation (Actual)                                              | GitHub Actions       | Azure DevOps         |
 | --------------------------- | ---------------------------------------------------------------------- | -------------------- | -------------------- |
