@@ -34,7 +34,6 @@ Debe respaldar tablas especificas, flujos de Power Automate y app
 
 Revisar si la solucion real usa Environment Variables para hacerles backup
 
-
 Opciones para habilitar URL dinámica:
 OPCIÓN 1: Asignar Power Platform Administrator (NO RECOMENDADO)
 Pros:
@@ -52,3 +51,26 @@ Pros:
 3. Buscar Service Principal: 7fc4ef96-8566-4adb-a579-2030dbf71c35
 4. Asignar rol: Power Platform Administrator
 5. Esperar 15-30 min propagación
+
+# CONFIGURACIÓN DEFAULT RECOMENDADA:
+
+- Destino: Mismo environment (Opción A)
+- Soluciones: Sobrescribir/Upgrade (Opción A)
+- Datos: Update/Insert (Opción A)
+- Tablas: Solo críticas + parent lookups (Opción B mejorada)
+- Validaciones: Todas excepto dry-run
+- Parámetros: TargetEnvironment opcional (default = source)
+- Errores: Stop y reportar (Opción B)
+- Orden: Solución → Tablas críticas → Relacionadas
+- Post-restore: Reporte de comparación + validación básica
+
+| Aspecto                     | Azure Automation (Actual)                                              | GitHub Actions       | Azure DevOps         |
+| --------------------------- | ---------------------------------------------------------------------- | -------------------- | -------------------- |
+| **Setup time**        | ✅ 30 min                                                              | ⚠️ 2-4 horas       | ⚠️ 4-8 horas       |
+| **Complejidad**       | ✅ Baja                                                                | ⚠️ Media           | ❌ Alta              |
+| **Costo (tu escala)** | ✅ ~$5/mes                | ✅ Gratis            | ⚠️ Gratis-$40/mes |                      |                      |
+| **Auditoría**        | ⚠️ 30 días logs                                                     | ✅ Permanente (Git)  | ✅ Permanente        |
+| **Aprobaciones**      | ❌ No nativo                                                           | ✅ Environments      | ✅ Release gates     |
+| **CI/CD integration** | ❌ No                                                                  | ✅ Excelente         | ✅ Excelente         |
+| **Curva aprendizaje** | ✅ 1 día                                                              | ⚠️ 1-2 semanas     | ❌ 2-4 semanas       |
+| **Ideal para**        | ✅ Backups automáticos                                                | ✅ ALM de soluciones | ⚠️ Orgs enterprise |
