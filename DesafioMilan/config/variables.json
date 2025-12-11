@@ -1,0 +1,38 @@
+{
+  "storageAccount": {
+    "name": "",
+    "resourceGroup": "rg-backups-nfd",
+    "location": "EastUS",
+    "sku": "Standard_ZRS",
+    "tier": "Cool"
+  },
+  "automationAccount": {
+    "name": "aa-backups-nfd",
+    "resourceGroup": "rg-backups-nfd",
+    "location": "EastUS"
+  },
+  "powerPlatform": {
+    "tenantId": "",
+    "servicePrincipalAppId": "",
+    "environmentName": "295e50db-257c-ea96-882c-67404a3847ec",
+    "solutionName": "miApp"
+  },
+  "backup": {
+    "retention": {
+      "coolTierAfterDays": 7,
+      "deleteAfterDays": 30
+    },
+    "schedules": {
+      "powerPlatform": "Daily 02:00 AM",
+      "sharePoint": "Daily 03:00 AM",
+      "physical": "Weekly Sunday 02:00 AM"
+    }
+  },
+  "notes": {
+    "scenario": "DEV/Testing - Backup limitado",
+    "ppScope": "Solo solución dev02",
+    "spScope": "Primeros 50 archivos o carpeta específica",
+    "estimatedSize": "~250 MB por backup",
+    "monthlyCost": "< $1 USD"
+  }
+}
