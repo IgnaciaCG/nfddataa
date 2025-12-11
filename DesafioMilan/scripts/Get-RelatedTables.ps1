@@ -7,15 +7,17 @@
     mediante Lookup fields, N:N relationships, etc.
 
 .PARAMETER Tables
-    Array de nombres de tablas base a analizar
+    Array de nombres de tablas base a analizar.
+    NOTA: Deben ser los "Logical Names" (generalmente en singular).
 
 .EXAMPLE
-    .\Get-RelatedTables.ps1 -Tables @("cr8df_actividadcalendarios", "cr391_calendario2s")
+    .\Get-RelatedTables.ps1 -Tables @("cr8df_actividadcalendario", "cr391_calendario2")
 #>
 
 param(
     [Parameter(Mandatory=$false)]
-    [string[]]$Tables = @("cr8df_actividadcalendarios", "cr391_calendario2s", "cr391_casosfluentpivots", "cr8df_usuarios")
+    # IMPORTANTE: Asegúrate de usar los nombres en SINGULAR (Logical Names) aquí
+    [string[]]$Tables = @("cr8df_actividadcalendario", "cr391_calendario2", "cr391_casosfluentpivot", "cr8df_usuario")
 )
 
 $ErrorActionPreference = "Stop"
@@ -75,10 +77,20 @@ foreach ($table in $Tables) {
     
     try {
         # Obtener metadata de la tabla
-        $metadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalCollectionName='$table')?`$select=LogicalName&`$expand=ManyToOneRelationships(`$select=ReferencingEntity,ReferencedEntity),OneToManyRelationships(`$select=ReferencingEntity,ReferencedEntity),ManyToManyRelationships(`$select=Entity1LogicalName,Entity2LogicalName)"
+        # CAMBIO 1: Usamos Filter (Búsqueda) para evitar error fatal si no existe
+        $metadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions?`$filter=LogicalName eq '$table'&`$select=LogicalName&`$expand=ManyToOneRelationships(`$select=ReferencingEntity,ReferencedEntity),OneToManyRelationships(`$select=ReferencingEntity,ReferencedEntity),ManyToManyRelationships(`$select=Entity1LogicalName,Entity2LogicalName)"
         
-        $metadata = Invoke-RestMethod -Uri $metadataUrl -Headers $headers -Method Get
+        $response = Invoke-RestMethod -Uri $metadataUrl -Headers $headers -Method Get
         
+        # CAMBIO 2: Verificación de existencia
+        if ($response.value.Count -eq 0) {
+            Write-Warning "    ⛔ La tabla '$table' NO FUE ENCONTRADA en el entorno. Revisa si el nombre termina en 's' o si es singular."
+            continue # Salta a la siguiente tabla sin romper el script
+        }
+
+        # Asignamos el primer resultado a $metadata
+        $metadata = $response.value[0]
+
         # Procesar Many-to-One (Lookups)
         $lookups = $metadata.ManyToOneRelationships | Where-Object { $_.ReferencedEntity -ne 'systemuser' -and $_.ReferencedEntity -ne 'businessunit' -and $_.ReferencedEntity -ne 'owner' }
         foreach ($lookup in $lookups) {
@@ -107,7 +119,8 @@ foreach ($table in $Tables) {
         Write-Host "    ✓ Análisis completado" -ForegroundColor Green
         
     } catch {
-        Write-Warning "    ⚠ Error analizando $table: $_"
+        # CAMBIO 3: Corrección de sintaxis ${table}
+        Write-Warning "    ⚠ Error analizando ${table}: $_"
     }
 }
 

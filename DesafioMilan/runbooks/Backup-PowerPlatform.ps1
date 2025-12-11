@@ -8,14 +8,11 @@
     - Aplicaciones Canvas/Model-Driven
     - Flujos de Power Automate
     - Tablas críticas de Dataverse (JSON)
+    - Tablas relacionadas (JSON)
     
     Los datos se comprimen y suben a Azure Blob Storage.
 
 .NOTES
-    Autor: Milan Kurte
-    Fecha: Diciembre 2025
-    Versión: 1.0
-    
     Requisitos:
     - Service Principal con permisos en Power Platform
     - Managed Identity con acceso a Storage Account
@@ -27,25 +24,14 @@ param()
 # ==========================================
 # CONFIGURACIÓN INICIAL
 # ==========================================
-
-# CRÍTICO: No usar Stop hasta validar módulos
 $ErrorActionPreference = "Continue"
 $VerbosePreference = "Continue"
 $WarningPreference = "Continue"
 
-$date = Get-Date -Format "yyyyMMdd_HHmmss"
+$date = Get-Date -Format "dd-MM-yyyy HH-mm-ss"
 $tempPath = "$env:TEMP\PowerPlatform_$date"
 
-# Forzar output inmediato
-Write-Output "======================================"
-Write-Output "RUNBOOK INICIADO"
-Write-Output "======================================"
-Write-Output "Timestamp: $date"
-Write-Output "PowerShell Version: $($PSVersionTable.PSVersion)"
-Write-Output "Execution Policy: $(Get-ExecutionPolicy)"
-Write-Output ""
-
-# Variables de tracking para logs detallados
+# Variables de tracking para logs
 $script:executionLog = @()
 $script:errorDetails = @()
 
@@ -118,13 +104,12 @@ Write-Output "Inicio de Backup Power Platform"
 Write-Output "Fecha: $date"
 Write-Output "======================================"
 
-Write-DetailedLog "Iniciando proceso de backup" "INFO"
 
 # ==========================================
 # PASO 0: VALIDAR ENTORNO
 # ==========================================
 
-Write-Output "`n[0/6] Validando entorno de ejecución..."
+Write-Output "`n 0/6 Validando entorno de ejecución..."
 Write-DetailedLog "PASO 0: Validación de prerequisitos" "INFO"
 
 try {
@@ -145,10 +130,10 @@ try {
         $module = Get-Module -ListAvailable -Name $moduleName -ErrorAction SilentlyContinue
         
         if ($module) {
-            Write-Output "      ✓ Disponible: v$($module.Version)"
+            Write-Output "       Disponible: v$($module.Version)"
             Write-DetailedLog "  Módulo $moduleName disponible: v$($module.Version)" "SUCCESS"
         } else {
-            Write-Output "      ✗ NO ENCONTRADO: $moduleName"
+            Write-Output "       NO ENCONTRADO: $moduleName"
             Write-DetailedLog "  Módulo $moduleName NO ENCONTRADO" "ERROR"
             $missingModules += $moduleName
         }
@@ -156,7 +141,7 @@ try {
     
     if ($missingModules.Count -gt 0) {
         Write-Output ""
-        Write-Output "  ✗ MÓDULOS FALTANTES:"
+        Write-Output "  MÓDULOS FALTANTES:"
         foreach ($missing in $missingModules) {
             Write-Output "    - $missing"
         }
@@ -170,7 +155,7 @@ try {
         throw "Módulos requeridos no están disponibles. Importa los módulos antes de ejecutar."
     }
     
-    Write-Output "  ✓ Todos los módulos requeridos están disponibles"
+    Write-Output "  Todos los módulos requeridos están disponibles"
     Write-DetailedLog "Validación de módulos completada" "SUCCESS"
     
     # Validar contexto de Automation
@@ -179,22 +164,22 @@ try {
     Write-DetailedLog "Validando contexto de ejecución" "INFO"
     
     if ($env:AUTOMATION_ASSET_ACCOUNTID) {
-        Write-Output "    ✓ Ejecutando en Azure Automation Account"
+        Write-Output "    Ejecutando en Azure Automation Account"
         Write-Output "      Account ID: $env:AUTOMATION_ASSET_ACCOUNTID"
         Write-DetailedLog "  Contexto: Azure Automation (Account ID: $env:AUTOMATION_ASSET_ACCOUNTID)" "SUCCESS"
     } else {
-        Write-Output "    ⚠ NO ejecutando en Azure Automation (test local?)"
+        Write-Output "    NO ejecutando en Azure Automation (test local?)"
         Write-DetailedLog "  Contexto: Ejecución local/manual" "WARNING"
     }
     
     Write-Output ""
-    Write-Output "  ✓ Validación de entorno completada"
+    Write-Output "  Validación de entorno completada"
     Write-DetailedLog "Prerequisitos validados exitosamente" "SUCCESS"
     
   } catch {
     Write-ErrorDetail "Paso 0 - Validación de Entorno" $_
     Write-Output ""
-    Write-Output "✗ FALLO EN VALIDACIÓN DE ENTORNO"
+    Write-Output "FALLO EN VALIDACIÓN DE ENTORNO"
     Write-Output "  No se puede continuar sin los módulos requeridos"
     Write-Output ""
     throw
@@ -230,35 +215,35 @@ try {
             throw "Client Secret en PP-ServicePrincipal está vacío"
         }
         
-        Write-Output "      ✓ Obtenido: (${clientSecret.Length} caracteres)"
-        Write-DetailedLog "  ✓ Client Secret obtenido (${clientSecret.Length} chars)" "SUCCESS"
+        Write-Output "      Obtenido: (${clientSecret.Length} caracteres)"
+        Write-DetailedLog "  Client Secret obtenido (${clientSecret.Length} chars)" "SUCCESS"
         
         # Leer TenantId
         Write-DetailedLog "Obteniendo variable: PP-ServicePrincipal-TenantId" "INFO"
         $tenantId = Get-AutomationVariable -Name "PP-ServicePrincipal-TenantId" -ErrorAction Stop
-        Write-DetailedLog "  ✓ TenantId obtenido: $($tenantId.Substring(0,8))..." "SUCCESS"
+        Write-DetailedLog "  TenantId obtenido: $($tenantId.Substring(0,8))..." "SUCCESS"
         
         # Leer Environment Name
         Write-DetailedLog "Obteniendo variable: PP-EnvironmentName" "INFO"
         $environmentName = Get-AutomationVariable -Name "PP-EnvironmentName" -ErrorAction Stop
-        Write-DetailedLog "  ✓ Environment Name: $environmentName" "SUCCESS"
+        Write-DetailedLog "  Environment Name: $environmentName" "SUCCESS"
         
         # Leer Solution Name
         Write-DetailedLog "Obteniendo variable: PP-SolutionName" "INFO"
         $solutionName = Get-AutomationVariable -Name "PP-SolutionName" -ErrorAction Stop
-        Write-DetailedLog "  ✓ Solution Name: $solutionName" "SUCCESS"
+        Write-DetailedLog "  Solution Name: $solutionName" "SUCCESS"
         
         # Leer Dataverse URL
         Write-DetailedLog "Obteniendo variable: PP-DataverseUrl" "INFO"
         $dataverseUrl = Get-AutomationVariable -Name "PP-DataverseUrl" -ErrorAction Stop
-        Write-DetailedLog "  ✓ Dataverse URL: $dataverseUrl" "SUCCESS"
+        Write-DetailedLog "  Dataverse URL: $dataverseUrl" "SUCCESS"
         
         # Leer Storage Account Name
         Write-DetailedLog "Obteniendo variable: StorageAccountName" "INFO"
         $storageAccountName = Get-AutomationVariable -Name "StorageAccountName" -ErrorAction Stop
-        Write-DetailedLog "  ✓ Storage Account: $storageAccountName" "SUCCESS"
+        Write-DetailedLog "  Storage Account: $storageAccountName" "SUCCESS"
         
-        Write-Output "  ✓ Variables cargadas exitosamente"
+        Write-Output "  Variables cargadas exitosamente"
         Write-Output "    - Environment: $environmentName"
         Write-Output "    - Solution: $solutionName"
         Write-Output "    - Dataverse URL: $dataverseUrl"
@@ -267,7 +252,7 @@ try {
     } catch {
         Write-ErrorDetail "Paso 1 - Leer Variables" $_
         Write-Output ""
-        Write-Output "✗ [PASO 1 ERROR] No se pudieron leer variables de Automation"
+        Write-Output "[PASO 1 ERROR] No se pudieron leer variables de Automation"
         Write-Output "Variable problemática: $($_.Exception.ItemName)"
         Write-Output ""
         Write-Output "Posibles causas:"
@@ -290,7 +275,7 @@ try {
         Write-Output "  [2a] Autenticando con Managed Identity..."
         Write-DetailedLog "Conectando a Azure con Managed Identity" "INFO"
         Connect-AzAccount -Identity -ErrorAction Stop | Out-Null
-        Write-Output "    ✓ Conectado a Azure con Managed Identity"
+        Write-Output "    Conectado a Azure con Managed Identity"
         
         # Convertir Client Secret a SecureString
         $securePassword = ConvertTo-SecureString -String $clientSecret -AsPlainText -Force
@@ -300,7 +285,7 @@ try {
         Write-Output "  [2b] Conectando a Power Platform..."
         Add-PowerAppsAccount -TenantID $tenantId -ApplicationId $appId -ClientSecret $clientSecret
         
-        Write-Output "  ✓ Conectado a Power Platform"
+        Write-Output "  Conectado a Power Platform"
         Write-Output "    - Tenant: $tenantId"
         Write-Output "    - App ID: $appId"
         Write-Output "    - Environment: $environmentName"
@@ -353,11 +338,11 @@ try {
                 $ppTokenResponse = Invoke-RestMethod -Uri $ppTokenUrl -Method Post -Body $ppTokenBody -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
                 $ppToken = $ppTokenResponse.access_token
                 
-                Write-DetailedLog "  ✓ Token de Power Platform API obtenido" "SUCCESS"
-                Write-Output "    ✓ Token de Power Platform API obtenido"
+                Write-DetailedLog "  Token de Power Platform API obtenido" "SUCCESS"
+                Write-Output "    Token de Power Platform API obtenido"
             } catch {
                 $errorDetails = $_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue
-                Write-Output "    ✗ ERROR obteniendo token de Power Platform API:"
+                Write-Output "    ERROR obteniendo token de Power Platform API:"
                 Write-Output "      HTTP Status: $($_.Exception.Response.StatusCode.value__)"
                 Write-Output "      Mensaje: $($_.Exception.Message)"
                 if ($errorDetails) {
@@ -383,7 +368,7 @@ try {
                 
                 if (-not [string]::IsNullOrEmpty($dataverseUrlFromApi)) {
                     $dataverseUrl = $dataverseUrlFromApi
-                    Write-Output "    ✓ Dataverse URL obtenida dinámicamente: $dataverseUrl"
+                    Write-Output "    Dataverse URL obtenida dinámicamente: $dataverseUrl"
                 } else {
                     throw "API no devolvió instanceUrl en response"
                 }
@@ -416,7 +401,7 @@ try {
             }
         } catch {
             # Fallback: usar URL de variable si API falla
-            Write-Output "  ⚠ Power Platform API no disponible - usando fallback"
+            Write-Output "  Power Platform API no disponible - usando fallback"
             Write-Output "  URL de variable: $dataverseUrl"
             Write-Output "  El backup continuará normalmente con URL hardcoded"
         }
@@ -440,7 +425,7 @@ try {
         $tokenResponse = Invoke-RestMethod -Uri $tokenUrl -Method Post -Body $tokenBody -ContentType "application/x-www-form-urlencoded"
         $accessToken = $tokenResponse.access_token
         
-        Write-Output "    ✓ Token obtenido exitosamente"
+        Write-Output "    Token obtenido exitosamente"
         
         # Headers para API de Dataverse
         $headers = @{
@@ -462,7 +447,7 @@ try {
         
         $solutionId = $solutionResponse.value[0].solutionid
         $solutionVersion = $solutionResponse.value[0].version
-        Write-Output "    ✓ Solución encontrada: ID=$solutionId, Version=$solutionVersion"
+        Write-Output "    Solución encontrada: ID=$solutionId, Version=$solutionVersion"
         
         # Inicializar con la solución principal
         $solutionsToExport = @($solutionName)
@@ -495,7 +480,7 @@ try {
                     if (-not $pcfSolution.ismanaged -and $pcfSolution.uniquename -ne $solutionName) {
                         $solutionsToExport += $pcfSolution.uniquename
                         $pcfSolutionNames += $pcfSolution.uniquename
-                        Write-Output "      ✓ PCF solution agregada: $($pcfSolution.uniquename)"
+                        Write-Output "      PCF solution agregada: $($pcfSolution.uniquename)"
                         Write-DetailedLog "PCF solution agregada: $($pcfSolution.uniquename)" "SUCCESS"
                     } else {
                         Write-Output "      • PCF en misma solución o managed: $($pcfSolution.uniquename)"
@@ -506,7 +491,7 @@ try {
                 Write-DetailedLog "No se encontraron PCF controls (componenttype=66)" "INFO"
             }
         } catch {
-            Write-Output "    ⚠ Error detectando PCF (continuando con solución principal): $($_.Exception.Message)"
+            Write-Output "    Error detectando PCF (continuando con solución principal): $($_.Exception.Message)"
             Write-DetailedLog "Error en detección de PCF: $($_.Exception.Message)" "ERROR"
         }
         
@@ -584,7 +569,7 @@ try {
                 $solutionZipBase64 = $exportResponse.ExportSolutionFile
                 
                 if ([string]::IsNullOrEmpty($solutionZipBase64)) {
-                    Write-Output "      ⚠ Sin datos para '$solToExport'"
+                    Write-Output "      Sin datos para '$solToExport'"
                     continue
                 }
                 
@@ -594,15 +579,15 @@ try {
                 [System.IO.File]::WriteAllBytes($solutionPath, $solutionBytes)
                 
                 $solSize = [Math]::Round((Get-Item $solutionPath).Length / 1MB, 2)
-                Write-Output "      ✓ Exportado: $solSize MB"
+                Write-Output "      Exportado: $solSize MB"
                 $exportedCount++
                 
             } catch {
-                Write-Output "      ⚠ Error: $($_.Exception.Message)"
+                Write-Output "      Error: $($_.Exception.Message)"
             }
         }
         
-        Write-Output "  ✓ Soluciones exportadas: $exportedCount de $($solutionsToExport.Count)"
+        Write-Output "  Soluciones exportadas: $exportedCount de $($solutionsToExport.Count)"
         Write-DetailedLog "Exportación de soluciones completada: $exportedCount exportadas" "SUCCESS"
         
     } catch {
@@ -628,24 +613,42 @@ try {
     try {
         Write-Output "  Dataverse URL: $dataverseUrl"
         
-        # Tablas críticas principales (PERSONALIZAR según necesidades)
-        $criticalTables = @("cr8df_actividadcalendarios", "cr391_calendario2s", "cr391_casosfluentpivots", "cr8df_usuarios")
+        # Tablas críticas principales (LogicalName - singular)
+        $criticalTables = @("cr8df_actividadcalendario", "cr391_calendario2", "cr391_casosfluentpivot", "cr8df_usuario")
         Write-Output "  Tablas críticas: $($criticalTables.Count)"
         
         # Detectar tablas relacionadas automáticamente
-        Write-Output "  [4a] Detectando relaciones automáticamente..."
+        Write-Output "  [4a] Detectando relaciones y obteniendo EntitySetNames..."
+        
+        # Mapa de LogicalName → EntitySetName (necesario para queries OData)
+        $tableNameMap = @{}
+        
+        # Obtener EntitySetName para cada tabla crítica
+        foreach ($table in $criticalTables) {
+            try {
+                $metadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$table')?`$select=LogicalName,EntitySetName"
+                $entityDef = Invoke-RestMethod -Uri $metadataUrl -Method Get -Headers $headers -ErrorAction Stop
+                $tableNameMap[$table] = $entityDef.EntitySetName
+                Write-Output "    • $table → $($entityDef.EntitySetName)"
+            } catch {
+                # Fallback: asumir plural con 's' si falla
+                $tableNameMap[$table] = "${table}s"
+                Write-Output "    • $table → ${table}s (fallback)"
+            }
+        }
         
         $allTablesToExport = @($criticalTables)
         $relatedTablesFound = @()
         
         foreach ($table in $criticalTables) {
             try {
-                # Obtener metadata de relaciones Many-to-One (N:1 - lookup fields)
-                $metadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$table')/ManyToOneRelationships?`$select=ReferencedEntity,ReferencingEntity"
+                # === RELACIONES N:1 (Many-to-One) - Tablas padre ===
+                # Obtener tablas que las críticas REFERENCIAN (lookups en tablas críticas)
+                $n1Url = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$table')/ManyToOneRelationships?`$select=ReferencedEntity,ReferencingEntity"
                 
-                $relationships = Invoke-RestMethod -Uri $metadataUrl -Method Get -Headers $headers -ErrorAction SilentlyContinue
+                $n1Relationships = Invoke-RestMethod -Uri $n1Url -Method Get -Headers $headers -ErrorAction SilentlyContinue
                 
-                foreach ($rel in $relationships.value) {
+                foreach ($rel in $n1Relationships.value) {
                     $relatedTable = $rel.ReferencedEntity
                     
                     # Filtrar tablas del sistema y duplicados
@@ -656,9 +659,52 @@ try {
                         $relatedTable -ne 'owner' -and
                         $allTablesToExport -notcontains $relatedTable) {
                         
+                        # Obtener EntitySetName para la tabla relacionada
+                        try {
+                            $relMetadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$relatedTable')?`$select=LogicalName,EntitySetName"
+                            $relEntityDef = Invoke-RestMethod -Uri $relMetadataUrl -Method Get -Headers $headers -ErrorAction Stop
+                            $tableNameMap[$relatedTable] = $relEntityDef.EntitySetName
+                        } catch {
+                            # Fallback
+                            $tableNameMap[$relatedTable] = "${relatedTable}s"
+                        }
+                        
                         $allTablesToExport += $relatedTable
                         $relatedTablesFound += $relatedTable
-                        Write-Output "    ↳ Relación detectada: $table → $relatedTable"
+                        Write-Output "    ↳ N:1 - $table → $relatedTable (parent)"
+                    }
+                }
+                
+                # === RELACIONES 1:N (One-to-Many) - Tablas hijo ===
+                # Obtener tablas que REFERENCIAN a las críticas (lookups a tablas críticas)
+                $1nUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$table')/OneToManyRelationships?`$select=ReferencedEntity,ReferencingEntity"
+                
+                $1nRelationships = Invoke-RestMethod -Uri $1nUrl -Method Get -Headers $headers -ErrorAction SilentlyContinue
+                
+                foreach ($rel in $1nRelationships.value) {
+                    $relatedTable = $rel.ReferencingEntity
+                    
+                    # Filtrar tablas del sistema y duplicados
+                    if ($relatedTable -and 
+                        $relatedTable -notlike 'system*' -and
+                        $relatedTable -ne 'organization' -and
+                        $relatedTable -ne 'businessunit' -and
+                        $relatedTable -ne 'owner' -and
+                        $allTablesToExport -notcontains $relatedTable) {
+                        
+                        # Obtener EntitySetName para la tabla relacionada
+                        try {
+                            $relMetadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$relatedTable')?`$select=LogicalName,EntitySetName"
+                            $relEntityDef = Invoke-RestMethod -Uri $relMetadataUrl -Method Get -Headers $headers -ErrorAction Stop
+                            $tableNameMap[$relatedTable] = $relEntityDef.EntitySetName
+                        } catch {
+                            # Fallback
+                            $tableNameMap[$relatedTable] = "${relatedTable}s"
+                        }
+                        
+                        $allTablesToExport += $relatedTable
+                        $relatedTablesFound += $relatedTable
+                        Write-Output "    ↳ 1:N - $table ← $relatedTable (child)"
                     }
                 }
             } catch {
@@ -684,13 +730,19 @@ try {
         $errorCount = 0
         $totalRecords = 0
         
-        foreach ($table in $allTablesToExport) {
+        foreach ($logicalName in $allTablesToExport) {
             try {
-                Write-Output "    • Procesando: $table"
-                Write-DetailedLog "Exportando tabla: $table" "INFO"
+                # Obtener EntitySetName del mapa (para query OData)
+                $entitySetName = $tableNameMap[$logicalName]
+                if (-not $entitySetName) {
+                    $entitySetName = "${logicalName}s"  # Fallback
+                }
                 
-                # Construir URL de API Web de Dataverse (usar nombre de colección tal cual)
-                $apiUrl = "$dataverseUrl/api/data/v9.2/$table`?`$select=*"
+                Write-Output "    • Procesando: $logicalName ($entitySetName)"
+                Write-DetailedLog "Exportando tabla: $logicalName → $entitySetName" "INFO"
+                
+                # Construir URL de API Web de Dataverse (usar EntitySetName - plural)
+                $apiUrl = "$dataverseUrl/api/data/v9.2/$entitySetName`?`$select=*"
                 
                 # Hacer request con autenticación usando el mismo token de Dataverse
                 $headers = @{
@@ -700,21 +752,23 @@ try {
                 }
                 
                 $response = Invoke-RestMethod -Uri $apiUrl -Method Get -Headers $headers
-                $response.value | ConvertTo-Json -Depth 10 | Out-File "$dataversePath\$table.json" -Encoding UTF8
+                
+                # Guardar con LogicalName para consistencia
+                $response.value | ConvertTo-Json -Depth 10 | Out-File "$dataversePath\$logicalName.json" -Encoding UTF8
                 
                 $recordCount = $response.value.Count
                 $totalRecords += $recordCount
-                Write-Output "      ✓ Exportada: $recordCount registros"
+                Write-Output "      Exportada: $recordCount registros"
                 $exportedCount++
             } catch {
-                Write-Warning "      ⚠ Error exportando $table"
+                Write-Warning "      Error exportando $logicalName"
                 Write-Warning "      Detalle: $($_.Exception.Message)"
                 Write-Warning "      API URL: $apiUrl"
                 $errorCount++
             }
         }
         
-        Write-Output "  ✓ Tablas procesadas: $exportedCount de $($allTablesToExport.Count) exitosas, $errorCount errores"
+        Write-Output "  Tablas procesadas: $exportedCount de $($allTablesToExport.Count) exitosas, $errorCount errores"
         Write-Output "  Total registros exportados: $totalRecords"
         
         if ($errorCount -eq $allTablesToExport.Count) {
@@ -732,7 +786,7 @@ try {
         throw
     }
     
-    Write-Output "  ✓ Exportación de Dataverse completada"
+    Write-Output "  Exportación de Dataverse completada"
     
     # ==========================================
     # 5. COMPRIMIR Y SUBIR A STORAGE
@@ -752,7 +806,7 @@ try {
         Compress-Archive -Path "$tempPath\*" -DestinationPath $zipPath -CompressionLevel Optimal
         $backupSize = [Math]::Round((Get-Item $zipPath).Length / 1MB, 2)
         
-        Write-DetailedLog "  ✓ Backup comprimido: $backupSize MB" "SUCCESS"
+        Write-DetailedLog "  Backup comprimido: $backupSize MB" "SUCCESS"
         Write-Output "  Backup comprimido: $backupSize MB"
         
         # Obtener Storage Account Key desde Automation Variables
@@ -763,11 +817,11 @@ try {
         Write-Output "  Conectado a Storage Account: $storageAccountName"
         
         # Subir a blob
-        Write-DetailedLog "Subiendo backup a Azure Storage" "INFO"
-        Write-DetailedLog "  Storage Account: $storageAccountName" "INFO"
-        Write-DetailedLog "  Container: pp-backup" "INFO"
-        Write-DetailedLog "  Blob: $zipFileName" "INFO"
-        Write-DetailedLog "  Tamaño: $backupSize MB" "INFO"
+        Write-DetailedLog "Subiendo backup a Azure Storage"
+        Write-DetailedLog "  Storage Account: $storageAccountName"
+        Write-DetailedLog "  Container: pp-backup"
+        Write-DetailedLog "  Blob: $zipFileName"
+        Write-DetailedLog "  Tamaño: $backupSize MB"
         
         Set-AzStorageBlobContent `
             -File $zipPath `
@@ -777,10 +831,10 @@ try {
             -BlobType Block `
             -Force | Out-Null
         
-        Write-DetailedLog "  ✓ Backup subido exitosamente" "SUCCESS"
+        Write-DetailedLog "  Backup subido exitosamente" "SUCCESS"
         
         $sizeMsg = "$backupSize MB"
-        Write-Output "  ✓ Backup subido: $zipFileName"
+        Write-Output "  Backup subido: $zipFileName"
         Write-Output "    - Tamano: $sizeMsg"
         Write-Output "    - Container: pp-backup"
         Write-Output "    - Blob: $zipFileName"
@@ -833,7 +887,7 @@ try {
             -Context $ctx `
             -Force | Out-Null
         
-        Write-Output "  ✓ Log guardado en: logs/powerplatform/$logFileName"
+        Write-Output "  Log guardado en: logs/powerplatform/$logFileName"
     } catch {
         Write-Warning "[PASO 6 WARNING] No se pudo guardar log (backup completado, pero sin log)"
         Write-Warning "Detalle: $($_.Exception.Message)"
@@ -847,10 +901,10 @@ try {
     Remove-Item -Path $tempPath -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -Path $zipPath -Force -ErrorAction SilentlyContinue
     Remove-Item -Path $logPath -Force -ErrorAction SilentlyContinue
-    Write-Output "  ✓ Archivos temporales eliminados"
+    Write-Output "  Archivos temporales eliminados"
     
     Write-Output "`n======================================"
-    Write-Output "✓ BACKUP COMPLETADO EXITOSAMENTE"
+    Write-Output "BACKUP COMPLETADO EXITOSAMENTE"
     Write-Output "======================================"
     Write-Output ""
     Write-Output "SOLUCIONES EXPORTADAS:"
@@ -905,7 +959,7 @@ try {
     Write-Output "    - $($solutionsToExport.Count) archivo(s) .zip de soluciones"
     Write-Output "    - $totalTablas archivo(s) .json de tablas"
     Write-Output ""
-    Write-Output "PRÓXIMOS PASOS:"
+    Write-Output "Extras:"
     Write-Output "  1. Verificar backup en Azure Portal → Storage Account → pp-backup"
     Write-Output "  2. Revisar logs en: Storage Account → logs/powerplatform/"
     Write-Output "  3. Para restaurar: Ejecutar runbook 'Restore-PowerPlatform'"
@@ -913,7 +967,7 @@ try {
     
 } catch {
     Write-Output "`n======================================"
-    Write-Output "✗ ERROR EN BACKUP - PROCESO ABORTADO"
+    Write-Output "ERROR EN BACKUP - PROCESO ABORTADO"
     Write-Output "======================================"
     Write-Output ""
     Write-Output "ERROR DETALLADO:"
@@ -958,7 +1012,7 @@ try {
         $errorLogPath = "$env:TEMP\$errorLogFileName"
         $errorLogContent | Out-File -FilePath $errorLogPath -Encoding UTF8
         
-        Write-Output "✓ Log de error generado localmente"
+        Write-Output "Log de error generado localmente"
         Write-DetailedLog "Log de error guardado: $errorLogPath" "INFO"
         
         # Intentar subir log de error
@@ -972,25 +1026,14 @@ try {
                 -Context $ctx `
                 -Force | Out-Null
             
-            Write-Output "✓ Log de error guardado en: logs/powerplatform/errors/$errorLogFileName"
+            Write-Output "Log de error guardado en: logs/powerplatform/errors/$errorLogFileName"
             Write-DetailedLog "Log de error subido a Storage" "SUCCESS"
         } else {
-            Write-Output "⚠ Storage context no disponible - log solo guardado localmente"
+            Write-Output "Storage context no disponible - log solo guardado localmente"
         }
     } catch {
         Write-Warning "No se pudo guardar log de error: $($_.Exception.Message)"
     }
-    
-    Write-Output ""
-    Write-Output "======================================"
-    Write-Output "INFORMACIÓN DE DIAGNÓSTICO:"
-    Write-Output "======================================"
-    Write-Output "Para diagnosticar el error, revisa:"
-    Write-Output "  1. Azure Portal → Automation Account → Jobs → [Este job] → Output"
-    Write-Output "  2. Storage Account → logs/powerplatform/errors/"
-    Write-Output "  3. Verifica variables en: Automation Account → Variables"
-    Write-Output "  4. Confirma permisos en: Entra ID → App registrations"
-    Write-Output "======================================"
     
     throw
 }
