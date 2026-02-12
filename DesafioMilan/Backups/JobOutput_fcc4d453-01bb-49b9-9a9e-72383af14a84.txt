@@ -1,0 +1,1414 @@
+15/1/2026, 09:45:33 - Output: 🔒 Lock file creado: C:\Users\ContainerAdministrator\AppData\Local\Temp\restore-powerplatform.lock
+15/1/2026, 09:45:33 - Output: 
+15/1/2026, 09:45:34 - Output: ==========================================
+15/1/2026, 09:45:34 - Output: RESTORE POWER PLATFORM - INICIO
+15/1/2026, 09:45:34 - Output: ==========================================
+15/1/2026, 09:45:34 - Output: Fecha/Hora: 15-01-2026 12:45:34
+15/1/2026, 09:45:34 - Output: Backup File: PowerPlatform_Backup_19-12-2025 18-05-12.zip
+15/1/2026, 09:45:34 - Output: Modo Restore: NewEnvironment
+15/1/2026, 09:45:34 - Output: Force: False
+15/1/2026, 09:45:35 - Output: ==========================================
+15/1/2026, 09:45:35 - Output: 
+15/1/2026, 09:45:35 - Output: 
+15/1/2026, 09:45:35 - Output: ==========================================
+15/1/2026, 09:45:35 - Output: PASO 0: VALIDAR ENTORNO
+15/1/2026, 09:45:35 - Output: ==========================================
+15/1/2026, 09:45:35 - Output: Validando módulos PowerShell...
+15/1/2026, 09:45:36 - Output:   Az.Accounts
+15/1/2026, 09:45:37 - Output:   Az.Storage
+15/1/2026, 09:45:37 - Output:   Microsoft.PowerApps.Administration.PowerShell
+15/1/2026, 09:45:37 - Output: 
+15/1/2026, 09:45:37 - Output: Validando parámetros para modo NewEnvironment...
+15/1/2026, 09:45:37 - Output:   Modo: Continuar restore en environment existente 'd0d4c85a-09f2-f011-89f6-00224836e4e5'
+15/1/2026, 09:45:37 - Output:   GUID válido: d0d4c85a-09f2-f011-89f6-00224836e4e5
+15/1/2026, 09:45:37 - Output: 
+15/1/2026, 09:45:37 - Output: Validación de entorno completada
+15/1/2026, 09:45:37 - Output: 
+15/1/2026, 09:45:37 - Output: ==========================================
+15/1/2026, 09:45:37 - Output: PASO 1: LEER VARIABLES DE AUTOMATION
+15/1/2026, 09:45:37 - Output: ==========================================
+15/1/2026, 09:45:40 - Output:   [OK] Service Principal: $appId
+15/1/2026, 09:45:40 - Output:   [OK] Tenant ID: $tenantId
+15/1/2026, 09:45:40 - Output:   [OK] Storage Account: $storageAccountName
+15/1/2026, 09:45:40 - Output: 
+15/1/2026, 09:45:40 - Output: 
+15/1/2026, 09:45:40 - Output: ==========================================
+15/1/2026, 09:45:40 - Output: PASO 2: AUTENTICAR
+15/1/2026, 09:45:40 - Output: ==========================================
+15/1/2026, 09:45:40 - Output: Autenticando en Azure con Managed Identity...
+15/1/2026, 09:45:44 - Output:   Azure autenticado (Managed Identity)
+15/1/2026, 09:45:44 - Output: 
+15/1/2026, 09:45:44 - Output: Autenticando en Power Platform con Service Principal...
+15/1/2026, 09:45:44 - Warning: The names of some imported commands from the module 'Microsoft.PowerApps.AuthModule' include unapproved verbs that might make them less discoverable. To find the commands with unapproved verbs, run the Import-Module command again with the Verbose parameter. For a list of approved verbs, type Get-Verb.
+15/1/2026, 09:45:45 - Output:   Power Platform autenticado
+15/1/2026, 09:45:45 - Output: 
+15/1/2026, 09:45:46 - Output: Verificando permisos de administrador...
+15/1/2026, 09:45:47 - Output:   Service Principal tiene permisos de Power Platform Admin
+15/1/2026, 09:45:47 - Output: 
+15/1/2026, 09:45:47 - Output: 
+15/1/2026, 09:45:47 - Output: ==========================================
+15/1/2026, 09:45:47 - Output: PASO 3: DESCARGAR Y EXTRAER BACKUP
+15/1/2026, 09:45:47 - Output: ==========================================
+15/1/2026, 09:45:48 - Warning: You're using Az.Storage version 6.1.0. The latest version of Az.Storage is 9.5.0. Upgrade your Az modules using the following commands:
+  Update-PSResource Az.* -WhatIf    -- Simulate updating your Az modules.
+  Update-PSResource Az.*            -- Update your Az modules.
+15/1/2026, 09:45:48 - Output: Descargando backup desde Storage Account...
+15/1/2026, 09:45:49 - Output:   Container: pp-backup
+15/1/2026, 09:45:49 - Output:   Archivo: PowerPlatform_Backup_19-12-2025 18-05-12.zip
+15/1/2026, 09:45:50 - Output:   Archivo descargado: 9.12 MB
+15/1/2026, 09:45:50 - Output: 
+15/1/2026, 09:45:50 - Output: Extrayendo archivos...
+15/1/2026, 09:45:52 - Output:   Archivos extraídos: 526
+15/1/2026, 09:45:52 - Output: 
+15/1/2026, 09:45:52 - Output:   📋 Leyendo metadata del backup (environment-config.json)...
+15/1/2026, 09:45:52 - Output:     ✓ Backup Version: 5.0
+15/1/2026, 09:45:52 - Output:     ✓ Fecha: 19-12-2025 18-05-12
+15/1/2026, 09:45:52 - Output:     ✓ Organization: 660b64c6-c0d9-f011-89f6-002248e0aee4
+15/1/2026, 09:45:52 - Output:     ✓ Soluciones: 2
+15/1/2026, 09:45:53 - Output:     ✓ Tablas custom: 498
+15/1/2026, 09:45:53 - Output:     ✓ Registros: 61356
+15/1/2026, 09:45:53 - Output:     ⚠ Fórmulas removidas: 1
+15/1/2026, 09:45:53 - Output:       (deberán recrearse manualmente después del restore)
+15/1/2026, 09:45:53 - Output: 
+15/1/2026, 09:45:53 - Output: ==========================================
+15/1/2026, 09:45:53 - Output: PASO 4: ENVIRONMENT Y DATAVERSE URL
+15/1/2026, 09:45:53 - Output: =========================================
+15/1/2026, 09:45:53 - Output: Continuando restore en environment existente...
+15/1/2026, 09:45:53 - Output:   Environment ID: d0d4c85a-09f2-f011-89f6-00224836e4e5
+15/1/2026, 09:45:53 - Output: 
+15/1/2026, 09:45:53 - Output:   [5a] Obteniendo información del environment...
+15/1/2026, 09:45:53 - Output:     Método 1: Consultando Discovery Service...
+15/1/2026, 09:45:54 - Output:     ✓ Environment encontrado vía Discovery Service
+15/1/2026, 09:45:54 - Output:       Display Name: Dev-06
+15/1/2026, 09:45:54 - Output:       Region: SAM
+15/1/2026, 09:45:54 - Output:       Type: 
+15/1/2026, 09:45:54 - Output:       State: 0
+15/1/2026, 09:45:54 - Output:       Dataverse URL: https://org6df5329d.crm2.dynamics.com
+15/1/2026, 09:45:54 - Output: 
+15/1/2026, 09:45:54 - Output:     [OK] Environment validado exitosamente
+15/1/2026, 09:45:54 - Output:     URL de Dataverse: https://org6df5329d.crm2.dynamics.com
+15/1/2026, 09:45:55 - Output: 
+15/1/2026, 09:45:55 - Output: 
+15/1/2026, 09:45:55 - Output:   [5c] Obteniendo Dataverse URL...
+15/1/2026, 09:45:55 - Output: 
+15/1/2026, 09:45:55 - Output: 
+15/1/2026, 09:45:55 - Output:   [OK] Environment configurado:
+15/1/2026, 09:45:55 - Output:     ID: d0d4c85a-09f2-f011-89f6-00224836e4e5
+15/1/2026, 09:45:55 - Output:     Nombre: Dev-06
+15/1/2026, 09:45:55 - Output:     Dataverse URL: https://org6df5329d.crm2.dynamics.com
+15/1/2026, 09:45:55 - Output:     Creado ahora: No (existente)
+15/1/2026, 09:45:55 - Output: 
+15/1/2026, 09:45:55 - Output:   [5d] Obteniendo access token para Dataverse API...
+15/1/2026, 09:45:55 - Output:       Scope: https://org6df5329d.crm2.dynamics.com/.default
+15/1/2026, 09:45:56 - Output:   Access token obtenido (válido por 2 horas)
+15/1/2026, 09:45:56 - Output: 
+15/1/2026, 09:45:56 - Output: ==========================================
+15/1/2026, 09:45:56 - Output: PASO 6: RESUMEN Y CONFIRMACIÓN
+15/1/2026, 09:45:56 - Output: ==========================================
+15/1/2026, 09:45:56 - Output: 
+15/1/2026, 09:45:56 - Output: DETALLES DEL BACKUP:
+15/1/2026, 09:45:56 - Output:   Archivo: PowerPlatform_Backup_19-12-2025 18-05-12.zip
+15/1/2026, 09:45:56 - Output:   Archivos extraídos: 526
+15/1/2026, 09:45:56 - Output: 
+15/1/2026, 09:45:56 - Output: MODO DE RESTORE: NewEnvironment (Exclusivo)
+15/1/2026, 09:45:56 - Output:   -> Continuando restore en environment existente
+15/1/2026, 09:45:56 - Output:   -> Environment ID: d0d4c85a-09f2-f011-89f6-00224836e4e5
+15/1/2026, 09:45:56 - Output:   -> Nombre: Dev-06
+15/1/2026, 09:45:56 - Output:   -> Solución se importa como nueva
+15/1/2026, 09:45:56 - Output:   -> Datos limpios SIN marcadores
+15/1/2026, 09:45:56 - Output:   -> IDEAL PARA: Prod -> Dev, Disaster Recovery, Testing
+15/1/2026, 09:45:56 - Output: 
+15/1/2026, 09:45:56 - Output: QUE SE VA A RESTAURAR:
+15/1/2026, 09:45:56 - Output:   [OK] Solucion completa (metadata, forms, views, PCF, workflows, etc.)
+15/1/2026, 09:45:56 - Output:   [OK] Datos de ~46 tablas Dataverse
+15/1/2026, 09:45:56 - Output:     -> Datos sin marcadores (environment limpio)
+15/1/2026, 09:45:57 - Output:     -> No afecta datos existentes (environment nuevo o vacio)
+15/1/2026, 09:45:57 - Output: 
+15/1/2026, 09:45:57 - Output: INFORMACIÓN:
+15/1/2026, 09:45:57 - Output:   - Continuando restore en environment previamente creado
+15/1/2026, 09:45:57 - Output:   - Se verificará que Dataverse esté provisionado
+15/1/2026, 09:45:57 - Output: 
+15/1/2026, 09:45:57 - Output: ==========================================
+15/1/2026, 09:45:57 - Output:   Confirmación omitida (ejecución en Azure Automation sin stdin)
+15/1/2026, 09:45:57 - Output: 
+15/1/2026, 09:45:57 - Output: Confirmación recibida - Continuando con restore...
+15/1/2026, 09:45:57 - Output: 
+15/1/2026, 09:45:57 - Output: ==========================================
+15/1/2026, 09:45:57 - Output: PASO 6.5: VERIFICAR Y CREAR PUBLISHERS
+15/1/2026, 09:45:57 - Output: ==========================================
+15/1/2026, 09:45:57 - Output:   Analizando publishers en 2 soluciones...
+15/1/2026, 09:45:57 - Output: 
+15/1/2026, 09:45:57 - Output:   Publishers únicos encontrados: 1
+15/1/2026, 09:45:57 - Output:     •  (nfddata) - Prefix: cr8df
+15/1/2026, 09:45:57 - Output: 
+15/1/2026, 09:45:57 - Output:   Verificando publishers existentes en el environment...
+15/1/2026, 09:45:58 - Output:     🔨 Creando publisher 'nfddata'...
+15/1/2026, 09:45:59 - Output:        ✅ Publisher creado exitosamente
+15/1/2026, 09:45:59 - Output: 
+15/1/2026, 09:45:59 - Output:   ✅ Verificación de publishers completada
+15/1/2026, 09:45:59 - Output: 
+15/1/2026, 09:45:59 - Output: ==========================================
+15/1/2026, 09:45:59 - Output: PASO 6: IMPORTAR SOLUCIONES
+15/1/2026, 09:45:59 - Output: ==========================================
+15/1/2026, 09:45:59 - Output:   Soluciones encontradas en el backup: 2
+15/1/2026, 09:45:59 - Output: 
+15/1/2026, 09:45:59 - Output:   📦 SOLUCIONES EN EL BACKUP:
+15/1/2026, 09:45:59 - Output:     • solucionCalendarioYes (solucionCalendarioYes) - v1.0
+15/1/2026, 09:45:59 - Output:     • CalendarioAPP (CalendarioAPP) - v1.0.0.0
+15/1/2026, 09:46:00 - Output: 
+15/1/2026, 09:46:00 - Output:   Filtrando soluciones del sistema...
+15/1/2026, 09:46:00 - Output:   Soluciones válidas (excluidas del sistema): 2
+15/1/2026, 09:46:00 - Output: 
+15/1/2026, 09:46:00 - Output:   📦 SOLUCIONES A IMPORTAR: 2
+15/1/2026, 09:46:00 - Output:   Estrategia: Importar TODAS las soluciones para restore completo
+15/1/2026, 09:46:00 - Output: 
+15/1/2026, 09:46:00 - Output:   Analizando soluciones y sus dependencias...
+15/1/2026, 09:46:00 - Output:     [Fase 1/3] Extrayendo metadata y componentes...
+15/1/2026, 09:46:00 - Output:       DEBUG: CalendarioAPP provee 4 componentes
+15/1/2026, 09:46:00 - Output:       DEBUG: CalendarioAPP requiere 1 componentes
+15/1/2026, 09:46:01 - Output:       DEBUG: solucionCalendarioYes provee 1 componentes
+15/1/2026, 09:46:01 - Output:     [Fase 2/3] Analizando dependencias entre soluciones...
+15/1/2026, 09:46:01 - Output:       DEBUG: CalendarioAPP busca dependencias para 1 componentes requeridos
+15/1/2026, 09:46:01 - Output:         ✓ Encontrado: 'cr8df_BeverControls.ScheduleBoardView' provisto por solucionCalendarioYes
+15/1/2026, 09:46:01 - Output:       • CalendarioAPP: 1 tablas, 11.02 KB - → Depende de: solucionCalendarioYes
+15/1/2026, 09:46:01 - Output:       • solucionCalendarioYes: 1 tablas, 185.77 KB - (sin dependencias)
+15/1/2026, 09:46:01 - Output: 
+15/1/2026, 09:46:01 - Output:   🔗 Construyendo grafo de dependencias...
+15/1/2026, 09:46:01 - Output:     [Fase 3/3] Ordenamiento topológico...
+15/1/2026, 09:46:01 - Output: 
+15/1/2026, 09:46:01 - Output:   📋 ORDEN DE IMPORTACIÓN (respetando dependencias):
+15/1/2026, 09:46:01 - Output:     1. solucionCalendarioYes
+15/1/2026, 09:46:01 - Output:     2. CalendarioAPP (depende de: solucionCalendarioYes)
+15/1/2026, 09:46:01 - Output:   ✅ Orden calculado mediante análisis de dependencias (topological sort)
+15/1/2026, 09:46:01 - Output: 
+15/1/2026, 09:46:01 - Output:   ✅ Total de soluciones a importar: 2
+15/1/2026, 09:46:01 - Output:   ⏱️ Tiempo estimado: 1 minutos
+15/1/2026, 09:46:01 - Output: 
+15/1/2026, 09:46:01 - Output: 
+15/1/2026, 09:46:02 - Output: ==========================================
+15/1/2026, 09:46:02 - Output: IMPORTANDO SOLUCIÓN 1 de 2
+15/1/2026, 09:46:02 - Output: ==========================================
+15/1/2026, 09:46:02 - Output: Nombre: solucionCalendarioYes
+15/1/2026, 09:46:02 - Output: Tamaño: 100.47 MB
+15/1/2026, 09:46:02 - Output: Tablas custom: 1
+15/1/2026, 09:46:02 - Output: Prefix: cr8df
+15/1/2026, 09:46:02 - Output: 
+15/1/2026, 09:46:02 - Output: 
+15/1/2026, 09:46:02 - Output:   Extrayendo metadata del ZIP de solución...
+15/1/2026, 09:46:02 - Output:   Nombre único extraído del ZIP: solucionCalendarioYes
+15/1/2026, 09:46:02 - Output:   Versión: 1.0
+15/1/2026, 09:46:02 - Output:   Managed: 0 (0=Unmanaged, 1=Managed)
+15/1/2026, 09:46:02 - Output:   Publisher Prefix: cr8df
+15/1/2026, 09:46:02 - Output: 
+15/1/2026, 09:46:02 - Output:   Verificando si la solución ya existe en el environment...
+15/1/2026, 09:46:03 - Output:   Solución NO existe - será nueva instalación
+15/1/2026, 09:46:03 - Output: 
+15/1/2026, 09:46:03 - Output:   Modo: NewEnvironment
+15/1/2026, 09:46:03 - Output:   -> Importando como nueva solución
+15/1/2026, 09:46:03 - Output:   (Este proceso puede tomar 1-3 minutos)
+15/1/2026, 09:46:03 - Output: 
+15/1/2026, 09:46:03 - Output:   Validando integridad del archivo ZIP...
+15/1/2026, 09:46:03 - Output:     ZIP válido: 6 archivos
+15/1/2026, 09:46:03 - Output:     Archivos críticos presentes: solution.xml, customizations.xml
+15/1/2026, 09:46:03 - Output: 
+15/1/2026, 09:46:03 - Output:   No se detectó solución existente o modo es CreateCopy (solución nueva)
+15/1/2026, 09:46:03 - Output:   -> ConvertToManaged no será especificado (Dataverse decidirá)
+15/1/2026, 09:46:03 - Output: 
+15/1/2026, 09:46:03 - Output:   Import Job ID: 35295a0a-5be0-43ec-b9c7-3207ca3b6179
+15/1/2026, 09:46:03 - Output:   Convert to Managed: No especificado (clave no existe en hashtable)
+15/1/2026, 09:46:03 - Output: 
+15/1/2026, 09:46:03 - Output:   Request Parameters:
+15/1/2026, 09:46:03 - Output:     - ImportJobId: 35295a0a-5be0-43ec-b9c7-3207ca3b6179
+15/1/2026, 09:46:04 - Output:     - OverwriteUnmanagedCustomizations: False
+15/1/2026, 09:46:04 - Output:     - PublishWorkflows: True
+15/1/2026, 09:46:04 - Output:     - CustomizationFile: [Base64 - 186 KB]
+15/1/2026, 09:46:04 - Output: 
+15/1/2026, 09:46:17 - Output: 
+15/1/2026, 09:46:17 - Output:   Solución importada exitosamente
+15/1/2026, 09:46:17 - Output: 
+15/1/2026, 09:46:17 - Output:   ✅ Solución solucionCalendarioYes importada correctamente
+15/1/2026, 09:46:17 - Output: 
+15/1/2026, 09:46:17 - Output: 
+15/1/2026, 09:46:18 - Output: ==========================================
+15/1/2026, 09:46:18 - Output: IMPORTANDO SOLUCIÓN 2 de 2
+15/1/2026, 09:46:18 - Output: ==========================================
+15/1/2026, 09:46:18 - Output: Nombre: CalendarioAPP
+15/1/2026, 09:46:18 - Output: Tamaño: 100.47 MB
+15/1/2026, 09:46:18 - Output: Tablas custom: 1
+15/1/2026, 09:46:18 - Output: Prefix: cr8df
+15/1/2026, 09:46:18 - Output: 
+15/1/2026, 09:46:18 - Output: 
+15/1/2026, 09:46:18 - Output:   Extrayendo metadata del ZIP de solución...
+15/1/2026, 09:46:18 - Output:   Nombre único extraído del ZIP: CalendarioAPP
+15/1/2026, 09:46:18 - Output:   Versión: 1.0.0.0
+15/1/2026, 09:46:18 - Output:   Managed: 0 (0=Unmanaged, 1=Managed)
+15/1/2026, 09:46:18 - Output:   Publisher Prefix: cr8df
+15/1/2026, 09:46:18 - Output: 
+15/1/2026, 09:46:18 - Output:   Verificando si la solución ya existe en el environment...
+15/1/2026, 09:46:18 - Output:   Solución NO existe - será nueva instalación
+15/1/2026, 09:46:18 - Output: 
+15/1/2026, 09:46:19 - Output:   Modo: NewEnvironment
+15/1/2026, 09:46:19 - Output:   -> Importando como nueva solución
+15/1/2026, 09:46:19 - Output:   (Este proceso puede tomar 1-3 minutos)
+15/1/2026, 09:46:19 - Output: 
+15/1/2026, 09:46:19 - Output:   Validando integridad del archivo ZIP...
+15/1/2026, 09:46:19 - Output:     ZIP válido: 3 archivos
+15/1/2026, 09:46:19 - Output:     Archivos críticos presentes: solution.xml, customizations.xml
+15/1/2026, 09:46:19 - Output: 
+15/1/2026, 09:46:19 - Output:   No se detectó solución existente o modo es CreateCopy (solución nueva)
+15/1/2026, 09:46:19 - Output:   -> ConvertToManaged no será especificado (Dataverse decidirá)
+15/1/2026, 09:46:19 - Output: 
+15/1/2026, 09:46:19 - Output:   Import Job ID: adff6729-d700-4238-ac54-0720a05db184
+15/1/2026, 09:46:19 - Output:   Convert to Managed: No especificado (clave no existe en hashtable)
+15/1/2026, 09:46:19 - Output: 
+15/1/2026, 09:46:19 - Output:   Request Parameters:
+15/1/2026, 09:46:19 - Output:     - ImportJobId: adff6729-d700-4238-ac54-0720a05db184
+15/1/2026, 09:46:19 - Output:     - OverwriteUnmanagedCustomizations: False
+15/1/2026, 09:46:19 - Output:     - PublishWorkflows: True
+15/1/2026, 09:46:19 - Output:     - CustomizationFile: [Base64 - 11 KB]
+15/1/2026, 09:46:20 - Output: 
+15/1/2026, 09:47:16 - Output: 
+15/1/2026, 09:47:16 - Output:   Solución importada exitosamente
+15/1/2026, 09:47:16 - Output: 
+15/1/2026, 09:47:16 - Output:   ✅ Solución CalendarioAPP importada correctamente
+15/1/2026, 09:47:16 - Output: 
+15/1/2026, 09:47:16 - Output: 
+15/1/2026, 09:47:16 - Output: ==========================================
+15/1/2026, 09:47:17 - Output: RESUMEN DE IMPORTACIÓN DE SOLUCIONES
+15/1/2026, 09:47:17 - Output: ==========================================
+15/1/2026, 09:47:17 - Output: 
+15/1/2026, 09:47:17 - Output: Total de soluciones procesadas: 2
+15/1/2026, 09:47:17 - Output:   ✅ Exitosas: 2
+15/1/2026, 09:47:17 - Output:   ❌ Con errores: 0
+15/1/2026, 09:47:17 - Output: 
+15/1/2026, 09:47:17 - Output: ==========================================
+15/1/2026, 09:47:18 - Output: 
+15/1/2026, 09:47:18 - Output: 
+15/1/2026, 09:47:18 - Output: ==========================================
+15/1/2026, 09:47:18 - Output: PASO 7.5: CREAR CAMPOS MARCADORES
+15/1/2026, 09:47:18 - Output: ==========================================
+15/1/2026, 09:47:18 - Output:  Paso omitido (solo necesario en modos UpdateCurrent y CreateCopy)
+15/1/2026, 09:47:18 - Output:  Modo NewEnvironment: Datos sin marcadores (environment limpio)
+15/1/2026, 09:47:18 - Output: 
+15/1/2026, 09:47:18 - Output: ==========================================
+15/1/2026, 09:47:18 - Output: PASO 7: RESTAURAR DATOS DE TABLAS
+15/1/2026, 09:47:18 - Output: ==========================================
+15/1/2026, 09:47:19 - Output:   ✓ Modo NewEnvironment: Restaurando TODOS los datos de las tablas
+15/1/2026, 09:47:19 - Output:   Datos se inyectarán sin marcadores (environment limpio)
+15/1/2026, 09:47:19 - Output: 
+15/1/2026, 09:47:19 - Output:   Directorio dataverse encontrado: C:\Users\ContainerAdministrator\AppData\Local\Temp\PPRestore_20260115124548\extracted\dataverse
+15/1/2026, 09:47:19 - Output:   Tablas encontradas: 523
+15/1/2026, 09:47:19 - Output: 
+15/1/2026, 09:47:19 - Output:   [8a] Obteniendo EntitySetNames de tablas...
+15/1/2026, 09:47:45 - Output:     msdynce_bank_location -> msdynce_bank_locations (fallback)
+15/1/2026, 09:47:45 - Output:     msdynce_contact_msdyn_service -> msdynce_contact_msdyn_services (fallback)
+15/1/2026, 09:47:51 - Output:     msdyn_appointmentrequest -> msdyn_appointmentrequests (fallback)
+15/1/2026, 09:47:52 - Output:     msdyn_availability -> msdyn_availabilitys (fallback)
+15/1/2026, 09:48:01 - Output:     msdyn_location -> msdyn_locations (fallback)
+15/1/2026, 09:48:04 - Output:     msdyn_service -> msdyn_services (fallback)
+15/1/2026, 09:48:35 - Output:   Mapeo de nombres completado
+15/1/2026, 09:48:35 - Output: 
+15/1/2026, 09:48:35 - Output:   [8b] Restaurando datos de tablas...
+15/1/2026, 09:48:35 - Output:   -> Modo NewEnvironment: Insertar SIN marcadores
+15/1/2026, 09:48:35 - Output:   -> Datos limpios (sin cr8df_backupid ni cr8df_fecharestore)
+15/1/2026, 09:48:35 - Output:   -> Environment listo para uso productivo
+15/1/2026, 09:48:35 - Output: 
+15/1/2026, 09:48:35 - Output:   ℹ NOTA: Algunas tablas pueden fallar (normal):
+15/1/2026, 09:48:35 - Output:     • aicopilot*, aiplugin* (específicas del environment origen)
+15/1/2026, 09:48:35 - Output:     • appaction* (configuraciones UI - se recrean automáticamente)
+15/1/2026, 09:48:35 - Output:     • agent* (AI agents - específicos del environment)
+15/1/2026, 09:48:35 - Output:     Estas tablas se exportan para referencia pero sus datos
+15/1/2026, 09:48:35 - Output:     no son restaurables entre environments diferentes.
+15/1/2026, 09:48:35 - Output: 
+15/1/2026, 09:48:35 - Output:   🚫 Filtro automático: 158 tablas system-managed se saltarán
+15/1/2026, 09:48:35 - Output:      (Metadata, configuraciones de apps, AI features - NO restaurables)
+15/1/2026, 09:48:35 - Output: 
+15/1/2026, 09:48:36 - Output:   ⚡ Modo paralelo activado: Procesando 5 tablas simultáneamente
+15/1/2026, 09:48:36 - Output:   ℹ️  Token refresh configurado: cada 50 minutos
+15/1/2026, 09:48:36 - Output: 
+15/1/2026, 09:48:36 - Output:   📊 Tablas a procesar: 379 (después de filtros)
+15/1/2026, 09:48:36 - Output: 
+15/1/2026, 09:48:36 - Output:   🔄 Grupos paralelos: 76 (de 5 tablas c/u)
+15/1/2026, 09:48:36 - Output: 
+15/1/2026, 09:48:36 - Output:   📦 Grupo 1/76 [5 tablas]...
+15/1/2026, 09:49:01 - Output:     [1/379] [SERIAL] account -> accounts
+15/1/2026, 09:49:01 - Output:         Sin registros (skip)
+15/1/2026, 09:49:01 - Output:     [2/379] [SERIAL] actioncard -> actioncards
+15/1/2026, 09:49:02 - Output:         Sin registros (skip)
+15/1/2026, 09:49:02 - Output:     [3/379] [SERIAL] activityfileattachment -> activityfileattachments
+15/1/2026, 09:49:02 - Output:         Sin registros (skip)
+15/1/2026, 09:49:02 - Output:     [4/379] [SERIAL] adx_externalidentity -> adx_externalidentities
+15/1/2026, 09:49:02 - Output:         Registros: 
+15/1/2026, 09:49:02 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 09:49:02 - Output:     [5/379] [SERIAL] adx_invitation -> adx_invitations
+15/1/2026, 09:49:02 - Output:         Sin registros (skip)
+15/1/2026, 09:49:02 - Output: 
+15/1/2026, 09:49:02 - Output:   📦 Grupo 2/76 [5 tablas]...
+15/1/2026, 09:49:27 - Output:     [6/379] [SERIAL] adx_invitation_invitecontacts -> adx_invitation_invitecontactsset
+15/1/2026, 09:49:27 - Output:         Sin registros (skip)
+15/1/2026, 09:49:27 - Output:     [7/379] [SERIAL] adx_invitation_mspp_webrole_powerpagecomponent -> adx_invitation_mspp_webrole_powerpagecomponentset
+15/1/2026, 09:49:27 - Output:         Sin registros (skip)
+15/1/2026, 09:49:27 - Output:     [8/379] [SERIAL] adx_invitation_redeemedcontacts -> adx_invitation_redeemedcontactsset
+15/1/2026, 09:49:27 - Output:         Sin registros (skip)
+15/1/2026, 09:49:27 - Output:     [9/379] [SERIAL] adx_inviteredemption -> adx_inviteredemptions
+15/1/2026, 09:49:27 - Output:         Sin registros (skip)
+15/1/2026, 09:49:28 - Output:     [10/379] [SERIAL] adx_kbarticle_kbarticle -> adx_kbarticle_kbarticleset
+15/1/2026, 09:49:28 - Output:         Sin registros (skip)
+15/1/2026, 09:49:28 - Output: 
+15/1/2026, 09:49:28 - Output:   📦 Grupo 3/76 [5 tablas]...
+15/1/2026, 09:49:50 - Output:     [11/379] [SERIAL] adx_portalcomment -> adx_portalcomments
+15/1/2026, 09:49:50 - Output:         Sin registros (skip)
+15/1/2026, 09:49:50 - Output:     [12/379] [SERIAL] adx_setting -> adx_settings
+15/1/2026, 09:49:50 - Output:         Registros: 
+15/1/2026, 09:49:50 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 09:49:50 - Output:     [13/379] [SERIAL] adx_webformsession -> adx_webformsessions
+15/1/2026, 09:49:50 - Output:         Sin registros (skip)
+15/1/2026, 09:49:50 - Output:     [14/379] [SERIAL] agenticscenario -> agenticscenarios
+15/1/2026, 09:49:50 - Output:         Sin registros (skip)
+15/1/2026, 09:49:50 - Output:     [15/379] [SERIAL] aicopilot_aiplugin -> aicopilot_aipluginset
+15/1/2026, 09:49:50 - Output:         Sin registros (skip)
+15/1/2026, 09:49:51 - Output: 
+15/1/2026, 09:49:51 - Output:   📦 Grupo 4/76 [5 tablas]...
+15/1/2026, 09:50:12 - Output:     [16/379] [SERIAL] annotation -> annotations
+15/1/2026, 09:50:12 - Output:         Sin registros (skip)
+15/1/2026, 09:50:12 - Output:     [17/379] [SERIAL] appnotification -> appnotifications
+15/1/2026, 09:50:12 - Output:         Sin registros (skip)
+15/1/2026, 09:50:12 - Output:     [18/379] [SERIAL] appointment -> appointments
+15/1/2026, 09:50:12 - Output:         Sin registros (skip)
+15/1/2026, 09:50:13 - Output:     [19/379] [SERIAL] approvalprocess -> approvalprocesses
+15/1/2026, 09:50:13 - Output:         Sin registros (skip)
+15/1/2026, 09:50:13 - Output:     [20/379] [SERIAL] approvalstageapproval -> approvalstageapprovals
+15/1/2026, 09:50:13 - Output:         Sin registros (skip)
+15/1/2026, 09:50:13 - Output: 
+15/1/2026, 09:50:13 - Output:   📦 Grupo 5/76 [5 tablas]...
+15/1/2026, 09:50:38 - Output:     [21/379] [SERIAL] approvalstagecondition -> approvalstageconditions
+15/1/2026, 09:50:38 - Output:         Sin registros (skip)
+15/1/2026, 09:50:38 - Output:     [22/379] [SERIAL] approvalstageintelligent -> approvalstageintelligents
+15/1/2026, 09:50:38 - Output:         Sin registros (skip)
+15/1/2026, 09:50:38 - Output:     [23/379] [SERIAL] approvalstageorder -> approvalstageorders
+15/1/2026, 09:50:38 - Output:         Sin registros (skip)
+15/1/2026, 09:50:38 - Output:     [24/379] [SERIAL] archivecleanupoperation -> archivecleanupoperations
+15/1/2026, 09:50:38 - Output:         Sin registros (skip)
+15/1/2026, 09:50:38 - Output:     [25/379] [SERIAL] attributeclusterconfig -> attributeclusterconfigs
+15/1/2026, 09:50:38 - Output:         Sin registros (skip)
+15/1/2026, 09:50:38 - Output: 
+15/1/2026, 09:50:38 - Output:   📦 Grupo 6/76 [5 tablas]...
+15/1/2026, 09:51:00 - Output:     [26/379] [SERIAL] bot_botcomponentcollection -> bot_botcomponentcollectionset
+15/1/2026, 09:51:00 - Output:         Sin registros (skip)
+15/1/2026, 09:51:00 - Output:     [27/379] [SERIAL] bot_environmentvariabledefinition -> bot_environmentvariabledefinitionset
+15/1/2026, 09:51:00 - Output:         Sin registros (skip)
+15/1/2026, 09:51:00 - Output:     [28/379] [SERIAL] bulkarchiveconfig -> bulkarchiveconfigs
+15/1/2026, 09:51:00 - Output:         Sin registros (skip)
+15/1/2026, 09:51:00 - Output:     [29/379] [SERIAL] bulkarchivefailuredetail -> bulkarchivefailuredetails
+15/1/2026, 09:51:00 - Output:         Sin registros (skip)
+15/1/2026, 09:51:01 - Output:     [30/379] [SERIAL] bulkarchiveoperation -> bulkarchiveoperations
+15/1/2026, 09:51:01 - Output:         Sin registros (skip)
+15/1/2026, 09:51:01 - Output: 
+15/1/2026, 09:51:01 - Output:   📦 Grupo 7/76 [5 tablas]...
+15/1/2026, 09:51:24 - Output:     [31/379] [SERIAL] bulkarchiveoperationdetail -> bulkarchiveoperationdetails
+15/1/2026, 09:51:25 - Output:         Sin registros (skip)
+15/1/2026, 09:51:25 - Output:     [32/379] [SERIAL] businessprocess -> businessprocesses
+15/1/2026, 09:51:25 - Output:         Sin registros (skip)
+15/1/2026, 09:51:25 - Output:     [33/379] [SERIAL] canvasapp -> canvasapps
+15/1/2026, 09:51:25 - Output:         Sin registros (skip)
+15/1/2026, 09:51:25 - Output:     [34/379] [SERIAL] canvasappextendedmetadata -> canvasappextendedmetadata
+15/1/2026, 09:51:25 - Output:         Sin registros (skip)
+15/1/2026, 09:51:25 - Output:     [35/379] [SERIAL] card -> cards
+15/1/2026, 09:51:25 - Output:         Sin registros (skip)
+15/1/2026, 09:51:25 - Output: 
+15/1/2026, 09:51:25 - Output:   📦 Grupo 8/76 [5 tablas]...
+15/1/2026, 09:51:46 - Output:     [36/379] [SERIAL] cardentityconnections -> cardentityconnectionsset
+15/1/2026, 09:51:46 - Output:         Sin registros (skip)
+15/1/2026, 09:51:46 - Output:     [37/379] [SERIAL] cardstateitem -> cardstateitems
+15/1/2026, 09:51:46 - Output:         Sin registros (skip)
+15/1/2026, 09:51:46 - Output:     [38/379] [SERIAL] chat -> chats
+15/1/2026, 09:51:46 - Output:         Sin registros (skip)
+15/1/2026, 09:51:46 - Output:     [39/379] [SERIAL] comment -> comments
+15/1/2026, 09:51:46 - Output:         Sin registros (skip)
+15/1/2026, 09:51:46 - Output:     [40/379] [SERIAL] connection -> connections
+15/1/2026, 09:51:46 - Output:         Sin registros (skip)
+15/1/2026, 09:51:46 - Output: 
+15/1/2026, 09:51:47 - Output:   📦 Grupo 9/76 [5 tablas]...
+15/1/2026, 09:52:31 - Output:     [41/379] [SERIAL] connector -> connectors
+15/1/2026, 09:52:31 - Output:         Sin registros (skip)
+15/1/2026, 09:52:31 - Output:     [42/379] [SERIAL] contact -> contacts
+15/1/2026, 09:52:31 - Output:         Registros: 8
+15/1/2026, 09:52:31 - Output:           Error: [FIXED] Campos removidos: msdynce_schedulephysicalabilitytest, msdynce_signagreements, msdynce_backgroundcheck, msdynce_workauthorization, msdynce_safetyguidelines, msdynce_preferencesnotification, msdynce_policy2, msdynce_policy1, msdynce_scheduledrugtest
+15/1/2026, 09:52:31 - Output:           Error: [FIXED] Campos removidos: msdynce_schedulephysicalabilitytest, msdynce_signagreements, msdynce_backgroundcheck, msdynce_workauthorization, msdynce_safetyguidelines, msdynce_preferencesnotification, msdynce_policy2, msdynce_policy1, msdynce_scheduledrugtest
+15/1/2026, 09:52:31 - Output:           Error: [FIXED] Campos removidos: msdynce_schedulephysicalabilitytest, msdynce_signagreements, msdynce_backgroundcheck, msdynce_workauthorization, msdynce_safetyguidelines, msdynce_preferencesnotification, msdynce_policy2, msdynce_policy1, msdynce_scheduledrugtest
+15/1/2026, 09:52:31 - Output:         ✅ 8/8 registros restaurados
+15/1/2026, 09:52:31 - Output:     [43/379] [SERIAL] conversationtranscript -> conversationtranscripts
+15/1/2026, 09:52:31 - Output:         Sin registros (skip)
+15/1/2026, 09:52:31 - Output:     [44/379] [SERIAL] copilotexamplequestion -> copilotexamplequestions
+15/1/2026, 09:52:31 - Output:         Sin registros (skip)
+15/1/2026, 09:52:31 - Output:     [45/379] [SERIAL] copilotglossaryterm -> copilotglossaryterms
+15/1/2026, 09:52:31 - Output:         Sin registros (skip)
+15/1/2026, 09:52:31 - Output: 
+15/1/2026, 09:52:31 - Output:   📦 Grupo 10/76 [5 tablas]...
+15/1/2026, 09:52:53 - Output:     [46/379] [SERIAL] copilotsynonyms -> copilotsynonyms
+15/1/2026, 09:52:53 - Output:         Sin registros (skip)
+15/1/2026, 09:52:53 - Output:     [47/379] [BATCH API] cr8df_tablacalendario -> cr8df_tablacalendarios
+15/1/2026, 09:52:53 - Output:         Registros: 31
+15/1/2026, 09:52:53 - Output:         ✅ 31/31 registros restaurados
+15/1/2026, 09:52:53 - Output:     [48/379] [SERIAL] datalakeworkspace -> datalakeworkspaces
+15/1/2026, 09:52:54 - Output:         Sin registros (skip)
+15/1/2026, 09:52:54 - Output:     [49/379] [SERIAL] datalakeworkspacepermission -> datalakeworkspacepermissions
+15/1/2026, 09:52:54 - Output:         Sin registros (skip)
+15/1/2026, 09:52:54 - Output:     [50/379] [SERIAL] deleteditemreference -> deleteditemreferences
+15/1/2026, 09:52:54 - Output:         Sin registros (skip)
+15/1/2026, 09:52:54 - Output: 
+15/1/2026, 09:52:54 - Output:   📦 Grupo 11/76 [5 tablas]...
+15/1/2026, 09:53:17 - Output:     [51/379] [SERIAL] desktopflowbinary -> desktopflowbinaries
+15/1/2026, 09:53:17 - Output:         Sin registros (skip)
+15/1/2026, 09:53:17 - Output:     [52/379] [SERIAL] desktopflowmodule -> desktopflowmodules
+15/1/2026, 09:53:17 - Output:         Sin registros (skip)
+15/1/2026, 09:53:17 - Output:     [53/379] [SERIAL] dvfilesearchattribute -> dvfilesearchattributes
+15/1/2026, 09:53:17 - Output:         Registros: 
+15/1/2026, 09:53:17 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 09:53:17 - Output:     [54/379] [SERIAL] dvfilesearchentity -> dvfilesearchentities
+15/1/2026, 09:53:17 - Output:         Registros: 
+15/1/2026, 09:53:17 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 09:53:17 - Output:     [55/379] [SERIAL] dvtablesearchattribute -> dvtablesearchattributes
+15/1/2026, 09:53:17 - Output:         Sin registros (skip)
+15/1/2026, 09:53:18 - Output: 
+15/1/2026, 09:53:18 - Output:   📦 Grupo 12/76 [5 tablas]...
+15/1/2026, 09:53:48 - Output:     [56/379] [BATCH API] dvtablesearchentity -> dvtablesearchentities
+15/1/2026, 09:53:48 - Output:         Registros: 35
+15/1/2026, 09:53:48 - Output:         ✅ 35/35 registros restaurados
+15/1/2026, 09:53:48 - Output:     [57/379] [SERIAL] email -> emails
+15/1/2026, 09:53:48 - Output:         Sin registros (skip)
+15/1/2026, 09:53:48 - Output:     [58/379] [SERIAL] emailaddressconfiguration -> emailaddressconfigurations
+15/1/2026, 09:53:48 - Output:         Sin registros (skip)
+15/1/2026, 09:53:48 - Output:     [59/379] [SERIAL] enablearchivalrequest -> enablearchivalrequests
+15/1/2026, 09:53:48 - Output:         Sin registros (skip)
+15/1/2026, 09:53:48 - Output:     [60/379] [SERIAL] entityrecordfilter -> entityrecordfilters
+15/1/2026, 09:53:48 - Output:         Sin registros (skip)
+15/1/2026, 09:53:48 - Output: 
+15/1/2026, 09:53:48 - Output:   📦 Grupo 13/76 [5 tablas]...
+15/1/2026, 09:54:09 - Output:     [61/379] [SERIAL] eventexpanderbreadcrumb -> eventexpanderbreadcrumbs
+15/1/2026, 09:54:09 - Output:         Sin registros (skip)
+15/1/2026, 09:54:09 - Output:     [62/379] [SERIAL] exportedexcel -> exportedexcels
+15/1/2026, 09:54:09 - Output:         Sin registros (skip)
+15/1/2026, 09:54:10 - Output:     [63/379] [SERIAL] exportsolutionupload -> exportsolutionuploads
+15/1/2026, 09:54:10 - Output:         Sin registros (skip)
+15/1/2026, 09:54:10 - Output:     [64/379] [SERIAL] fabricaiskill -> fabricaiskills
+15/1/2026, 09:54:10 - Output:         Sin registros (skip)
+15/1/2026, 09:54:10 - Output:     [65/379] [SERIAL] fax -> faxes
+15/1/2026, 09:54:10 - Output:         Sin registros (skip)
+15/1/2026, 09:54:10 - Output: 
+15/1/2026, 09:54:10 - Output:   📦 Grupo 14/76 [5 tablas]...
+15/1/2026, 09:54:34 - Output:     [66/379] [SERIAL] federatedknowledgecitation -> federatedknowledgecitations
+15/1/2026, 09:54:34 - Output:         Sin registros (skip)
+15/1/2026, 09:54:34 - Output:     [67/379] [SERIAL] federatedknowledgeconfiguration -> federatedknowledgeconfigurations
+15/1/2026, 09:54:34 - Output:         Sin registros (skip)
+15/1/2026, 09:54:34 - Output:     [68/379] [SERIAL] federatedknowledgeentityconfiguration -> federatedknowledgeentityconfigurations
+15/1/2026, 09:54:34 - Output:         Sin registros (skip)
+15/1/2026, 09:54:34 - Output:     [69/379] [SERIAL] federatedknowledgemetadatarefresh -> federatedknowledgemetadatarefreshset
+15/1/2026, 09:54:34 - Output:         Sin registros (skip)
+15/1/2026, 09:54:34 - Output:     [70/379] [SERIAL] flowaggregation -> flowaggregations
+15/1/2026, 09:54:34 - Output:         Sin registros (skip)
+15/1/2026, 09:54:34 - Output: 
+15/1/2026, 09:54:34 - Output:   📦 Grupo 15/76 [5 tablas]...
+15/1/2026, 09:54:59 - Output:     [71/379] [SERIAL] flowcapacityassignment -> flowcapacityassignments
+15/1/2026, 09:54:59 - Output:         Sin registros (skip)
+15/1/2026, 09:54:59 - Output:     [72/379] [SERIAL] flowcredentialapplication -> flowcredentialapplications
+15/1/2026, 09:54:59 - Output:         Sin registros (skip)
+15/1/2026, 09:54:59 - Output:     [73/379] [SERIAL] flowevent -> flowevents
+15/1/2026, 09:54:59 - Output:         Sin registros (skip)
+15/1/2026, 09:54:59 - Output:     [74/379] [SERIAL] flowmachine -> flowmachines
+15/1/2026, 09:54:59 - Output:         Sin registros (skip)
+15/1/2026, 09:54:59 - Output:     [75/379] [SERIAL] flowmachinegroup -> flowmachinegroups
+15/1/2026, 09:54:59 - Output:         Registros: 
+15/1/2026, 09:54:59 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:54:59 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 09:54:59 - Output: 
+15/1/2026, 09:54:59 - Output:   ⏱️  CHECKPOINT 1: Grupos 15/76 | Token: 9 min
+15/1/2026, 09:54:59 - Output: 
+15/1/2026, 09:54:59 - Output:   📦 Grupo 16/76 [5 tablas]...
+15/1/2026, 09:55:22 - Output:     [76/379] [SERIAL] flowmachineimage -> flowmachineimages
+15/1/2026, 09:55:22 - Output:         Registros: 3
+15/1/2026, 09:55:22 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:55:22 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:55:22 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:55:22 - Output:         ✅ 0/3 registros restaurados
+15/1/2026, 09:55:22 - Output:     [77/379] [SERIAL] flowmachinenetwork -> flowmachinenetworks
+15/1/2026, 09:55:22 - Output:         Sin registros (skip)
+15/1/2026, 09:55:22 - Output:     [78/379] [SERIAL] flowrun -> flowruns
+15/1/2026, 09:55:22 - Output:         Sin registros (skip)
+15/1/2026, 09:55:22 - Output:     [79/379] [SERIAL] flowsession -> flowsessions
+15/1/2026, 09:55:22 - Output:         Sin registros (skip)
+15/1/2026, 09:55:22 - Output:     [80/379] [SERIAL] flowsessionbinary -> flowsessionbinaries
+15/1/2026, 09:55:23 - Output:         Sin registros (skip)
+15/1/2026, 09:55:23 - Output: 
+15/1/2026, 09:55:23 - Output:   📦 Grupo 17/76 [5 tablas]...
+15/1/2026, 09:55:49 - Output:     [81/379] [SERIAL] fxexpression -> fxexpressions
+15/1/2026, 09:55:49 - Output:         Sin registros (skip)
+15/1/2026, 09:55:49 - Output:     [82/379] [SERIAL] gitconfigurationretrievaldatasource -> gitconfigurationretrievaldatasources
+15/1/2026, 09:55:49 - Output:         Registros: 
+15/1/2026, 09:55:49 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:55:49 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 09:55:49 - Output:     [83/379] [SERIAL] imagedescriptor -> imagedescriptors
+15/1/2026, 09:55:49 - Output:         Registros: 
+15/1/2026, 09:55:49 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:55:50 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 09:55:50 - Output:     [84/379] [SERIAL] indexedtrait -> indexedtraits
+15/1/2026, 09:55:50 - Output:         Sin registros (skip)
+15/1/2026, 09:55:50 - Output:     [85/379] [SERIAL] intelligentmemory -> intelligentmemories
+15/1/2026, 09:55:50 - Output:         Sin registros (skip)
+15/1/2026, 09:55:50 - Output: 
+15/1/2026, 09:55:50 - Output:   📦 Grupo 18/76 [5 tablas]...
+15/1/2026, 09:56:14 - Output:     [86/379] [SERIAL] interactionforemail -> interactionforemails
+15/1/2026, 09:56:14 - Output:         Sin registros (skip)
+15/1/2026, 09:56:14 - Output:     [87/379] [SERIAL] internalcatalogassignment -> internalcatalogassignments
+15/1/2026, 09:56:14 - Output:         Sin registros (skip)
+15/1/2026, 09:56:14 - Output:     [88/379] [SERIAL] keyvaultreference -> keyvaultreferences
+15/1/2026, 09:56:14 - Output:         Registros: 2
+15/1/2026, 09:56:14 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:56:14 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 09:56:14 - Output:         ✅ 0/2 registros restaurados
+15/1/2026, 09:56:14 - Output:     [89/379] [SERIAL] knowledgearticle -> knowledgearticles
+15/1/2026, 09:56:14 - Output:         Sin registros (skip)
+15/1/2026, 09:56:14 - Output:     [90/379] [SERIAL] knowledgebaserecord -> knowledgebaserecords
+15/1/2026, 09:56:14 - Output:         Sin registros (skip)
+15/1/2026, 09:56:14 - Output: 
+15/1/2026, 09:56:14 - Output:   📦 Grupo 19/76 [5 tablas]...
+15/1/2026, 09:56:39 - Output:     [91/379] [SERIAL] knowledgefaq -> knowledgefaqs
+15/1/2026, 09:56:39 - Output:         Sin registros (skip)
+15/1/2026, 09:56:39 - Output:     [92/379] [SERIAL] knowledgesourceconsumer -> knowledgesourceconsumers
+15/1/2026, 09:56:39 - Output:         Sin registros (skip)
+15/1/2026, 09:56:39 - Output:     [93/379] [SERIAL] knowledgesourceprofile -> knowledgesourceprofiles
+15/1/2026, 09:56:39 - Output:         Sin registros (skip)
+15/1/2026, 09:56:39 - Output:     [94/379] [SERIAL] letter -> letters
+15/1/2026, 09:56:39 - Output:         Sin registros (skip)
+15/1/2026, 09:56:39 - Output:     [95/379] [SERIAL] mailboxtrackingfolder -> mailboxtrackingfolders
+15/1/2026, 09:56:39 - Output:         Sin registros (skip)
+15/1/2026, 09:56:40 - Output: 
+15/1/2026, 09:56:40 - Output:   📦 Grupo 20/76 [5 tablas]...
+15/1/2026, 09:57:09 - Output:     [96/379] [SERIAL] mcpserver -> mcpservers
+15/1/2026, 09:57:09 - Output:         Sin registros (skip)
+15/1/2026, 09:57:09 - Output:     [97/379] [SERIAL] mcptool -> mcptools
+15/1/2026, 09:57:09 - Output:         Sin registros (skip)
+15/1/2026, 09:57:09 - Output:     [98/379] [SERIAL] mobileofflineprofile -> mobileofflineprofiles
+15/1/2026, 09:57:09 - Output:         Sin registros (skip)
+15/1/2026, 09:57:09 - Output:     [99/379] [SERIAL] mobileofflineprofileextension -> mobileofflineprofileextensions
+15/1/2026, 09:57:09 - Output:         Sin registros (skip)
+15/1/2026, 09:57:09 - Output:     [100/379] [SERIAL] mobileofflineprofileitemfilter -> mobileofflineprofileitemfilters
+15/1/2026, 09:57:09 - Output:         Sin registros (skip)
+15/1/2026, 09:57:09 - Output: 
+15/1/2026, 09:57:10 - Output:   📦 Grupo 21/76 [5 tablas]...
+15/1/2026, 09:57:32 - Output:     [101/379] [SERIAL] msdynce_bank_location -> msdynce_bank_locations
+15/1/2026, 09:57:33 - Output:         Sin registros (skip)
+15/1/2026, 09:57:34 - Output:     [102/379] [SERIAL] msdynce_botcontent -> msdynce_botcontents
+15/1/2026, 09:57:34 - Output:         Sin registros (skip)
+15/1/2026, 09:57:34 - Output:     [103/379] [SERIAL] msdyn_aibdataset -> msdyn_aibdatasets
+15/1/2026, 09:57:34 - Output:         Sin registros (skip)
+15/1/2026, 09:57:34 - Output:     [104/379] [SERIAL] msdyn_aibdatasetfile -> msdyn_aibdatasetfiles
+15/1/2026, 09:57:34 - Output:         Sin registros (skip)
+15/1/2026, 09:57:34 - Output:     [105/379] [SERIAL] msdyn_aibdatasetrecord -> msdyn_aibdatasetrecords
+15/1/2026, 09:57:34 - Output:         Sin registros (skip)
+15/1/2026, 09:57:34 - Output: 
+15/1/2026, 09:57:34 - Output:   📦 Grupo 22/76 [5 tablas]...
+15/1/2026, 09:57:56 - Output:     [106/379] [SERIAL] msdyn_aibdatasetscontainer -> msdyn_aibdatasetscontainers
+15/1/2026, 09:57:56 - Output:         Sin registros (skip)
+15/1/2026, 09:57:56 - Output:     [107/379] [SERIAL] msdyn_aibfeedbackloop -> msdyn_aibfeedbackloops
+15/1/2026, 09:57:56 - Output:         Sin registros (skip)
+15/1/2026, 09:57:56 - Output:     [108/379] [SERIAL] msdyn_aibfile -> msdyn_aibfiles
+15/1/2026, 09:57:56 - Output:         Sin registros (skip)
+15/1/2026, 09:57:56 - Output:     [109/379] [SERIAL] msdyn_aibfileattacheddata -> msdyn_aibfileattacheddatas
+15/1/2026, 09:57:56 - Output:         Sin registros (skip)
+15/1/2026, 09:57:56 - Output:     [110/379] [SERIAL] msdyn_aiconfigurationsearch -> msdyn_aiconfigurationsearchs
+15/1/2026, 09:57:57 - Output:         Sin registros (skip)
+15/1/2026, 09:57:57 - Output: 
+15/1/2026, 09:57:57 - Output:   📦 Grupo 23/76 [5 tablas]...
+15/1/2026, 09:58:17 - Output:     [111/379] [SERIAL] msdyn_aiconfiguration_documenttemplate -> msdyn_aiconfiguration_documenttemplateset
+15/1/2026, 09:58:17 - Output:         Sin registros (skip)
+15/1/2026, 09:58:18 - Output:     [112/379] [SERIAL] msdyn_aidataprocessingevent -> msdyn_aidataprocessingevents
+15/1/2026, 09:58:18 - Output:         Sin registros (skip)
+15/1/2026, 09:58:18 - Output:     [113/379] [SERIAL] msdyn_aidocumenttemplate -> msdyn_aidocumenttemplates
+15/1/2026, 09:58:18 - Output:         Sin registros (skip)
+15/1/2026, 09:58:18 - Output:     [114/379] [SERIAL] msdyn_aievaluationconfiguration -> msdyn_aievaluationconfigurations
+15/1/2026, 09:58:18 - Output:         Sin registros (skip)
+15/1/2026, 09:58:18 - Output:     [115/379] [SERIAL] msdyn_aievaluationmetric -> msdyn_aievaluationmetrics
+15/1/2026, 09:58:18 - Output:         Sin registros (skip)
+15/1/2026, 09:58:18 - Output: 
+15/1/2026, 09:58:18 - Output:   📦 Grupo 24/76 [5 tablas]...
+15/1/2026, 09:58:42 - Output:     [116/379] [SERIAL] msdyn_aievaluationrun -> msdyn_aievaluationruns
+15/1/2026, 09:58:42 - Output:         Sin registros (skip)
+15/1/2026, 09:58:42 - Output:     [117/379] [SERIAL] msdyn_aievent -> msdyn_aievents
+15/1/2026, 09:58:42 - Output:         Sin registros (skip)
+15/1/2026, 09:58:42 - Output:     [118/379] [SERIAL] msdyn_aifptrainingdocument -> msdyn_aifptrainingdocuments
+15/1/2026, 09:58:42 - Output:         Sin registros (skip)
+15/1/2026, 09:58:42 - Output:     [119/379] [SERIAL] msdyn_aimodelcatalog -> msdyn_aimodelcatalogs
+15/1/2026, 09:58:42 - Output:         Sin registros (skip)
+15/1/2026, 09:58:42 - Output:     [120/379] [SERIAL] msdyn_aiodimage -> msdyn_aiodimages
+15/1/2026, 09:58:42 - Output:         Sin registros (skip)
+15/1/2026, 09:58:42 - Output: 
+15/1/2026, 09:58:42 - Output:   📦 Grupo 25/76 [5 tablas]...
+15/1/2026, 09:59:08 - Output:     [121/379] [SERIAL] msdyn_aiodlabel -> msdyn_aiodlabels
+15/1/2026, 09:59:08 - Output:         Sin registros (skip)
+15/1/2026, 09:59:08 - Output:     [122/379] [SERIAL] msdyn_aiodlabel_msdyn_aiconfiguration -> msdyn_aiodlabel_msdyn_aiconfigurationset
+15/1/2026, 09:59:08 - Output:         Sin registros (skip)
+15/1/2026, 09:59:08 - Output:     [123/379] [SERIAL] msdyn_aiodtrainingboundingbox -> msdyn_aiodtrainingboundingboxes
+15/1/2026, 09:59:08 - Output:         Sin registros (skip)
+15/1/2026, 09:59:08 - Output:     [124/379] [SERIAL] msdyn_aiodtrainingimage -> msdyn_aiodtrainingimages
+15/1/2026, 09:59:08 - Output:         Sin registros (skip)
+15/1/2026, 09:59:08 - Output:     [125/379] [SERIAL] msdyn_aioptimization -> msdyn_aioptimizations
+15/1/2026, 09:59:08 - Output:         Sin registros (skip)
+15/1/2026, 09:59:08 - Output: 
+15/1/2026, 09:59:08 - Output:   📦 Grupo 26/76 [5 tablas]...
+15/1/2026, 09:59:33 - Output:     [126/379] [SERIAL] msdyn_aitestcase -> msdyn_aitestcases
+15/1/2026, 09:59:33 - Output:         Sin registros (skip)
+15/1/2026, 09:59:33 - Output:     [127/379] [SERIAL] msdyn_aitestcasedocument -> msdyn_aitestcasedocuments
+15/1/2026, 09:59:33 - Output:         Sin registros (skip)
+15/1/2026, 09:59:33 - Output:     [128/379] [SERIAL] msdyn_aitestcaseinput -> msdyn_aitestcaseinputs
+15/1/2026, 09:59:33 - Output:         Sin registros (skip)
+15/1/2026, 09:59:33 - Output:     [129/379] [SERIAL] msdyn_aitestrun -> msdyn_aitestruns
+15/1/2026, 09:59:33 - Output:         Sin registros (skip)
+15/1/2026, 09:59:33 - Output:     [130/379] [SERIAL] msdyn_aitestrunbatch -> msdyn_aitestrunbatches
+15/1/2026, 09:59:33 - Output:         Sin registros (skip)
+15/1/2026, 09:59:33 - Output: 
+15/1/2026, 09:59:33 - Output:   📦 Grupo 27/76 [5 tablas]...
+15/1/2026, 09:59:57 - Output:     [131/379] [SERIAL] msdyn_analysiscomponent -> msdyn_analysiscomponents
+15/1/2026, 09:59:57 - Output:         Sin registros (skip)
+15/1/2026, 09:59:57 - Output:     [132/379] [SERIAL] msdyn_analysisjob -> msdyn_analysisjobs
+15/1/2026, 09:59:57 - Output:         Sin registros (skip)
+15/1/2026, 09:59:57 - Output:     [133/379] [SERIAL] msdyn_analysisoverride -> msdyn_analysisoverrides
+15/1/2026, 09:59:57 - Output:         Sin registros (skip)
+15/1/2026, 09:59:57 - Output:     [134/379] [SERIAL] msdyn_analysisresult -> msdyn_analysisresults
+15/1/2026, 09:59:58 - Output:         Sin registros (skip)
+15/1/2026, 09:59:58 - Output:     [135/379] [SERIAL] msdyn_analysisresultdetail -> msdyn_analysisresultdetails
+15/1/2026, 09:59:58 - Output:         Sin registros (skip)
+15/1/2026, 09:59:58 - Output: 
+15/1/2026, 09:59:58 - Output:   📦 Grupo 28/76 [5 tablas]...
+15/1/2026, 10:00:21 - Output:     [136/379] [SERIAL] msdyn_appinsightsmetadata -> msdyn_appinsightsmetadatas
+15/1/2026, 10:00:21 - Output:         Sin registros (skip)
+15/1/2026, 10:00:21 - Output:     [137/379] [SERIAL] msdyn_appointmentrequest -> msdyn_appointmentrequests
+15/1/2026, 10:00:22 - Output:         Sin registros (skip)
+15/1/2026, 10:00:22 - Output:     [138/379] [SERIAL] msdyn_availability -> msdyn_availabilitys
+15/1/2026, 10:00:22 - Output:         Sin registros (skip)
+15/1/2026, 10:00:22 - Output:     [139/379] [SERIAL] msdyn_componentlayer -> msdyn_componentlayers
+15/1/2026, 10:00:22 - Output:         Sin registros (skip)
+15/1/2026, 10:00:22 - Output:     [140/379] [SERIAL] msdyn_connectordatasource -> msdyn_connectordatasources
+15/1/2026, 10:00:22 - Output:         Sin registros (skip)
+15/1/2026, 10:00:22 - Output: 
+15/1/2026, 10:00:22 - Output:   📦 Grupo 29/76 [5 tablas]...
+15/1/2026, 10:01:07 - Output:     [141/379] [SERIAL] msdyn_connectordatasource_environmentva -> msdyn_connectordatasource_environmentvaset
+15/1/2026, 10:01:08 - Output:         Sin registros (skip)
+15/1/2026, 10:01:08 - Output:     [142/379] [SERIAL] msdyn_copilotinteractions -> msdyn_copilotinteractionses
+15/1/2026, 10:01:08 - Output:         Sin registros (skip)
+15/1/2026, 10:01:09 - Output:     [143/379] [SERIAL] msdyn_customcontrolextendedsettings -> msdyn_customcontrolextendedsettingses
+15/1/2026, 10:01:09 - Output:         Sin registros (skip)
+15/1/2026, 10:01:09 - Output:     [144/379] [SERIAL] msdyn_dataflow -> msdyn_dataflows
+15/1/2026, 10:01:09 - Output:         Sin registros (skip)
+15/1/2026, 10:01:09 - Output:     [145/379] [SERIAL] msdyn_dataflowconnectionreference -> msdyn_dataflowconnectionreferences
+15/1/2026, 10:01:09 - Output:         Sin registros (skip)
+15/1/2026, 10:01:09 - Output: 
+15/1/2026, 10:01:10 - Output:   📦 Grupo 30/76 [5 tablas]...
+15/1/2026, 10:01:42 - Output:     [146/379] [SERIAL] msdyn_dataflowrefreshhistory -> msdyn_dataflowrefreshhistories
+15/1/2026, 10:01:42 - Output:         Sin registros (skip)
+15/1/2026, 10:01:42 - Output:     [147/379] [SERIAL] msdyn_dataflowtemplate -> msdyn_dataflowtemplates
+15/1/2026, 10:01:42 - Output:         Sin registros (skip)
+15/1/2026, 10:01:42 - Output:     [148/379] [SERIAL] msdyn_dataflow_datalakefolder -> msdyn_dataflow_datalakefolders
+15/1/2026, 10:01:42 - Output:         Sin registros (skip)
+15/1/2026, 10:01:43 - Output:     [149/379] [SERIAL] msdyn_datalakeds -> msdyn_datalakedses
+15/1/2026, 10:01:43 - Output:         Registros: 
+15/1/2026, 10:01:43 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 10:01:43 - Output:     [150/379] [SERIAL] msdyn_dataworkspace -> msdyn_dataworkspaces
+15/1/2026, 10:01:43 - Output:         Sin registros (skip)
+15/1/2026, 10:01:43 - Output: 
+15/1/2026, 10:01:43 - Output:   ⏱️  CHECKPOINT 2: Grupos 30/76 | Token: 15 min
+15/1/2026, 10:01:43 - Output: 
+15/1/2026, 10:01:43 - Output:   📦 Grupo 31/76 [5 tablas]...
+15/1/2026, 10:02:12 - Output:     [151/379] [SERIAL] msdyn_dmsrequest -> msdyn_dmsrequests
+15/1/2026, 10:02:13 - Output:         Sin registros (skip)
+15/1/2026, 10:02:13 - Output:     [152/379] [SERIAL] msdyn_dmsrequeststatus -> msdyn_dmsrequeststatuses
+15/1/2026, 10:02:13 - Output:         Sin registros (skip)
+15/1/2026, 10:02:13 - Output:     [153/379] [SERIAL] msdyn_dmssyncrequest -> msdyn_dmssyncrequests
+15/1/2026, 10:02:13 - Output:         Sin registros (skip)
+15/1/2026, 10:02:13 - Output:     [154/379] [SERIAL] msdyn_dmssyncstatus -> msdyn_dmssyncstatuses
+15/1/2026, 10:02:13 - Output:         Sin registros (skip)
+15/1/2026, 10:02:13 - Output:     [155/379] [SERIAL] msdyn_entitylinkchatconfiguration -> msdyn_entitylinkchatconfigurations
+15/1/2026, 10:02:13 - Output:         Sin registros (skip)
+15/1/2026, 10:02:13 - Output: 
+15/1/2026, 10:02:13 - Output:   📦 Grupo 32/76 [5 tablas]...
+15/1/2026, 10:02:44 - Output:     [156/379] [SERIAL] msdyn_entityrefreshhistory -> msdyn_entityrefreshhistories
+15/1/2026, 10:02:44 - Output:         Sin registros (skip)
+15/1/2026, 10:02:44 - Output:     [157/379] [SERIAL] msdyn_favoriteknowledgearticle -> msdyn_favoriteknowledgearticles
+15/1/2026, 10:02:44 - Output:         Sin registros (skip)
+15/1/2026, 10:02:44 - Output:     [158/379] [SERIAL] msdyn_federatedarticle -> msdyn_federatedarticles
+15/1/2026, 10:02:44 - Output:         Sin registros (skip)
+15/1/2026, 10:02:44 - Output:     [159/379] [SERIAL] msdyn_federatedarticleincident -> msdyn_federatedarticleincidents
+15/1/2026, 10:02:44 - Output:         Sin registros (skip)
+15/1/2026, 10:02:44 - Output:     [160/379] [SERIAL] msdyn_flow_actionapprovalmodel -> msdyn_flow_actionapprovalmodels
+15/1/2026, 10:02:44 - Output:         Sin registros (skip)
+15/1/2026, 10:02:44 - Output: 
+15/1/2026, 10:02:44 - Output:   📦 Grupo 33/76 [5 tablas]...
+15/1/2026, 10:03:06 - Output:     [161/379] [SERIAL] msdyn_flow_actionapprovalmodel_systemuser -> msdyn_flow_actionapprovalmodel_systemuserset
+15/1/2026, 10:03:06 - Output:         Sin registros (skip)
+15/1/2026, 10:03:06 - Output:     [162/379] [SERIAL] msdyn_flow_actionapprovalmodel_team -> msdyn_flow_actionapprovalmodel_teamset
+15/1/2026, 10:03:06 - Output:         Sin registros (skip)
+15/1/2026, 10:03:06 - Output:     [163/379] [SERIAL] msdyn_flow_approval -> msdyn_flow_approvals
+15/1/2026, 10:03:06 - Output:         Sin registros (skip)
+15/1/2026, 10:03:06 - Output:     [164/379] [SERIAL] msdyn_flow_approvalrequest -> msdyn_flow_approvalrequests
+15/1/2026, 10:03:06 - Output:         Sin registros (skip)
+15/1/2026, 10:03:06 - Output:     [165/379] [SERIAL] msdyn_flow_approvalresponse -> msdyn_flow_approvalresponses
+15/1/2026, 10:03:06 - Output:         Sin registros (skip)
+15/1/2026, 10:03:06 - Output: 
+15/1/2026, 10:03:06 - Output:   📦 Grupo 34/76 [5 tablas]...
+15/1/2026, 10:03:28 - Output:     [166/379] [SERIAL] msdyn_flow_approvalstep -> msdyn_flow_approvalsteps
+15/1/2026, 10:03:28 - Output:         Sin registros (skip)
+15/1/2026, 10:03:28 - Output:     [167/379] [SERIAL] msdyn_flow_awaitallactionapprovalmodel -> msdyn_flow_awaitallactionapprovalmodels
+15/1/2026, 10:03:28 - Output:         Sin registros (skip)
+15/1/2026, 10:03:28 - Output:     [168/379] [SERIAL] msdyn_flow_awaitallactionapprovalmodel_team -> msdyn_flow_awaitallactionapprovalmodel_teamset
+15/1/2026, 10:03:28 - Output:         Sin registros (skip)
+15/1/2026, 10:03:28 - Output:     [169/379] [SERIAL] msdyn_flow_awaitallactionapprovalmodel_user -> msdyn_flow_awaitallactionapprovalmodel_userset
+15/1/2026, 10:03:28 - Output:         Sin registros (skip)
+15/1/2026, 10:03:28 - Output:     [170/379] [SERIAL] msdyn_flow_awaitallapprovalmodel -> msdyn_flow_awaitallapprovalmodels
+15/1/2026, 10:03:28 - Output:         Sin registros (skip)
+15/1/2026, 10:03:29 - Output: 
+15/1/2026, 10:03:29 - Output:   📦 Grupo 35/76 [5 tablas]...
+15/1/2026, 10:03:50 - Output:     [171/379] [SERIAL] msdyn_flow_awaitallmodel_systemuser -> msdyn_flow_awaitallmodel_systemuserset
+15/1/2026, 10:03:50 - Output:         Sin registros (skip)
+15/1/2026, 10:03:50 - Output:     [172/379] [SERIAL] msdyn_flow_awaitallmodel_team -> msdyn_flow_awaitallmodel_teamset
+15/1/2026, 10:03:50 - Output:         Sin registros (skip)
+15/1/2026, 10:03:50 - Output:     [173/379] [SERIAL] msdyn_flow_basicapprovalmodel -> msdyn_flow_basicapprovalmodels
+15/1/2026, 10:03:50 - Output:         Sin registros (skip)
+15/1/2026, 10:03:50 - Output:     [174/379] [SERIAL] msdyn_flow_basicapprovalmodel_systemuser -> msdyn_flow_basicapprovalmodel_systemuserset
+15/1/2026, 10:03:51 - Output:         Sin registros (skip)
+15/1/2026, 10:03:51 - Output:     [175/379] [SERIAL] msdyn_flow_basicapprovalmodel_team -> msdyn_flow_basicapprovalmodel_teamset
+15/1/2026, 10:03:51 - Output:         Sin registros (skip)
+15/1/2026, 10:03:51 - Output: 
+15/1/2026, 10:03:51 - Output:   📦 Grupo 36/76 [5 tablas]...
+15/1/2026, 10:04:12 - Output:     [176/379] [SERIAL] msdyn_flow_flowapproval -> msdyn_flow_flowapprovals
+15/1/2026, 10:04:12 - Output:         Sin registros (skip)
+15/1/2026, 10:04:12 - Output:     [177/379] [SERIAL] msdyn_formmapping -> msdyn_formmappings
+15/1/2026, 10:04:12 - Output:         Sin registros (skip)
+15/1/2026, 10:04:12 - Output:     [178/379] [SERIAL] msdyn_function -> msdyn_functions
+15/1/2026, 10:04:13 - Output:         Sin registros (skip)
+15/1/2026, 10:04:13 - Output:     [179/379] [SERIAL] msdyn_helppage -> msdyn_helppages
+15/1/2026, 10:04:13 - Output:         Sin registros (skip)
+15/1/2026, 10:04:13 - Output:     [180/379] [SERIAL] msdyn_historicalcaseharvestbatch -> msdyn_historicalcaseharvestbatches
+15/1/2026, 10:04:13 - Output:         Sin registros (skip)
+15/1/2026, 10:04:13 - Output: 
+15/1/2026, 10:04:13 - Output:   📦 Grupo 37/76 [5 tablas]...
+15/1/2026, 10:04:40 - Output:     [181/379] [SERIAL] msdyn_historicalcaseharvestrun -> msdyn_historicalcaseharvestruns
+15/1/2026, 10:04:40 - Output:         Sin registros (skip)
+15/1/2026, 10:04:40 - Output:     [182/379] [SERIAL] msdyn_insightsstorevirtualentity -> msdyn_insightsstorevirtualentities
+15/1/2026, 10:04:41 - Output:         Sin registros (skip)
+15/1/2026, 10:04:41 - Output:     [183/379] [SERIAL] msdyn_integratedsearchprovider -> msdyn_integratedsearchproviders
+15/1/2026, 10:04:41 - Output:         Sin registros (skip)
+15/1/2026, 10:04:41 - Output:     [184/379] [SERIAL] msdyn_interimupdateknowledgearticle -> msdyn_interimupdateknowledgearticles
+15/1/2026, 10:04:41 - Output:         Sin registros (skip)
+15/1/2026, 10:04:41 - Output:     [185/379] [SERIAL] msdyn_kalanguagesetting -> msdyn_kalanguagesettings
+15/1/2026, 10:04:41 - Output:         Sin registros (skip)
+15/1/2026, 10:04:41 - Output: 
+15/1/2026, 10:04:41 - Output:   📦 Grupo 38/76 [5 tablas]...
+15/1/2026, 10:05:04 - Output:     [186/379] [SERIAL] msdyn_kbattachment -> msdyn_kbattachments
+15/1/2026, 10:05:04 - Output:         Sin registros (skip)
+15/1/2026, 10:05:04 - Output:     [187/379] [SERIAL] msdyn_kmfederatedsearchconfig -> msdyn_kmfederatedsearchconfigs
+15/1/2026, 10:05:04 - Output:         Sin registros (skip)
+15/1/2026, 10:05:04 - Output:     [188/379] [SERIAL] msdyn_kmpersonalizationsetting -> msdyn_kmpersonalizationsettings
+15/1/2026, 10:05:04 - Output:         Registros: 
+15/1/2026, 10:05:04 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:05:04 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:05:04 - Output:     [189/379] [SERIAL] msdyn_knowledgearticlecustomentity -> msdyn_knowledgearticlecustomentities
+15/1/2026, 10:05:04 - Output:         Sin registros (skip)
+15/1/2026, 10:05:04 - Output:     [190/379] [SERIAL] msdyn_knowledgearticleimage -> msdyn_knowledgearticleimages
+15/1/2026, 10:05:05 - Output:         Sin registros (skip)
+15/1/2026, 10:05:05 - Output: 
+15/1/2026, 10:05:05 - Output:   📦 Grupo 39/76 [5 tablas]...
+15/1/2026, 10:05:34 - Output:     [191/379] [SERIAL] msdyn_knowledgearticletemplate -> msdyn_knowledgearticletemplates
+15/1/2026, 10:05:34 - Output:         Sin registros (skip)
+15/1/2026, 10:05:34 - Output:     [192/379] [SERIAL] msdyn_knowledgeassetconfiguration -> msdyn_knowledgeassetconfigurations
+15/1/2026, 10:05:35 - Output:         Sin registros (skip)
+15/1/2026, 10:05:35 - Output:     [193/379] [SERIAL] msdyn_knowledgeconfiguration -> msdyn_knowledgeconfigurations
+15/1/2026, 10:05:35 - Output:         Registros: 
+15/1/2026, 10:05:35 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:05:35 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:05:35 - Output:     [194/379] [SERIAL] msdyn_knowledgeharvestjobrecord -> msdyn_knowledgeharvestjobrecords
+15/1/2026, 10:05:35 - Output:         Sin registros (skip)
+15/1/2026, 10:05:35 - Output:     [195/379] [SERIAL] msdyn_knowledgeinteractioninsight -> msdyn_knowledgeinteractioninsights
+15/1/2026, 10:05:35 - Output:         Sin registros (skip)
+15/1/2026, 10:05:35 - Output: 
+15/1/2026, 10:05:35 - Output:   📦 Grupo 40/76 [5 tablas]...
+15/1/2026, 10:05:59 - Output:     [196/379] [SERIAL] msdyn_knowledgemanagementsetting -> msdyn_knowledgemanagementsettings
+15/1/2026, 10:05:59 - Output:         Sin registros (skip)
+15/1/2026, 10:05:59 - Output:     [197/379] [SERIAL] msdyn_knowledgepersonalfilter -> msdyn_knowledgepersonalfilters
+15/1/2026, 10:05:59 - Output:         Sin registros (skip)
+15/1/2026, 10:05:59 - Output:     [198/379] [SERIAL] msdyn_knowledgesearchinsight -> msdyn_knowledgesearchinsights
+15/1/2026, 10:05:59 - Output:         Sin registros (skip)
+15/1/2026, 10:05:59 - Output:     [199/379] [SERIAL] msdyn_mobileapp -> msdyn_mobileapps
+15/1/2026, 10:05:59 - Output:         Sin registros (skip)
+15/1/2026, 10:05:59 - Output:     [200/379] [SERIAL] msdyn_modulerundetail -> msdyn_modulerundetails
+15/1/2026, 10:06:00 - Output:         Sin registros (skip)
+15/1/2026, 10:06:00 - Output: 
+15/1/2026, 10:06:00 - Output:   📦 Grupo 41/76 [5 tablas]...
+15/1/2026, 10:06:24 - Output:     [201/379] [SERIAL] msdyn_msdyn_kbattachment_knowledgearticle -> msdyn_msdyn_kbattachment_knowledgearticleset
+15/1/2026, 10:06:24 - Output:         Sin registros (skip)
+15/1/2026, 10:06:24 - Output:     [202/379] [SERIAL] msdyn_odatav4ds -> msdyn_odatav4ds
+15/1/2026, 10:06:24 - Output:         Sin registros (skip)
+15/1/2026, 10:06:24 - Output:     [203/379] [SERIAL] msdyn_plan -> msdyn_plans
+15/1/2026, 10:06:24 - Output:         Sin registros (skip)
+15/1/2026, 10:06:24 - Output:     [204/379] [SERIAL] msdyn_planartifact -> msdyn_planartifacts
+15/1/2026, 10:06:24 - Output:         Sin registros (skip)
+15/1/2026, 10:06:24 - Output:     [205/379] [SERIAL] msdyn_planattachment -> msdyn_planattachments
+15/1/2026, 10:06:24 - Output:         Sin registros (skip)
+15/1/2026, 10:06:24 - Output: 
+15/1/2026, 10:06:24 - Output:   📦 Grupo 42/76 [5 tablas]...
+15/1/2026, 10:06:46 - Output:     [206/379] [SERIAL] msdyn_pmanalysishistory -> msdyn_pmanalysishistories
+15/1/2026, 10:06:46 - Output:         Sin registros (skip)
+15/1/2026, 10:06:46 - Output:     [207/379] [SERIAL] msdyn_pmbusinessruleautomationconfig -> msdyn_pmbusinessruleautomationconfigs
+15/1/2026, 10:06:46 - Output:         Sin registros (skip)
+15/1/2026, 10:06:46 - Output:     [208/379] [SERIAL] msdyn_pmcalendar -> msdyn_pmcalendars
+15/1/2026, 10:06:46 - Output:         Sin registros (skip)
+15/1/2026, 10:06:46 - Output:     [209/379] [SERIAL] msdyn_pmcalendarversion -> msdyn_pmcalendarversions
+15/1/2026, 10:06:46 - Output:         Sin registros (skip)
+15/1/2026, 10:06:46 - Output:     [210/379] [SERIAL] msdyn_pminferredtask -> msdyn_pminferredtasks
+15/1/2026, 10:06:46 - Output:         Sin registros (skip)
+15/1/2026, 10:06:46 - Output: 
+15/1/2026, 10:06:47 - Output:   📦 Grupo 43/76 [5 tablas]...
+15/1/2026, 10:07:08 - Output:     [211/379] [SERIAL] msdyn_pmprocessextendedmetadataversion -> msdyn_pmprocessextendedmetadataversions
+15/1/2026, 10:07:08 - Output:         Sin registros (skip)
+15/1/2026, 10:07:08 - Output:     [212/379] [SERIAL] msdyn_pmprocesstemplate -> msdyn_pmprocesstemplates
+15/1/2026, 10:07:08 - Output:         Sin registros (skip)
+15/1/2026, 10:07:09 - Output:     [213/379] [SERIAL] msdyn_pmprocessusersettings -> msdyn_pmprocessusersettings
+15/1/2026, 10:07:09 - Output:         Sin registros (skip)
+15/1/2026, 10:07:09 - Output:     [214/379] [SERIAL] msdyn_pmprocessversion -> msdyn_pmprocessversions
+15/1/2026, 10:07:09 - Output:         Sin registros (skip)
+15/1/2026, 10:07:09 - Output:     [215/379] [SERIAL] msdyn_pmrecording -> msdyn_pmrecordings
+15/1/2026, 10:07:09 - Output:         Sin registros (skip)
+15/1/2026, 10:07:09 - Output: 
+15/1/2026, 10:07:09 - Output:   📦 Grupo 44/76 [5 tablas]...
+15/1/2026, 10:07:33 - Output:     [216/379] [SERIAL] msdyn_pmsimulation -> msdyn_pmsimulations
+15/1/2026, 10:07:34 - Output:         Sin registros (skip)
+15/1/2026, 10:07:34 - Output:     [217/379] [SERIAL] msdyn_pmtab -> msdyn_pmtabs
+15/1/2026, 10:07:34 - Output:         Sin registros (skip)
+15/1/2026, 10:07:34 - Output:     [218/379] [SERIAL] msdyn_pmview -> msdyn_pmviews
+15/1/2026, 10:07:35 - Output:         Sin registros (skip)
+15/1/2026, 10:07:35 - Output:     [219/379] [SERIAL] msdyn_qna -> msdyn_qnas
+15/1/2026, 10:07:35 - Output:         Sin registros (skip)
+15/1/2026, 10:07:35 - Output:     [220/379] [SERIAL] msdyn_richtextfile -> msdyn_richtextfiles
+15/1/2026, 10:07:35 - Output:         Sin registros (skip)
+15/1/2026, 10:07:35 - Output: 
+15/1/2026, 10:07:35 - Output:   📦 Grupo 45/76 [5 tablas]...
+15/1/2026, 10:07:58 - Output:     [221/379] [SERIAL] msdyn_salesforcestructuredobject -> msdyn_salesforcestructuredobjects
+15/1/2026, 10:07:58 - Output:         Sin registros (skip)
+15/1/2026, 10:07:59 - Output:     [222/379] [SERIAL] msdyn_salesforcestructuredqnaconfig -> msdyn_salesforcestructuredqnaconfigs
+15/1/2026, 10:07:59 - Output:         Sin registros (skip)
+15/1/2026, 10:07:59 - Output:     [223/379] [SERIAL] msdyn_schedule -> msdyn_schedules
+15/1/2026, 10:07:59 - Output:         Registros: 
+15/1/2026, 10:07:59 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:07:59 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:07:59 - Output:     [224/379] [SERIAL] msdyn_serviceconfiguration -> msdyn_serviceconfigurations
+15/1/2026, 10:07:59 - Output:         Sin registros (skip)
+15/1/2026, 10:07:59 - Output:     [225/379] [SERIAL] msdyn_slakpi -> msdyn_slakpis
+15/1/2026, 10:07:59 - Output:         Sin registros (skip)
+15/1/2026, 10:07:59 - Output: 
+15/1/2026, 10:07:59 - Output:   ⏱️  CHECKPOINT 3: Grupos 45/76 | Token: 22 min
+15/1/2026, 10:07:59 - Output: 
+15/1/2026, 10:07:59 - Output:   📦 Grupo 46/76 [5 tablas]...
+15/1/2026, 10:08:29 - Output:     [226/379] [BATCH API] msdyn_solutioncomponentcountsummary -> msdyn_solutioncomponentcountsummaries
+15/1/2026, 10:08:29 - Output:         Registros: 80
+15/1/2026, 10:08:29 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:08:29 - Output:         ✅ 0/80 registros restaurados
+15/1/2026, 10:08:29 - Output:     [227/379] [SERIAL] msdyn_solutionhealthruleset -> msdyn_solutionhealthrulesets
+15/1/2026, 10:08:29 - Output:         Sin registros (skip)
+15/1/2026, 10:08:29 - Output:     [228/379] [SERIAL] msdyn_solutionhistorydatasource -> msdyn_solutionhistorydatasources
+15/1/2026, 10:08:29 - Output:         Registros: 
+15/1/2026, 10:08:29 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 10:08:29 - Output:     [229/379] [SERIAL] msdyn_timelinepin -> msdyn_timelinepins
+15/1/2026, 10:08:29 - Output:         Sin registros (skip)
+15/1/2026, 10:08:29 - Output:     [230/379] [SERIAL] msdyn_tour -> msdyn_tours
+15/1/2026, 10:08:30 - Output:         Sin registros (skip)
+15/1/2026, 10:08:30 - Output: 
+15/1/2026, 10:08:30 - Output:   📦 Grupo 47/76 [5 tablas]...
+15/1/2026, 10:08:53 - Output:     [231/379] [SERIAL] msdyn_virtualtablecolumncandidate -> msdyn_virtualtablecolumncandidates
+15/1/2026, 10:08:53 - Output:         Sin registros (skip)
+15/1/2026, 10:08:53 - Output:     [232/379] [SERIAL] msdyn_workflowactionstatus -> msdyn_workflowactionstatuses
+15/1/2026, 10:08:54 - Output:         Sin registros (skip)
+15/1/2026, 10:08:54 - Output:     [233/379] [SERIAL] msgraphresourcetosubscription -> msgraphresourcetosubscriptions
+15/1/2026, 10:08:54 - Output:         Sin registros (skip)
+15/1/2026, 10:08:54 - Output:     [234/379] [SERIAL] mspcat_catalogsubmissionfiles -> mspcat_catalogsubmissionfileses
+15/1/2026, 10:08:54 - Output:         Sin registros (skip)
+15/1/2026, 10:08:54 - Output:     [235/379] [SERIAL] mspcat_packagestore -> mspcat_packagestores
+15/1/2026, 10:08:54 - Output:         Sin registros (skip)
+15/1/2026, 10:08:54 - Output: 
+15/1/2026, 10:08:54 - Output:   📦 Grupo 48/76 [5 tablas]...
+15/1/2026, 10:09:16 - Output:     [236/379] [SERIAL] mspp_accesscontrolrule_publishingstate -> mspp_accesscontrolrule_publishingstateset
+15/1/2026, 10:09:16 - Output:         Sin registros (skip)
+15/1/2026, 10:09:16 - Output:     [237/379] [SERIAL] mspp_columnpermission -> mspp_columnpermissions
+15/1/2026, 10:09:16 - Output:         Sin registros (skip)
+15/1/2026, 10:09:16 - Output:     [238/379] [SERIAL] mspp_columnpermissionprofile -> mspp_columnpermissionprofiles
+15/1/2026, 10:09:16 - Output:         Sin registros (skip)
+15/1/2026, 10:09:16 - Output:     [239/379] [SERIAL] mspp_columnpermissionprofile_webrole -> mspp_columnpermissionprofile_webroleset
+15/1/2026, 10:09:16 - Output:         Sin registros (skip)
+15/1/2026, 10:09:16 - Output:     [240/379] [SERIAL] mspp_entitypermission_webrole -> mspp_entitypermission_webroleset
+15/1/2026, 10:09:16 - Output:         Sin registros (skip)
+15/1/2026, 10:09:16 - Output: 
+15/1/2026, 10:09:17 - Output:   📦 Grupo 49/76 [5 tablas]...
+15/1/2026, 10:09:46 - Output:     [241/379] [SERIAL] mspp_powerpagescoreentityds -> mspp_powerpagescoreentitydses
+15/1/2026, 10:09:46 - Output:         Registros: 
+15/1/2026, 10:09:46 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:09:46 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:09:46 - Output:     [242/379] [SERIAL] mspp_publishingstatetransitionrule_webrole -> mspp_publishingstatetransitionrule_webroleset
+15/1/2026, 10:09:46 - Output:         Sin registros (skip)
+15/1/2026, 10:09:46 - Output:     [243/379] [SERIAL] mspp_webpageaccesscontrolrule_webrole -> mspp_webpageaccesscontrolrule_webroleset
+15/1/2026, 10:09:46 - Output:         Sin registros (skip)
+15/1/2026, 10:09:46 - Output:     [244/379] [SERIAL] mspp_websiteaccess_webrole -> mspp_websiteaccess_webroleset
+15/1/2026, 10:09:46 - Output:         Sin registros (skip)
+15/1/2026, 10:09:46 - Output:     [245/379] [SERIAL] mspp_websitelanguage -> mspp_websitelanguages
+15/1/2026, 10:09:47 - Output:         Registros: 
+15/1/2026, 10:09:47 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 10:09:47 - Output: 
+15/1/2026, 10:09:47 - Output:   📦 Grupo 50/76 [5 tablas]...
+15/1/2026, 10:10:24 - Output:     [246/379] [SERIAL] nlsqregistration -> nlsqregistrations
+15/1/2026, 10:10:24 - Output:         Sin registros (skip)
+15/1/2026, 10:10:24 - Output:     [247/379] [SERIAL] organizationdatasyncfnostate -> organizationdatasyncfnostates
+15/1/2026, 10:10:25 - Output:         Sin registros (skip)
+15/1/2026, 10:10:25 - Output:     [248/379] [SERIAL] organizationdatasyncstate -> organizationdatasyncstates
+15/1/2026, 10:10:25 - Output:         Sin registros (skip)
+15/1/2026, 10:10:25 - Output:     [249/379] [SERIAL] organizationdatasyncsubscriptionfnotable -> organizationdatasyncsubscriptionfnotables
+15/1/2026, 10:10:25 - Output:         Registros: 2
+15/1/2026, 10:10:25 - Output:         ✅ 2/2 registros restaurados
+15/1/2026, 10:10:25 - Output:     [250/379] [BATCH API] package -> packages
+15/1/2026, 10:10:25 - Output:         Registros: 129
+15/1/2026, 10:10:25 - Output:         ✅ 129/129 registros restaurados
+15/1/2026, 10:10:25 - Output: 
+15/1/2026, 10:10:25 - Output:   📦 Grupo 51/76 [5 tablas]...
+15/1/2026, 10:10:53 - Output:     [251/379] [BATCH API] package_solution -> package_solutionset
+15/1/2026, 10:10:53 - Output:         Registros: 425
+15/1/2026, 10:10:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:10:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:10:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:10:53 - Output:         ✅ 0/425 registros restaurados
+15/1/2026, 10:10:53 - Output:     [252/379] [SERIAL] pdfsetting -> pdfsettings
+15/1/2026, 10:10:53 - Output:         Registros: 
+15/1/2026, 10:10:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:10:53 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:10:53 - Output:     [253/379] [SERIAL] phonecall -> phonecalls
+15/1/2026, 10:10:54 - Output:         Sin registros (skip)
+15/1/2026, 10:10:54 - Output:     [254/379] [SERIAL] plannerbusinessscenario -> plannerbusinessscenarios
+15/1/2026, 10:10:54 - Output:         Sin registros (skip)
+15/1/2026, 10:10:54 - Output:     [255/379] [SERIAL] plannersyncaction -> plannersyncactions
+15/1/2026, 10:10:54 - Output:         Sin registros (skip)
+15/1/2026, 10:10:54 - Output: 
+15/1/2026, 10:10:54 - Output:   📦 Grupo 52/76 [5 tablas]...
+15/1/2026, 10:11:18 - Output:     [256/379] [SERIAL] plugin -> plugins
+15/1/2026, 10:11:18 - Output:         Sin registros (skip)
+15/1/2026, 10:11:18 - Output:     [257/379] [SERIAL] pluginpackage -> pluginpackages
+15/1/2026, 10:11:18 - Output:         Registros: 
+15/1/2026, 10:11:18 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:11:18 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:11:18 - Output:     [258/379] [SERIAL] post -> posts
+15/1/2026, 10:11:19 - Output:         Sin registros (skip)
+15/1/2026, 10:11:19 - Output:     [259/379] [SERIAL] postcomment -> postcomments
+15/1/2026, 10:11:19 - Output:         Sin registros (skip)
+15/1/2026, 10:11:19 - Output:     [260/379] [SERIAL] powerbidataset -> powerbidatasets
+15/1/2026, 10:11:19 - Output:         Sin registros (skip)
+15/1/2026, 10:11:19 - Output: 
+15/1/2026, 10:11:19 - Output:   📦 Grupo 53/76 [5 tablas]...
+15/1/2026, 10:11:41 - Output:     [261/379] [SERIAL] powerbidatasetapdx -> powerbidatasetapdxes
+15/1/2026, 10:11:41 - Output:         Sin registros (skip)
+15/1/2026, 10:11:42 - Output:     [262/379] [SERIAL] powerbimashupparameter -> powerbimashupparameters
+15/1/2026, 10:11:42 - Output:         Sin registros (skip)
+15/1/2026, 10:11:42 - Output:     [263/379] [SERIAL] powerbireport -> powerbireports
+15/1/2026, 10:11:42 - Output:         Sin registros (skip)
+15/1/2026, 10:11:42 - Output:     [264/379] [SERIAL] powerbireportapdx -> powerbireportapdxes
+15/1/2026, 10:11:42 - Output:         Sin registros (skip)
+15/1/2026, 10:11:42 - Output:     [265/379] [SERIAL] powerfxrule -> powerfxrules
+15/1/2026, 10:11:42 - Output:         Sin registros (skip)
+15/1/2026, 10:11:42 - Output: 
+15/1/2026, 10:11:42 - Output:   📦 Grupo 54/76 [5 tablas]...
+15/1/2026, 10:12:07 - Output:     [266/379] [SERIAL] powerpagecomponent_mspp_webrole_account -> powerpagecomponent_mspp_webrole_accountset
+15/1/2026, 10:12:07 - Output:         Sin registros (skip)
+15/1/2026, 10:12:07 - Output:     [267/379] [SERIAL] powerpagecomponent_mspp_webrole_contact -> powerpagecomponent_mspp_webrole_contactset
+15/1/2026, 10:12:07 - Output:         Sin registros (skip)
+15/1/2026, 10:12:07 - Output:     [268/379] [SERIAL] powerpagecomponent_powerpagecomponent -> powerpagecomponent_powerpagecomponentset
+15/1/2026, 10:12:07 - Output:         Sin registros (skip)
+15/1/2026, 10:12:07 - Output:     [269/379] [SERIAL] powerpagecomponent_webrole_systemuser -> powerpagecomponent_webrole_systemuserset
+15/1/2026, 10:12:07 - Output:         Sin registros (skip)
+15/1/2026, 10:12:07 - Output:     [270/379] [SERIAL] powerpagesddosalert -> powerpagesddosalerts
+15/1/2026, 10:12:07 - Output:         Sin registros (skip)
+15/1/2026, 10:12:08 - Output: 
+15/1/2026, 10:12:08 - Output:   📦 Grupo 55/76 [5 tablas]...
+15/1/2026, 10:12:35 - Output:     [271/379] [SERIAL] powerpagesite -> powerpagesites
+15/1/2026, 10:12:35 - Output:         Registros: 
+15/1/2026, 10:12:35 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 10:12:35 - Output:     [272/379] [SERIAL] powerpagesitelanguage -> powerpagesitelanguages
+15/1/2026, 10:12:35 - Output:         Registros: 
+15/1/2026, 10:12:35 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:12:35 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:12:35 - Output:     [273/379] [SERIAL] powerpagesitepublished -> powerpagesitepublisheds
+15/1/2026, 10:12:35 - Output:         Sin registros (skip)
+15/1/2026, 10:12:35 - Output:     [274/379] [SERIAL] powerpagesite_dvfilesearch -> powerpagesite_dvfilesearchset
+15/1/2026, 10:12:35 - Output:         Sin registros (skip)
+15/1/2026, 10:12:35 - Output:     [275/379] [SERIAL] powerpagesite_dvtablesearch -> powerpagesite_dvtablesearchset
+15/1/2026, 10:12:36 - Output:         Sin registros (skip)
+15/1/2026, 10:12:36 - Output: 
+15/1/2026, 10:12:36 - Output:   📦 Grupo 56/76 [5 tablas]...
+15/1/2026, 10:12:59 - Output:     [276/379] [SERIAL] powerpageslog -> powerpageslogs
+15/1/2026, 10:12:59 - Output:         Sin registros (skip)
+15/1/2026, 10:12:59 - Output:     [277/379] [SERIAL] powerpagesmanagedidentity -> powerpagesmanagedidentities
+15/1/2026, 10:12:59 - Output:         Sin registros (skip)
+15/1/2026, 10:12:59 - Output:     [278/379] [SERIAL] powerpagesscanreport -> powerpagesscanreports
+15/1/2026, 10:12:59 - Output:         Sin registros (skip)
+15/1/2026, 10:12:59 - Output:     [279/379] [SERIAL] powerpagessiteaifeedback -> powerpagessiteaifeedbacks
+15/1/2026, 10:13:00 - Output:         Sin registros (skip)
+15/1/2026, 10:13:00 - Output:     [280/379] [SERIAL] powerpagessourcefile -> powerpagessourcefiles
+15/1/2026, 10:13:00 - Output:         Sin registros (skip)
+15/1/2026, 10:13:00 - Output: 
+15/1/2026, 10:13:00 - Output:   📦 Grupo 57/76 [5 tablas]...
+15/1/2026, 10:13:43 - Output:     [281/379] [BATCH API] privilege -> privileges
+15/1/2026, 10:13:43 - Output:         Registros: 5000
+15/1/2026, 10:13:43 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:13:43 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:13:43 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:13:43 - Output:         ✅ 0/5000 registros restaurados
+15/1/2026, 10:13:43 - Output:     [282/379] [SERIAL] privilegecheckerlog -> privilegecheckerlogs
+15/1/2026, 10:13:43 - Output:         Sin registros (skip)
+15/1/2026, 10:13:43 - Output:     [283/379] [SERIAL] privilegecheckerrun -> privilegecheckerruns
+15/1/2026, 10:13:43 - Output:         Sin registros (skip)
+15/1/2026, 10:13:43 - Output:     [284/379] [SERIAL] processorregistration -> processorregistrations
+15/1/2026, 10:13:44 - Output:         Sin registros (skip)
+15/1/2026, 10:13:44 - Output:     [285/379] [SERIAL] processstageparameter -> processstageparameters
+15/1/2026, 10:13:44 - Output:         Sin registros (skip)
+15/1/2026, 10:13:44 - Output: 
+15/1/2026, 10:13:44 - Output:   📦 Grupo 58/76 [5 tablas]...
+15/1/2026, 10:14:07 - Output:     [286/379] [SERIAL] provisionlanguageforuser -> provisionlanguageforusers
+15/1/2026, 10:14:07 - Output:         Sin registros (skip)
+15/1/2026, 10:14:07 - Output:     [287/379] [SERIAL] queueitem -> queueitems
+15/1/2026, 10:14:07 - Output:         Sin registros (skip)
+15/1/2026, 10:14:07 - Output:     [288/379] [SERIAL] recentlyused -> recentlyused
+15/1/2026, 10:14:08 - Output:         Sin registros (skip)
+15/1/2026, 10:14:08 - Output:     [289/379] [SERIAL] reconciliationentityinfo -> reconciliationentityinfos
+15/1/2026, 10:14:08 - Output:         Sin registros (skip)
+15/1/2026, 10:14:08 - Output:     [290/379] [SERIAL] reconciliationentitystepinfo -> reconciliationentitystepinfos
+15/1/2026, 10:14:08 - Output:         Sin registros (skip)
+15/1/2026, 10:14:08 - Output: 
+15/1/2026, 10:14:08 - Output:   📦 Grupo 59/76 [5 tablas]...
+15/1/2026, 10:14:37 - Output:     [291/379] [SERIAL] reconciliationinfo -> reconciliationinfos
+15/1/2026, 10:14:37 - Output:         Sin registros (skip)
+15/1/2026, 10:14:37 - Output:     [292/379] [SERIAL] recurringappointmentmaster -> recurringappointmentmasters
+15/1/2026, 10:14:37 - Output:         Sin registros (skip)
+15/1/2026, 10:14:37 - Output:     [293/379] [SERIAL] recyclebinconfig -> recyclebinconfigs
+15/1/2026, 10:14:37 - Output:         Sin registros (skip)
+15/1/2026, 10:14:37 - Output:     [294/379] [SERIAL] report -> reports
+15/1/2026, 10:14:37 - Output:         Registros: 5
+15/1/2026, 10:14:37 - Output:           Error: Invalid Operation: Trying to update an attribute in Live, which is not allowed
+15/1/2026, 10:14:38 - Output:           Error: Invalid Operation: Trying to update an attribute in Live, which is not allowed
+15/1/2026, 10:14:38 - Output:         ⚠️  3/5 registros restaurados, 2 errores
+15/1/2026, 10:14:38 - Output:     [295/379] [SERIAL] reportparameter -> reportparameters
+15/1/2026, 10:14:38 - Output:         Sin registros (skip)
+15/1/2026, 10:14:38 - Output: 
+15/1/2026, 10:14:38 - Output:   📦 Grupo 60/76 [5 tablas]...
+15/1/2026, 10:15:00 - Output:     [296/379] [SERIAL] retaineddataexcel -> retaineddataexcels
+15/1/2026, 10:15:00 - Output:         Sin registros (skip)
+15/1/2026, 10:15:00 - Output:     [297/379] [SERIAL] retentioncleanupinfo -> retentioncleanupinfos
+15/1/2026, 10:15:00 - Output:         Sin registros (skip)
+15/1/2026, 10:15:00 - Output:     [298/379] [SERIAL] retentioncleanupoperation -> retentioncleanupoperations
+15/1/2026, 10:15:00 - Output:         Sin registros (skip)
+15/1/2026, 10:15:00 - Output:     [299/379] [SERIAL] retentionconfig -> retentionconfigs
+15/1/2026, 10:15:00 - Output:         Sin registros (skip)
+15/1/2026, 10:15:00 - Output:     [300/379] [SERIAL] retentionfailuredetail -> retentionfailuredetails
+15/1/2026, 10:15:00 - Output:         Sin registros (skip)
+15/1/2026, 10:15:00 - Output: 
+15/1/2026, 10:15:00 - Output:   ⏱️  CHECKPOINT 4: Grupos 60/76 | Token: 29 min
+15/1/2026, 10:15:01 - Output: 
+15/1/2026, 10:15:01 - Output:   📦 Grupo 61/76 [5 tablas]...
+15/1/2026, 10:15:36 - Output:     [301/379] [SERIAL] retentionoperation -> retentionoperations
+15/1/2026, 10:15:36 - Output:         Sin registros (skip)
+15/1/2026, 10:15:36 - Output:     [302/379] [SERIAL] retentionoperationdetail -> retentionoperationdetails
+15/1/2026, 10:15:36 - Output:         Sin registros (skip)
+15/1/2026, 10:15:36 - Output:     [303/379] [SERIAL] retentionsuccessdetail -> retentionsuccessdetails
+15/1/2026, 10:15:36 - Output:         Sin registros (skip)
+15/1/2026, 10:15:36 - Output:     [304/379] [SERIAL] revokeinheritedaccessrecordstracker -> revokeinheritedaccessrecordstrackers
+15/1/2026, 10:15:36 - Output:         Sin registros (skip)
+15/1/2026, 10:15:36 - Output:     [305/379] [SERIAL] savingrule -> savingrules
+15/1/2026, 10:15:37 - Output:         Sin registros (skip)
+15/1/2026, 10:15:37 - Output: 
+15/1/2026, 10:15:37 - Output:   📦 Grupo 62/76 [5 tablas]...
+15/1/2026, 10:16:52 - Output:     [306/379] [SERIAL] sa_suggestedaction -> sa_suggestedactions
+15/1/2026, 10:16:52 - Output:         Sin registros (skip)
+15/1/2026, 10:16:52 - Output:     [307/379] [SERIAL] sa_suggestedactioncriteria -> sa_suggestedactioncriterias
+15/1/2026, 10:16:53 - Output:         Sin registros (skip)
+15/1/2026, 10:16:53 - Output:     [308/379] [BATCH API] sdkmessage -> sdkmessages
+15/1/2026, 10:16:53 - Output:         Registros: 1311
+15/1/2026, 10:16:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:16:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:16:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:16:53 - Output:         ✅ 0/1311 registros restaurados
+15/1/2026, 10:16:53 - Output:     [309/379] [BATCH API] sdkmessagefilter -> sdkmessagefilters
+15/1/2026, 10:16:53 - Output:         Registros: 5000
+15/1/2026, 10:16:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:16:53 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:16:54 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:16:54 - Output:         ✅ 0/5000 registros restaurados
+15/1/2026, 10:16:54 - Output:     [310/379] [SERIAL] searchattributesettings -> searchattributesettingses
+15/1/2026, 10:16:55 - Output:         Sin registros (skip)
+15/1/2026, 10:16:55 - Output: 
+15/1/2026, 10:16:55 - Output:   📦 Grupo 63/76 [5 tablas]...
+15/1/2026, 10:17:19 - Output:     [311/379] [SERIAL] searchcustomanalyzer -> searchcustomanalyzers
+15/1/2026, 10:17:19 - Output:         Sin registros (skip)
+15/1/2026, 10:17:20 - Output:     [312/379] [SERIAL] searchrelationshipsettings -> searchrelationshipsettingses
+15/1/2026, 10:17:20 - Output:         Sin registros (skip)
+15/1/2026, 10:17:20 - Output:     [313/379] [SERIAL] searchresultscache -> searchresultscaches
+15/1/2026, 10:17:20 - Output:         Sin registros (skip)
+15/1/2026, 10:17:20 - Output:     [314/379] [SERIAL] searchtelemetry -> searchtelemetries
+15/1/2026, 10:17:20 - Output:         Sin registros (skip)
+15/1/2026, 10:17:20 - Output:     [315/379] [SERIAL] sensitivitylabelattributemapping -> sensitivitylabelattributemappings
+15/1/2026, 10:17:20 - Output:         Sin registros (skip)
+15/1/2026, 10:17:20 - Output: 
+15/1/2026, 10:17:20 - Output:   📦 Grupo 64/76 [5 tablas]...
+15/1/2026, 10:17:49 - Output:     [316/379] [SERIAL] serviceendpoint -> serviceendpoints
+15/1/2026, 10:17:49 - Output:         Registros: 
+15/1/2026, 10:17:49 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:17:49 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:17:49 - Output:     [317/379] [BATCH API] serviceplan -> serviceplans
+15/1/2026, 10:17:49 - Output:         Registros: 349
+15/1/2026, 10:17:49 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:17:49 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:17:49 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:17:50 - Output:         ✅ 0/349 registros restaurados
+15/1/2026, 10:17:50 - Output:     [318/379] [SERIAL] serviceplanappmodules -> serviceplanappmodulesset
+15/1/2026, 10:17:50 - Output:         Sin registros (skip)
+15/1/2026, 10:17:50 - Output:     [319/379] [SERIAL] serviceplancustomcontrol -> serviceplancustomcontrolset
+15/1/2026, 10:17:50 - Output:         Sin registros (skip)
+15/1/2026, 10:17:50 - Output:     [320/379] [SERIAL] serviceplanmapping -> serviceplanmappings
+15/1/2026, 10:17:50 - Output:         Sin registros (skip)
+15/1/2026, 10:17:50 - Output: 
+15/1/2026, 10:17:50 - Output:   📦 Grupo 65/76 [5 tablas]...
+15/1/2026, 10:18:17 - Output:     [321/379] [SERIAL] sharedlinksetting -> sharedlinksettings
+15/1/2026, 10:18:17 - Output:         Sin registros (skip)
+15/1/2026, 10:18:17 - Output:     [322/379] [SERIAL] sharedobject -> sharedobjects
+15/1/2026, 10:18:17 - Output:         Sin registros (skip)
+15/1/2026, 10:18:18 - Output:     [323/379] [SERIAL] sharedworkspace -> sharedworkspaces
+15/1/2026, 10:18:18 - Output:         Sin registros (skip)
+15/1/2026, 10:18:18 - Output:     [324/379] [SERIAL] sharedworkspacepool -> sharedworkspacepools
+15/1/2026, 10:18:18 - Output:         Sin registros (skip)
+15/1/2026, 10:18:18 - Output:     [325/379] [SERIAL] sharepointdocument -> sharepointdocuments
+15/1/2026, 10:18:18 - Output:         Sin registros (skip)
+15/1/2026, 10:18:18 - Output: 
+15/1/2026, 10:18:18 - Output:   📦 Grupo 66/76 [5 tablas]...
+15/1/2026, 10:18:44 - Output:     [326/379] [SERIAL] sharepointdocumentlocation -> sharepointdocumentlocations
+15/1/2026, 10:18:44 - Output:         Sin registros (skip)
+15/1/2026, 10:18:44 - Output:     [327/379] [SERIAL] sharepointmanagedidentity -> sharepointmanagedidentities
+15/1/2026, 10:18:44 - Output:         Sin registros (skip)
+15/1/2026, 10:18:45 - Output:     [328/379] [SERIAL] sideloadedaiplugin -> sideloadedaiplugins
+15/1/2026, 10:18:45 - Output:         Sin registros (skip)
+15/1/2026, 10:18:45 - Output:     [329/379] [SERIAL] signal -> signals
+15/1/2026, 10:18:45 - Output:         Sin registros (skip)
+15/1/2026, 10:18:45 - Output:     [330/379] [SERIAL] signalregistration -> signalregistrations
+15/1/2026, 10:18:45 - Output:         Sin registros (skip)
+15/1/2026, 10:18:45 - Output: 
+15/1/2026, 10:18:45 - Output:   📦 Grupo 67/76 [5 tablas]...
+15/1/2026, 10:19:12 - Output:     [331/379] [SERIAL] sla -> slas
+15/1/2026, 10:19:12 - Output:         Sin registros (skip)
+15/1/2026, 10:19:12 - Output:     [332/379] [SERIAL] slaitem -> slaitems
+15/1/2026, 10:19:12 - Output:         Sin registros (skip)
+15/1/2026, 10:19:12 - Output:     [333/379] [SERIAL] socialactivity -> socialactivities
+15/1/2026, 10:19:12 - Output:         Sin registros (skip)
+15/1/2026, 10:19:12 - Output:     [334/379] [SERIAL] sourcecontrolbranchconfiguration -> sourcecontrolbranchconfigurations
+15/1/2026, 10:19:12 - Output:         Sin registros (skip)
+15/1/2026, 10:19:12 - Output:     [335/379] [SERIAL] sourcecontrolcomponent -> sourcecontrolcomponents
+15/1/2026, 10:19:12 - Output:         Sin registros (skip)
+15/1/2026, 10:19:12 - Output: 
+15/1/2026, 10:19:12 - Output:   📦 Grupo 68/76 [5 tablas]...
+15/1/2026, 10:19:42 - Output:     [336/379] [SERIAL] sourcecontrolconfiguration -> sourcecontrolconfigurations
+15/1/2026, 10:19:42 - Output:         Sin registros (skip)
+15/1/2026, 10:19:42 - Output:     [337/379] [SERIAL] stagedattributelookupvalue -> stagedattributelookupvalues
+15/1/2026, 10:19:42 - Output:         Sin registros (skip)
+15/1/2026, 10:19:42 - Output:     [338/379] [SERIAL] stagedattributepicklistvalue -> stagedattributepicklistvalues
+15/1/2026, 10:19:42 - Output:         Sin registros (skip)
+15/1/2026, 10:19:42 - Output:     [339/379] [SERIAL] stagedentity -> stagedentities
+15/1/2026, 10:19:42 - Output:         Sin registros (skip)
+15/1/2026, 10:19:42 - Output:     [340/379] [SERIAL] stagedentityattribute -> stagedentityattributes
+15/1/2026, 10:19:42 - Output:         Sin registros (skip)
+15/1/2026, 10:19:42 - Output: 
+15/1/2026, 10:19:42 - Output:   📦 Grupo 69/76 [5 tablas]...
+15/1/2026, 10:20:10 - Output:     [341/379] [SERIAL] stagedentityrelationship -> stagedentityrelationships
+15/1/2026, 10:20:10 - Output:         Sin registros (skip)
+15/1/2026, 10:20:10 - Output:     [342/379] [SERIAL] stagedentityrelationshiprelationships -> stagedentityrelationshiprelationships
+15/1/2026, 10:20:10 - Output:         Sin registros (skip)
+15/1/2026, 10:20:10 - Output:     [343/379] [SERIAL] stagedentityrelationshiprole -> stagedentityrelationshiproles
+15/1/2026, 10:20:10 - Output:         Sin registros (skip)
+15/1/2026, 10:20:10 - Output:     [344/379] [SERIAL] stagedmetadataasyncoperation -> stagedmetadataasyncoperations
+15/1/2026, 10:20:10 - Output:         Sin registros (skip)
+15/1/2026, 10:20:10 - Output:     [345/379] [SERIAL] stagedoptionset -> stagedoptionsets
+15/1/2026, 10:20:11 - Output:         Sin registros (skip)
+15/1/2026, 10:20:11 - Output: 
+15/1/2026, 10:20:11 - Output:   📦 Grupo 70/76 [5 tablas]...
+15/1/2026, 10:20:49 - Output:     [346/379] [SERIAL] stagedrelationship -> stagedrelationships
+15/1/2026, 10:20:49 - Output:         Sin registros (skip)
+15/1/2026, 10:20:49 - Output:     [347/379] [SERIAL] stagedrelationshipextracondition -> stagedrelationshipextraconditions
+15/1/2026, 10:20:49 - Output:         Sin registros (skip)
+15/1/2026, 10:20:50 - Output:     [348/379] [SERIAL] stagedsourcecontrolcomponent -> stagedsourcecontrolcomponents
+15/1/2026, 10:20:50 - Output:         Sin registros (skip)
+15/1/2026, 10:20:50 - Output:     [349/379] [SERIAL] stagedviewattribute -> stagedviewattributes
+15/1/2026, 10:20:50 - Output:         Sin registros (skip)
+15/1/2026, 10:20:50 - Output:     [350/379] [BATCH API] stagesolutionupload -> stagesolutionuploads
+15/1/2026, 10:20:50 - Output:         Registros: 25
+15/1/2026, 10:20:50 - Output:         ✅ 25/25 registros restaurados
+15/1/2026, 10:20:50 - Output: 
+15/1/2026, 10:20:50 - Output:   📦 Grupo 71/76 [5 tablas]...
+15/1/2026, 10:21:23 - Output:     [351/379] [SERIAL] subject -> subjects
+15/1/2026, 10:21:23 - Output:         Registros: 
+15/1/2026, 10:21:23 - Output:         ✅ 1/ registros restaurados
+15/1/2026, 10:21:24 - Output:     [352/379] [SERIAL] synapsedatabase -> synapsedatabases
+15/1/2026, 10:21:24 - Output:         Sin registros (skip)
+15/1/2026, 10:21:24 - Output:     [353/379] [SERIAL] synapselinkexternaltablestate -> synapselinkexternaltablestates
+15/1/2026, 10:21:24 - Output:         Sin registros (skip)
+15/1/2026, 10:21:24 - Output:     [354/379] [SERIAL] synapselinkprofile -> synapselinkprofiles
+15/1/2026, 10:21:24 - Output:         Sin registros (skip)
+15/1/2026, 10:21:24 - Output:     [355/379] [SERIAL] synapselinkprofileentity -> synapselinkprofileentities
+15/1/2026, 10:21:24 - Output:         Sin registros (skip)
+15/1/2026, 10:21:25 - Output: 
+15/1/2026, 10:21:25 - Output:   📦 Grupo 72/76 [5 tablas]...
+15/1/2026, 10:22:17 - Output:     [356/379] [SERIAL] synapselinkprofileentitystate -> synapselinkprofileentitystates
+15/1/2026, 10:22:17 - Output:         Sin registros (skip)
+15/1/2026, 10:22:17 - Output:     [357/379] [SERIAL] synapselinkschedule -> synapselinkschedules
+15/1/2026, 10:22:17 - Output:         Sin registros (skip)
+15/1/2026, 10:22:17 - Output:     [358/379] [SERIAL] tag -> tags
+15/1/2026, 10:22:17 - Output:         Sin registros (skip)
+15/1/2026, 10:22:17 - Output:     [359/379] [SERIAL] taggedflowsession -> taggedflowsessions
+15/1/2026, 10:22:17 - Output:         Sin registros (skip)
+15/1/2026, 10:22:17 - Output:     [360/379] [SERIAL] taggedprocess -> taggedprocesses
+15/1/2026, 10:22:17 - Output:         Sin registros (skip)
+15/1/2026, 10:22:17 - Output: 
+15/1/2026, 10:22:18 - Output:   📦 Grupo 73/76 [5 tablas]...
+15/1/2026, 10:23:05 - Output:     [361/379] [SERIAL] task -> tasks
+15/1/2026, 10:23:05 - Output:         Sin registros (skip)
+15/1/2026, 10:23:05 - Output:     [362/379] [SERIAL] tdsmetadata -> tdsmetadatas
+15/1/2026, 10:23:06 - Output:         Registros: 
+15/1/2026, 10:23:06 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:23:06 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:23:06 - Output:     [363/379] [SERIAL] teammobileofflineprofilemembership -> teammobileofflineprofilememberships
+15/1/2026, 10:23:06 - Output:         Sin registros (skip)
+15/1/2026, 10:23:06 - Output:     [364/379] [SERIAL] textdatarecordsindexingstatus -> textdatarecordsindexingstatuses
+15/1/2026, 10:23:06 - Output:         Sin registros (skip)
+15/1/2026, 10:23:06 - Output:     [365/379] [SERIAL] toolinggateway -> toolinggateways
+15/1/2026, 10:23:06 - Output:         Sin registros (skip)
+15/1/2026, 10:23:06 - Output: 
+15/1/2026, 10:23:06 - Output:   📦 Grupo 74/76 [5 tablas]...
+15/1/2026, 10:23:58 - Output:     [366/379] [SERIAL] toolinggatewaymcpserver -> toolinggatewaymcpservers
+15/1/2026, 10:23:58 - Output:         Sin registros (skip)
+15/1/2026, 10:23:59 - Output:     [367/379] [BATCH API] trait -> traits
+15/1/2026, 10:23:59 - Output:         Registros: 159
+15/1/2026, 10:23:59 - Output:         ✅ 159/159 registros restaurados
+15/1/2026, 10:23:59 - Output:     [368/379] [SERIAL] traitregistration -> traitregistrations
+15/1/2026, 10:23:59 - Output:         Sin registros (skip)
+15/1/2026, 10:23:59 - Output:     [369/379] [SERIAL] transactioncurrency -> transactioncurrencies
+15/1/2026, 10:23:59 - Output:         Registros: 
+15/1/2026, 10:23:59 - Output:           Error: [SKIP] Non-restorable record (system-managed/virtual/duplicate)
+15/1/2026, 10:23:59 - Output:         ✅ 0/ registros restaurados
+15/1/2026, 10:24:00 - Output:     [370/379] [SERIAL] userentityinstancedata -> userentityinstancedataset
+15/1/2026, 10:24:00 - Output:         Sin registros (skip)
+15/1/2026, 10:24:00 - Output: 
+15/1/2026, 10:24:00 - Output:   📦 Grupo 75/76 [5 tablas]...
+15/1/2026, 10:24:40 - Output:     [371/379] [SERIAL] usermobileofflineprofilemembership -> usermobileofflineprofilememberships
+15/1/2026, 10:24:40 - Output:         Sin registros (skip)
+15/1/2026, 10:24:40 - Output:     [372/379] [SERIAL] userrating -> userratings
+15/1/2026, 10:24:40 - Output:         Sin registros (skip)
+15/1/2026, 10:24:41 - Output:     [373/379] [SERIAL] viewasexamplequestion -> viewasexamplequestions
+15/1/2026, 10:24:41 - Output:         Sin registros (skip)
+15/1/2026, 10:24:41 - Output:     [374/379] [SERIAL] virtualentitymetadata -> virtualentitymetadatas
+15/1/2026, 10:24:41 - Output:         Sin registros (skip)
+15/1/2026, 10:24:41 - Output:     [375/379] [SERIAL] workflowbinary -> workflowbinaries
+15/1/2026, 10:24:41 - Output:         Sin registros (skip)
+15/1/2026, 10:24:41 - Output: 
+15/1/2026, 10:24:41 - Output:   ⏱️  CHECKPOINT 5: Grupos 75/76 | Token: 38 min
+15/1/2026, 10:24:42 - Output: 
+15/1/2026, 10:24:42 - Output:   📦 Grupo 76/76 [4 tablas]...
+15/1/2026, 10:25:12 - Output:     [376/379] [SERIAL] workflowcardconnections -> workflowcardconnectionsset
+15/1/2026, 10:25:12 - Output:         Sin registros (skip)
+15/1/2026, 10:25:13 - Output:     [377/379] [SERIAL] workflowmetadata -> workflowmetadata
+15/1/2026, 10:25:13 - Output:         Sin registros (skip)
+15/1/2026, 10:25:13 - Output:     [378/379] [SERIAL] workqueue -> workqueues
+15/1/2026, 10:25:13 - Output:         Sin registros (skip)
+15/1/2026, 10:25:13 - Output:     [379/379] [SERIAL] workqueueitem -> workqueueitems
+15/1/2026, 10:25:13 - Output:         Sin registros (skip)
+15/1/2026, 10:25:13 - Output: 
+15/1/2026, 10:25:13 - Output: ==========================================
+15/1/2026, 10:25:13 - Output: RESUMEN RESTORE DE TABLAS:
+15/1/2026, 10:25:13 - Output:   Tablas procesadas: 379
+15/1/2026, 10:25:13 - Output:     Exitosas: 378
+15/1/2026, 10:25:14 - Output:     Con errores: 1
+15/1/2026, 10:25:14 - Output:   Registros totales: 401 restaurados, 2 errores
+15/1/2026, 10:25:15 - Output: 
+15/1/2026, 10:25:15 - Output:   ✅ Tablas filtradas automáticamente (system-managed):
+15/1/2026, 10:25:15 - Output:     Total: 144 tablas
+15/1/2026, 10:25:15 - Output:      - Command Bar: appaction* (~5 tablas)
+15/1/2026, 10:25:15 - Output:      - AI Features: aicopilot*, aiplugin* (~17 tablas)
+15/1/2026, 10:25:15 - Output:      - Agent System: agent* (~8 tablas)
+15/1/2026, 10:25:15 - Output:      - App System: applicationuser*, appmodule* (~11 tablas)
+15/1/2026, 10:25:15 - Output:      - Metadata: attribute, entity, relationship (~8 tablas)
+15/1/2026, 10:25:15 - Output:      - Others: aiskillconfig, allowedmcpclient (~2 tablas)
+15/1/2026, 10:25:15 - Output: 
+15/1/2026, 10:25:15 - Output:     ESTRATEGIA:
+15/1/2026, 10:25:16 - Output:       ✓ Exportadas en backup (para auditoría y documentación)
+15/1/2026, 10:25:16 - Output:       ✗ NO restauradas (causan 400 Bad Request - system-managed)
+15/1/2026, 10:25:16 - Output:       → Evitados ~5,800+ errores automáticamente
+15/1/2026, 10:25:16 - Output: ==========================================
+15/1/2026, 10:25:16 - Output: 
+15/1/2026, 10:25:16 - Output: ==========================================
+15/1/2026, 10:25:16 - Output: PASO 8: REPORTE FINAL
+15/1/2026, 10:25:16 - Output: ==========================================
+15/1/2026, 10:25:16 - Output: Log generado: C:\Users\ContainerAdministrator\AppData\Local\Temp\log_Restore_PP_15-01-2026 13-25-16.json
+15/1/2026, 10:25:16 - Output: Subiendo log a Storage Account...
+15/1/2026, 10:25:19 - Output:   Log subido: logs/powerplatform/restore/log_Restore_PP_15-01-2026 13-25-16.json
+15/1/2026, 10:25:19 - Output: 
+15/1/2026, 10:25:19 - Output: Limpiando archivos temporales...
+15/1/2026, 10:25:20 - Output:   Archivos temporales eliminados
+15/1/2026, 10:25:20 - Output: 
+15/1/2026, 10:25:20 - Output: ==========================================
+15/1/2026, 10:25:20 - Output: RESTORE COMPLETADO
+15/1/2026, 10:25:20 - Output: ==========================================
+15/1/2026, 10:25:20 - Output: Duración total: 39.73 minutos
+15/1/2026, 10:25:20 - Output: 
+15/1/2026, 10:25:20 - Output: RESULTADOS:
+15/1/2026, 10:25:21 - Output:   Solución importada: CalendarioAPP
+15/1/2026, 10:25:21 - Output:   Modo: NewEnvironment
+15/1/2026, 10:25:21 - Output:   Tablas procesadas: 379
+15/1/2026, 10:25:21 - Output:     -> Exitosas: 378
+15/1/2026, 10:25:21 - Output:     -> Con errores: 1
+15/1/2026, 10:25:21 - Output:   Registros restaurados: 401
+15/1/2026, 10:25:21 - Output: 
+15/1/2026, 10:25:22 - Output: ⚠ ACCIÓN REQUERIDA: RECREAR FÓRMULAS MANUALMENTE
+15/1/2026, 10:25:22 - Output: ======================================================================
+15/1/2026, 10:25:22 - Output: 
+15/1/2026, 10:25:22 - Output:   El backup contenía 1 campo(s) con fórmulas (Power Fx)
+15/1/2026, 10:25:22 - Output:   que NO pueden restaurarse automáticamente.
+15/1/2026, 10:25:22 - Output: 
+15/1/2026, 10:25:22 - Output:   📋 CAMPOS A RECREAR:
+15/1/2026, 10:25:22 - Output:     ☐ cr8df_eventocolorhex
+15/1/2026, 10:25:22 - Output: 
+15/1/2026, 10:25:22 - Output:   📝 PASOS PARA RECREAR:
+15/1/2026, 10:25:22 - Output:     1. Ir a Power Apps → Solutions → [Tu Solución]
+15/1/2026, 10:25:23 - Output:     2. Buscar la tabla que contiene el campo
+15/1/2026, 10:25:23 - Output:     3. Abrir el campo → Properties
+15/1/2026, 10:25:23 - Output:     4. Cambiar tipo a 'Formula'
+15/1/2026, 10:25:23 - Output:     5. Ingresar la fórmula Power Fx original
+15/1/2026, 10:25:23 - Output:     6. Guardar y publicar
+15/1/2026, 10:25:23 - Output: 
+15/1/2026, 10:25:23 - Output:   💡 NOTA: Las fórmulas deben adaptarse al nuevo environment
+15/1/2026, 10:25:23 - Output:      (referencias a otras tablas/registros pueden diferir)
+15/1/2026, 10:25:23 - Output: 
+15/1/2026, 10:25:23 - Output: ======================================================================
+15/1/2026, 10:25:24 - Output: 
+15/1/2026, 10:25:24 - Output: PRÓXIMOS PASOS:
+15/1/2026, 10:25:24 - Output:   1. Verifica la solución en Power Apps Maker Portal
+15/1/2026, 10:25:24 - Output:   2. Verifica que los datos estén completos en las tablas
+15/1/2026, 10:25:24 - Output:   3. Prueba funcionalidades críticas de la aplicación
+15/1/2026, 10:25:24 - Output:   4. Verifica flujos de Power Automate (pueden requerir re-activación)
+15/1/2026, 10:25:24 - Output:   5. Configura conexiones y permisos de usuarios
+15/1/2026, 10:25:24 - Output:   6. Si es disaster recovery, actualiza DNS/URLs productivas
+15/1/2026, 10:25:24 - Output:   7. ⚠ IMPORTANTE: Recrea manualmente las 1 fórmulas (ver arriba)
+15/1/2026, 10:25:24 - Output: 
+15/1/2026, 10:25:25 - Output: VERIFICACIÓN DE DATOS:
+15/1/2026, 10:25:25 - Output:   - Todos los datos fueron restaurados sin marcadores
+15/1/2026, 10:25:25 - Output:   - Environment está limpio y listo para uso productivo
+15/1/2026, 10:25:25 - Output:   - Total registros: 401
+15/1/2026, 10:25:25 - Output: ==========================================
+15/1/2026, 10:25:25 - Output: 
+15/1/2026, 10:25:25 - Output: 🔓 Lock file eliminado
+15/1/2026, 10:25:25 - Output: 
+15/1/2026, 10:25:25 - Output: Restore finalizado exitosamente

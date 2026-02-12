@@ -1,0 +1,137 @@
+<ImportExportXml version="9.2.25122.139" SolutionPackageVersion="9.2" languagecode="3082" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25122.139" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25122.00142">
+  <SolutionManifest>
+    <UniqueName>Cr6d875</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="Common Data Services Default Solution" languagecode="3082" />
+    </LocalizedNames>
+    <Descriptions />
+    <Version>1.0.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>Crf9fae</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="CDS Default Publisher" languagecode="3082" />
+      </LocalizedNames>
+      <Descriptions />
+      <EMailAddress xsi:nil="true"></EMailAddress>
+      <SupportingWebsiteUrl xsi:nil="true"></SupportingWebsiteUrl>
+      <CustomizationPrefix>crd03</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>90099</CustomizationOptionValuePrefix>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <AddressTypeCode xsi:nil="true"></AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode xsi:nil="true"></ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+        <Address>
+          <AddressNumber>2</AddressNumber>
+          <AddressTypeCode xsi:nil="true"></AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode xsi:nil="true"></ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+      </Addresses>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="1" schemaName="cr8df_tablacalendario" behavior="1" />
+    </RootComponents>
+    <MissingDependencies>
+      <MissingDependency>
+        <Required type="1" schemaName="cr8df_tablacalendario" displayName="TablaCalendario" solution="Active" />
+        <Dependent type="1" schemaName="cr8df_tablacalendario" displayName="TablaCalendario" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_descripcion" displayName="descripcion" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_eventocolor" displayName="eventocolor" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_eventocolorhex" displayName="eventocolorhex" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_fechayhorainicioo" displayName="fecha y hora inicioo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_fechayhoratermino" displayName="fecha y hora termino" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_hipervinculo" displayName="hipervinculo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_id" displayName="id" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_nombrelink" displayName="nombre link" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_tablacalendarioid" displayName="TablaCalendario" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="cr8df_titulo" displayName="titulo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="statecode" displayName="Estado" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="66" schemaName="cr8df_BeverControls.ScheduleBoardView" displayName="cr8df_BeverControls.ScheduleBoardView" solution="Active" />
+        <Dependent type="26" schemaName="TablaCalendarios activo" displayName="TablaCalendarios activo" parentSchemaName="cr8df_tablacalendario" parentDisplayName="TablaCalendario" id="{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}" />
+      </MissingDependency>
+    </MissingDependencies>
+  </SolutionManifest>
+</ImportExportXml>

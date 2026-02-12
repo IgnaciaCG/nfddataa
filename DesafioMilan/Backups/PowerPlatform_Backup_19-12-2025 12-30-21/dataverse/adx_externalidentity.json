@@ -1,0 +1,21 @@
+﻿{
+    "overriddencreatedon":  null,
+    "utcconversiontimezonecode":  null,
+    "adx_externalidentityid":  "87f5bdd4-d4dc-f011-8406-002248e10de6",
+    "_modifiedonbehalfby_value":  "4e8c871e-1ed9-f011-8543-002248384659",
+    "adx_identityprovidername":  "https://sts.windows.net/344457f2-bd03-46c6-9974-97bffb8f626a/",
+    "@odata.etag":  "W/\"2544843\"",
+    "versionnumber":  2544843,
+    "_organizationid_value":  "660b64c6-c0d9-f011-89f6-002248e0aee4",
+    "_createdonbehalfby_value":  "4e8c871e-1ed9-f011-8543-002248384659",
+    "modifiedon":  "2025-12-19T12:18:39Z",
+    "importsequencenumber":  null,
+    "adx_username":  "df70baec-9036-4841-8b38-a11d121bea5b",
+    "createdon":  "2025-12-19T12:18:39Z",
+    "_createdby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+    "statuscode":  1,
+    "timezoneruleversionnumber":  null,
+    "statecode":  0,
+    "_adx_contactid_value":  "86f5bdd4-d4dc-f011-8406-002248e10de6",
+    "_modifiedby_value":  "d431eaf0-ead8-f011-8543-002248384659"
+}

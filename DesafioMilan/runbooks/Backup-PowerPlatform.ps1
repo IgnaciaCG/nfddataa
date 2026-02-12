@@ -1,29 +1,57 @@
 <#
 .SYNOPSIS
-    Runbook para respaldo diario de Power Platform y Dataverse
+    Runbook GENÉRICO para respaldo completo AUTOMÁTICO de Power Platform y Dataverse
 
 .DESCRIPTION
-    Este runbook exporta:
-    - Soluciones de Power Platform (ZIP)
-    - Aplicaciones Canvas/Model-Driven
-    - Flujos de Power Automate
-    - Tablas críticas de Dataverse (JSON)
-    - Tablas relacionadas (JSON)
+    Este runbook exporta AUTOMÁTICAMENTE cualquier environment SIN PARÁMETROS:
+    - TODAS las soluciones unmanaged (auto-detectadas)
+    - TODAS las tablas custom (auto-detectadas por IsCustomEntity)
+    - Tablas relacionadas (N:1, 1:N - auto-detectadas)
+    - Configuración del environment (JSON)
+    - Fórmulas eliminadas automáticamente (compatibilidad cross-environment)
     
-    Los datos se comprimen y suben a Azure Blob Storage.
+    100% GENÉRICO - Funciona con CUALQUIER tenant/environment/solución
+    sin necesidad de hardcodear nombres, prefijos o parámetros.
+    
+    EJECUCIÓN AUTOMÁTICA - Sin intervención manual requerida.
+
+.EXAMPLE
+    # Ejecutar backup automático (sin parámetros)
+    Start-AzAutomationRunbook -Name "Backup-PowerPlatform"
+    
+    # Programar backup diario
+    New-AzAutomationSchedule -AutomationAccountName "AA-PowerPlatform" `
+        -Name "Daily-Backup" -StartTime "02:00" -DayInterval 1
+    
+    Register-AzAutomationScheduledRunbook -RunbookName "Backup-PowerPlatform" `
+        -ScheduleName "Daily-Backup"
 
 .NOTES
     Requisitos:
     - Service Principal con permisos en Power Platform
     - Managed Identity con acceso a Storage Account
     - Módulos: Az.Storage, Microsoft.PowerApps.Administration.PowerShell
+    - Variables de Automation:
+        * PP-OrganizationId (requerido)
+        * StorageAccountName (requerido)
+        * PP-DataverseUrl (opcional - auto-detect si no existe)
+    
+    Configuración:
+    - IncludeSystemTables: $false (modificar en código si se necesita)
+    - CustomPrefixes: @() (vacío = solo IsCustomEntity - 100% genérico)
+    
+    Versión: 5.0 (100% automático - sin parámetros)
+    Fecha: 18 de diciembre de 2025
 #>
-
-param()
 
 # ==========================================
 # CONFIGURACIÓN INICIAL
 # ==========================================
+
+# Configuración de backup (sin parámetros - 100% automático)
+$IncludeSystemTables = $false  # Cambiar a $true si se necesitan tablas del sistema
+$CustomPrefixes = @()  # Vacío = detectar TODAS las tablas custom (IsCustomEntity)
+
 $ErrorActionPreference = "Continue"
 $VerbosePreference = "Continue"
 $WarningPreference = "Continue"
@@ -223,20 +251,19 @@ try {
         $tenantId = Get-AutomationVariable -Name "PP-ServicePrincipal-TenantId" -ErrorAction Stop
         Write-DetailedLog "  TenantId obtenido: $($tenantId.Substring(0,8))..." "SUCCESS"
         
-        # Leer Environment Name
-        Write-DetailedLog "Obteniendo variable: PP-EnvironmentName" "INFO"
-        $environmentName = Get-AutomationVariable -Name "PP-EnvironmentName" -ErrorAction Stop
-        Write-DetailedLog "  Environment Name: $environmentName" "SUCCESS"
+        # Leer Organization ID
+        Write-DetailedLog "Obteniendo variable: PP-OrganizationId" "INFO"
+        $organizationId = Get-AutomationVariable -Name "PP-OrganizationId" -ErrorAction Stop
+        Write-DetailedLog "  Organization ID: $organizationId" "SUCCESS"
         
-        # Leer Solution Name
-        Write-DetailedLog "Obteniendo variable: PP-SolutionName" "INFO"
-        $solutionName = Get-AutomationVariable -Name "PP-SolutionName" -ErrorAction Stop
-        Write-DetailedLog "  Solution Name: $solutionName" "SUCCESS"
-        
-        # Leer Dataverse URL
-        Write-DetailedLog "Obteniendo variable: PP-DataverseUrl" "INFO"
-        $dataverseUrl = Get-AutomationVariable -Name "PP-DataverseUrl" -ErrorAction Stop
-        Write-DetailedLog "  Dataverse URL: $dataverseUrl" "SUCCESS"
+        # Leer Dataverse URL (OPCIONAL - si no existe, se usa Discovery Service)
+        Write-DetailedLog "Obteniendo variable: PP-DataverseUrl (opcional)" "INFO"
+        $dataverseUrl = Get-AutomationVariable -Name "PP-DataverseUrl" -ErrorAction SilentlyContinue
+        if ($dataverseUrl) {
+            Write-DetailedLog "  Dataverse URL: $dataverseUrl" "SUCCESS"
+        } else {
+            Write-DetailedLog "  ⚠ Dataverse URL no configurada, usando Discovery Service" "WARNING"
+        }
         
         # Leer Storage Account Name
         Write-DetailedLog "Obteniendo variable: StorageAccountName" "INFO"
@@ -244,10 +271,23 @@ try {
         Write-DetailedLog "  Storage Account: $storageAccountName" "SUCCESS"
         
         Write-Output "  Variables cargadas exitosamente"
-        Write-Output "    - Environment: $environmentName"
-        Write-Output "    - Solution: $solutionName"
-        Write-Output "    - Dataverse URL: $dataverseUrl"
+        Write-Output "    - Tenant: $($tenantId.Substring(0,8))..."
+        Write-Output "    - App ID: $($appId.Substring(0,8))..."
+        Write-Output "    - Organization ID: $organizationId"
         Write-Output "    - Storage: $storageAccountName"
+        if ($dataverseUrl) {
+            Write-Output "    - Dataverse URL: $dataverseUrl (configurado)"
+        } else {
+            Write-Output "    - Dataverse URL: (auto-detectar via Discovery Service)"
+        }
+        
+        Write-Output ""
+        Write-Output "  🤖 MODO: Backup automático completo (sin parámetros)"
+        Write-Output "    - Todas las soluciones custom → auto-detect"
+        Write-Output "    - Todas las tablas custom → auto-detect (IsCustomEntity)"
+        Write-Output "    - Tablas relacionadas → auto-detect (N:1, 1:N)"
+        Write-Output "    - Tablas del sistema → $(if ($IncludeSystemTables) { 'Incluidas' } else { 'Excluidas' })"
+        Write-Output "    - Fórmulas → Eliminadas automáticamente"
         
     } catch {
         Write-ErrorDetail "Paso 1 - Leer Variables" $_
@@ -288,7 +328,7 @@ try {
         Write-Output "  Conectado a Power Platform"
         Write-Output "    - Tenant: $tenantId"
         Write-Output "    - App ID: $appId"
-        Write-Output "    - Environment: $environmentName"
+        Write-Output "    - Organization ID: $organizationId"
     } catch {
         Write-Output "[PASO 2 ERROR] Fallo en conexión a Azure/Power Platform"
         Write-Output "Detalle: $($_.Exception.Message)"
@@ -303,10 +343,10 @@ try {
     }
     
     # ==========================================
-    # 3. EXPORTAR SOLUCIÓN
+    # 3. EXPORTAR SOLUCIONES (AUTO-DETECT)
     # ==========================================
     
-    Write-Output "`n[3/6] Exportando solución: $solutionName..."
+    Write-Output "`n[3/6] Exportando soluciones custom (auto-detección)..."
     Write-DetailedLog "PASO 3: Exportar soluciones de Power Platform" "INFO"
     
     try {
@@ -318,92 +358,122 @@ try {
         Write-Output "  Obteniendo información del environment..."
         
         try {
-            # Intentar obtener URL automáticamente con Power Platform Management API
-            # Usar Service Principal (no Managed Identity) para evitar problemas cross-tenant
-            Write-Output "  [3a] Intentando obtener Dataverse URL dinámicamente..."
-            
-            $ppTokenBody = @{
-                client_id = $appId
-                client_secret = $clientSecret
-                scope = "https://service.powerapps.com/.default"
-                grant_type = "client_credentials"
-            }
-            $ppTokenUrl = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+            # ESTRATEGIA 1: Discovery Service (100% automático - método preferido)
+            Write-Output "  [3a] Intentando obtener Dataverse URL via Discovery Service..."
             
             try {
-                Write-DetailedLog "Solicitando token para Power Platform Management API" "INFO"
-                Write-DetailedLog "  Token URL: $ppTokenUrl" "INFO"
-                Write-DetailedLog "  Scope: service.powerapps.com/.default" "INFO"
-                
-                $ppTokenResponse = Invoke-RestMethod -Uri $ppTokenUrl -Method Post -Body $ppTokenBody -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
-                $ppToken = $ppTokenResponse.access_token
-                
-                Write-DetailedLog "  Token de Power Platform API obtenido" "SUCCESS"
-                Write-Output "    Token de Power Platform API obtenido"
-            } catch {
-                $errorDetails = $_.ErrorDetails.Message | ConvertFrom-Json -ErrorAction SilentlyContinue
-                Write-Output "    ERROR obteniendo token de Power Platform API:"
-                Write-Output "      HTTP Status: $($_.Exception.Response.StatusCode.value__)"
-                Write-Output "      Mensaje: $($_.Exception.Message)"
-                if ($errorDetails) {
-                    Write-Output "      Detalles: $($errorDetails.error_description)"
+                # Obtener token para Discovery Service
+                $discoveryTokenBody = @{
+                    client_id = $appId
+                    client_secret = $clientSecret
+                    scope = "https://globaldisco.crm.dynamics.com/.default"
+                    grant_type = "client_credentials"
                 }
-                Write-Output "     SOLUCIÓN: Verifica que Dynamics CRM API esté agregado en:"
-                Write-Output "      Azure Portal → Entra ID → App registrations → $appId"
-                Write-Output "      → API permissions → Dynamics CRM → user_impersonation"
-                throw
-            }
-            
-            $ppApiUrl = "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$environmentName`?api-version=2020-10-01"
-            $ppHeaders = @{
-                "Authorization" = "Bearer $ppToken"
-                "Accept" = "application/json"
-            }
-            
-            Write-Output "     Consultando: $ppApiUrl"
-            
-            try {
-                $envInfo = Invoke-RestMethod -Uri $ppApiUrl -Method Get -Headers $ppHeaders -ErrorAction Stop
-                $dataverseUrlFromApi = $envInfo.properties.linkedEnvironmentMetadata.instanceUrl
+                $discoveryTokenUrl = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
                 
-                if (-not [string]::IsNullOrEmpty($dataverseUrlFromApi)) {
-                    $dataverseUrl = $dataverseUrlFromApi
-                    Write-Output "    Dataverse URL obtenida dinámicamente: $dataverseUrl"
+                Write-DetailedLog "Solicitando token para Discovery Service" "INFO"
+                Write-DetailedLog "  Scope: globaldisco.crm.dynamics.com/.default" "INFO"
+                
+                $discoveryTokenResponse = Invoke-RestMethod -Uri $discoveryTokenUrl -Method Post -Body $discoveryTokenBody -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
+                
+                Write-DetailedLog "  Token de Discovery Service obtenido" "SUCCESS"
+                
+                # Consultar Discovery Service para listar todas las orgs
+                $discoveryHeaders = @{
+                    "Authorization" = "Bearer $($discoveryTokenResponse.access_token)"
+                    "Accept" = "application/json"
+                }
+                
+                $discoveryUrl = "https://globaldisco.crm.dynamics.com/api/discovery/v2.0/Instances"
+                
+                Write-DetailedLog "Consultando Discovery Service: $discoveryUrl" "INFO"
+                
+                $instances = Invoke-RestMethod -Uri $discoveryUrl -Method Get -Headers $discoveryHeaders -ErrorAction Stop
+                
+                # Buscar environment por Organization ID
+                $instance = $instances.value | Where-Object { $_.Id -eq $organizationId }
+                
+                if ($instance) {
+                    $dataverseUrl = $instance.Url
+                    Write-Output "    ✓ Dataverse URL obtenida via Discovery Service (automático)"
+                    Write-Output "      Environment: $($instance.FriendlyName)"
+                    Write-Output "      URL: $dataverseUrl"
+                    Write-Output "      Región: $($instance.Region)"
+                    Write-DetailedLog "  Dataverse URL: $dataverseUrl (Discovery Service)" "SUCCESS"
                 } else {
-                    throw "API no devolvió instanceUrl en response"
+                    Write-Output "    ⚠ Organization ID $organizationId no encontrado en Discovery Service"
+                    Write-Output "      (Verifica el ID en Power Platform Admin Center → Details → Id. de la organización)"
+                    Write-Output "      Environments disponibles: $($instances.value.Count)"
+                    Write-Output "      Environments encontrados:"
+                    foreach ($env in $instances.value) {
+                        Write-Output "        - $($env.FriendlyName) (ID: $($env.Id))"
+                    }
+                    throw "Organization ID no encontrado en Discovery Service"
                 }
+                
             } catch {
-                $statusCode = $_.Exception.Response.StatusCode.value__
-                Write-Output "    ✗ ERROR consultando Power Platform Management API:"
-                Write-Output "      HTTP Status: $statusCode"
-                Write-Output "      Mensaje: $($_.Exception.Message)"
+                Write-Output "    ⚠ Discovery Service no disponible: $($_.Exception.Message)"
+                Write-DetailedLog "Discovery Service falló, intentando fallback" "WARNING"
                 
-                if ($statusCode -eq 401) {
-                    Write-Output "     CAUSA: Falta 'Grant admin consent' para Dynamics CRM API"
-                    Write-Output "      SOLUCIÓN:"
-                    Write-Output "      1. Azure Portal → Entra ID → App registrations → $appId"
-                    Write-Output "      2. API permissions → Click 'Grant admin consent for [tenant]'"
-                } elseif ($statusCode -eq 403) {
-                    Write-Output "    CAUSA: Service Principal necesita rol 'Power Platform Administrator'"
-                    Write-Output "      SOLUCIÓN:"
-                    Write-Output "      1. Power Platform Admin Center → https://admin.powerplatform.com"
-                    Write-Output "      2. Settings → Security roles"
-                    Write-Output "      3. Asignar rol 'Power Platform Administrator' a Service Principal"
-                    Write-Output "      ADVERTENCIA: Este rol da acceso a TODOS los environments del tenant"
-                } elseif ($statusCode -eq 404) {
-                    Write-Output "    CAUSA: Environment ID incorrecto o no existe"
-                    Write-Output "      Environment ID usado: $environmentName"
-                } else {
-                    Write-Output "    Error inesperado, contacta a soporte de Microsoft"
+                # ESTRATEGIA 2: Power Platform Management API (fallback)
+                Write-Output "  [3b] Intentando Power Platform Management API (fallback)..."
+                
+                $ppTokenBody = @{
+                    client_id = $appId
+                    client_secret = $clientSecret
+                    scope = "https://service.powerapps.com/.default"
+                    grant_type = "client_credentials"
                 }
+                $ppTokenUrl = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
                 
-                throw
+                try {
+                    Write-DetailedLog "Solicitando token para Power Platform Management API" "INFO"
+                    Write-DetailedLog "  Scope: service.powerapps.com/.default" "INFO"
+                    
+                    $ppTokenResponse = Invoke-RestMethod -Uri $ppTokenUrl -Method Post -Body $ppTokenBody -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
+                    $ppToken = $ppTokenResponse.access_token
+                    
+                    Write-DetailedLog "  Token de Power Platform API obtenido" "SUCCESS"
+                    
+                    $ppApiUrl = "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$organizationId`?api-version=2020-10-01"
+                    $ppHeaders = @{
+                        "Authorization" = "Bearer $ppToken"
+                        "Accept" = "application/json"
+                    }
+                    
+                    Write-DetailedLog "Consultando: $ppApiUrl" "INFO"
+                    
+                    $envInfo = Invoke-RestMethod -Uri $ppApiUrl -Method Get -Headers $ppHeaders -ErrorAction Stop
+                    $dataverseUrlFromApi = $envInfo.properties.linkedEnvironmentMetadata.instanceUrl
+                    
+                    if (-not [string]::IsNullOrEmpty($dataverseUrlFromApi)) {
+                        $dataverseUrl = $dataverseUrlFromApi
+                        Write-Output "    ✓ Dataverse URL obtenida via Power Platform API (fallback)"
+                        Write-Output "      URL: $dataverseUrl"
+                        Write-DetailedLog "  Dataverse URL: $dataverseUrl (Power Platform API)" "SUCCESS"
+                    } else {
+                        throw "API no devolvió instanceUrl en response"
+                    }
+                    
+                } catch {
+                    $statusCode = $_.Exception.Response.StatusCode.value__
+                    Write-Output "    ✗ Power Platform API también falló:"
+                    Write-Output "      HTTP Status: $statusCode"
+                    Write-Output "      Mensaje: $($_.Exception.Message)"
+                    
+                    if ($statusCode -eq 403) {
+                        Write-Output "      CAUSA: Service Principal necesita permisos de API"
+                    }
+                    
+                    throw
+                }
             }
+            
         } catch {
-            # Fallback: usar URL de variable si API falla
-            Write-Output "  Power Platform API no disponible - usando fallback"
+            # ESTRATEGIA 3: Variable PP-DataverseUrl (último recurso)
+            Write-Output "  [3c] Usando variable PP-DataverseUrl (último recurso)..."
             Write-Output "  URL de variable: $dataverseUrl"
-            Write-Output "  El backup continuará normalmente con URL hardcoded"
+            Write-DetailedLog "  Usando URL de variable de Automation (fallback manual)" "WARNING"
         }
         
         Write-Output "  Dataverse URL final: $dataverseUrl"
@@ -436,104 +506,74 @@ try {
             "Accept" = "application/json"
         }
         
-        # Paso 1: Obtener el Solution ID y detectar PCF controls
-        Write-Output "  [3b] Buscando solución y detectando PCF controls..."
-        $solutionQuery = "$dataverseUrl/api/data/v9.2/solutions?`$filter=uniquename eq '$solutionName'&`$select=solutionid,friendlyname,version"
-        $solutionResponse = Invoke-RestMethod -Uri $solutionQuery -Method Get -Headers $headers
+        # Paso 1: AUTO-DETECTAR TODAS LAS SOLUCIONES CUSTOM
+        Write-Output "  [3b] Auto-detectando TODAS las soluciones custom del environment..."
+        Write-DetailedLog "Auto-detección de soluciones custom" "INFO"
         
-        if ($solutionResponse.value.Count -eq 0) {
-            throw "Solución '$solutionName' no encontrada en el environment"
+        # Obtener todas las soluciones unmanaged (custom) excluyendo Default y System
+        $allSolutionsQuery = "$dataverseUrl/api/data/v9.2/solutions?`$filter=ismanaged eq false and uniquename ne 'Default' and uniquename ne 'Active'&`$select=solutionid,uniquename,friendlyname,version,publisherid&`$orderby=createdon desc"
+        
+        Write-DetailedLog "Consultando: $allSolutionsQuery" "INFO"
+        $allSolutionsResponse = Invoke-RestMethod -Uri $allSolutionsQuery -Method Get -Headers $headers
+        
+        # Filtrar soluciones del sistema
+        $customSolutions = $allSolutionsResponse.value | Where-Object {
+            $_.uniquename -notlike "System*" -and
+            $_.uniquename -notlike "msdyn_*" -and
+            $_.uniquename -notlike "mspp_*" -and
+            $_.uniquename -ne "Basic" -and
+            $_.uniquename -ne "DefaultSolution" -and
+            $_.friendlyname -notlike "*Default Solution*" -and  # Filtrar "Common Data Services Default Solution" y similares
+            $_.uniquename -notlike "Cr*"  # Filtrar soluciones generadas automáticamente con prefijo Cr (Common Runtime)
         }
         
-        $solutionId = $solutionResponse.value[0].solutionid
-        $solutionVersion = $solutionResponse.value[0].version
-        Write-Output "    Solución encontrada: ID=$solutionId, Version=$solutionVersion"
-        
-        # Inicializar con la solución principal
-        $solutionsToExport = @($solutionName)
-        $pcfSolutionNames = @()
-        
-        # Detectar PCF controls en la solución
-        try {
-            Write-Output "    [DEBUG] Consultando componentes de la solución..."
-            $componentsUrl = "$dataverseUrl/api/data/v9.2/solutioncomponents?`$filter=_solutionid_value eq $solutionId and componenttype eq 66"
-            Write-Output "    [DEBUG] URL: $componentsUrl"
+        if ($customSolutions.Count -eq 0) {
+            Write-Output "    ⚠ No se encontraron soluciones custom en el environment"
+            Write-Output "      Solo hay soluciones del sistema (Default, System*, etc.)"
+            Write-DetailedLog "No hay soluciones custom para exportar" "WARNING"
+            $solutionsToExport = @()
+        } else {
+            Write-Output "    ✓ Soluciones custom encontradas: $($customSolutions.Count)"
+            Write-DetailedLog "Soluciones custom detectadas: $($customSolutions.Count)" "SUCCESS"
             
-            $pcfComponents = Invoke-RestMethod -Uri $componentsUrl -Method Get -Headers $headers
+            $solutionsToExport = @()
             
-            Write-Output "    [DEBUG] Componentes encontrados: $($pcfComponents.value.Count)"
-            
-            if ($pcfComponents.value.Count -gt 0) {
-                Write-Output "    • PCF controls detectados: $($pcfComponents.value.Count)"
-                Write-DetailedLog "PCF controls encontrados en solución: $($pcfComponents.value.Count)" "INFO"
-                
-                foreach ($pcf in $pcfComponents.value) {
-                    # Obtener nombre de la solución que contiene el PCF
-                    $pcfSolutionId = $pcf._solutionid_value
-                    Write-Output "      [DEBUG] PCF Solution ID: $pcfSolutionId"
-                    
-                    $pcfSolutionQuery = "$dataverseUrl/api/data/v9.2/solutions($pcfSolutionId)?`$select=uniquename,ismanaged"
-                    $pcfSolution = Invoke-RestMethod -Uri $pcfSolutionQuery -Method Get -Headers $headers
-                    
-                    Write-Output "      [DEBUG] PCF Solution: $($pcfSolution.uniquename), IsManaged: $($pcfSolution.ismanaged)"
-                    
-                    if (-not $pcfSolution.ismanaged -and $pcfSolution.uniquename -ne $solutionName) {
-                        $solutionsToExport += $pcfSolution.uniquename
-                        $pcfSolutionNames += $pcfSolution.uniquename
-                        Write-Output "      PCF solution agregada: $($pcfSolution.uniquename)"
-                        Write-DetailedLog "PCF solution agregada: $($pcfSolution.uniquename)" "SUCCESS"
-                    } else {
-                        Write-Output "      • PCF en misma solución o managed: $($pcfSolution.uniquename)"
-                    }
-                }
-            } else {
-                Write-Output "    • No se detectaron PCF controls en esta solución"
-                Write-DetailedLog "No se encontraron PCF controls (componenttype=66)" "INFO"
+            foreach ($sol in $customSolutions) {
+                $solutionsToExport += $sol.uniquename
+                Write-Output "      • $($sol.friendlyname) ($($sol.uniquename)) - v$($sol.version)"
+                Write-DetailedLog "  Solución: $($sol.uniquename) v$($sol.version)" "INFO"
             }
-        } catch {
-            Write-Output "    Error detectando PCF (continuando con solución principal): $($_.Exception.Message)"
-            Write-DetailedLog "Error en detección de PCF: $($_.Exception.Message)" "ERROR"
         }
         
-        # Reporte adicional: Verificar si la solución contiene custom controls
+        # Reporte adicional: Analizar componentes en todas las soluciones
         $script:pcfControlsInSolution = @()
+        $script:totalComponentsCount = 0
+        
         try {
-            Write-Output "    [INFO] Analizando componentes de la solución..."
+            Write-Output "    [INFO] Analizando componentes del environment..."
             
-            # Obtener todos los custom controls (componenttype=66) en la solución
+            # Obtener todos los custom controls (componenttype=66)
             $customControlsUrl = "$dataverseUrl/api/data/v9.2/customcontrols?`$select=name,version"
             $customControlsResponse = Invoke-RestMethod -Uri $customControlsUrl -Method Get -Headers $headers -ErrorAction SilentlyContinue
             
             if ($customControlsResponse.value.Count -gt 0) {
-                Write-Output "    [INFO] Custom Controls detectados en el environment:"
+                Write-Output "      • Custom Controls (PCF): $($customControlsResponse.value.Count)"
                 foreach ($ctrl in $customControlsResponse.value) {
                     $script:pcfControlsInSolution += "$($ctrl.name) (v$($ctrl.version))"
-                    Write-Output "      • $($ctrl.name) - v$($ctrl.version)"
                 }
             }
             
-            # Resumen de componentes por tipo
-            $allComponentsUrl = "$dataverseUrl/api/data/v9.2/solutioncomponents?`$filter=_solutionid_value eq $solutionId&`$select=componenttype&`$top=100"
-            $allComponents = Invoke-RestMethod -Uri $allComponentsUrl -Method Get -Headers $headers
-            
-            $componentTypes = $allComponents.value | Group-Object -Property componenttype | Select-Object Name, Count
-            Write-Output "    [INFO] Resumen de componentes en la solución:"
-            foreach ($type in $componentTypes) {
-                $typeName = switch ($type.Name) {
-                    "1" { "Entidades" }
-                    "2" { "Atributos" }
-                    "9" { "Option Sets" }
-                    "60" { "Plug-in Assemblies" }
-                    "61" { "SDK Message Steps" }
-                    "66" { "Custom Controls (PCF)" }
-                    "80" { "Canvas Apps" }
-                    "300" { "Cloud Flows" }
-                    default { "Type $($type.Name)" }
-                }
-                Write-Output "      - $typeName`: $($type.Count)"
+            # Contar componentes totales en todas las soluciones custom
+            foreach ($sol in $customSolutions) {
+                $componentsUrl = "$dataverseUrl/api/data/v9.2/solutioncomponents?`$filter=_solutionid_value eq $($sol.solutionid)&`$select=componenttype"
+                $components = Invoke-RestMethod -Uri $componentsUrl -Method Get -Headers $headers -ErrorAction SilentlyContinue
+                $script:totalComponentsCount += $components.value.Count
             }
+            
+            Write-Output "      • Componentes totales en soluciones: $script:totalComponentsCount"
+            
         } catch {
-            Write-Output "    [INFO] No se pudo obtener detalle de componentes"
+            Write-Output "    [INFO] No se pudo obtener detalle completo de componentes"
         }
         
         # Paso 2: Exportar todas las soluciones (principal + PCF)
@@ -551,7 +591,7 @@ try {
                 Write-DetailedLog "  Construyendo payload ExportSolution para $solToExport" "INFO"
                 $exportBody = @{
                     SolutionName = $solToExport
-                    Managed = $true
+                    Managed = $false  # ← CAMBIADO: Exportar como UNMANAGED para compatibilidad con restore
                     ExportAutoNumberingSettings = $false
                     ExportCalendarSettings = $false
                     ExportCustomizationSettings = $false
@@ -573,13 +613,164 @@ try {
                     continue
                 }
                 
-                # Decodificar y guardar
+                # Decodificar y guardar temporalmente
                 $solutionPath = "$tempPath\$solToExport.zip"
                 $solutionBytes = [System.Convert]::FromBase64String($solutionZipBase64)
                 [System.IO.File]::WriteAllBytes($solutionPath, $solutionBytes)
                 
                 $solSize = [Math]::Round((Get-Item $solutionPath).Length / 1MB, 2)
                 Write-Output "      Exportado: $solSize MB"
+                
+                # WORKAROUND AUTOMÁTICO: Eliminar fórmulas para compatibilidad cross-environment
+                try {
+                    Add-Type -AssemblyName System.IO.Compression.FileSystem
+                    $testZip = [System.IO.Compression.ZipFile]::OpenRead($solutionPath)
+                    $hasFormulas = ($testZip.Entries | Where-Object { $_.FullName -like "Formulas/*" }).Count -gt 0
+                    $formulasCount = ($testZip.Entries | Where-Object { $_.FullName -like "Formulas/*" }).Count
+                    $testZip.Dispose()
+                    
+                    # Variable para indicar si necesitamos procesar esta solución
+                    $needsProcessing = $false
+                    $processingReason = ""
+                    
+                    if ($hasFormulas) {
+                        $needsProcessing = $true
+                        $processingReason = "⚠ Detectadas $formulasCount fórmulas - aplicando workaround..."
+                    } elseif ($script:formulaFieldsToExclude.Count -gt 0) {
+                        # Incluso si esta solución no tiene Formulas/, puede tener referencias a campos de fórmula
+                        $needsProcessing = $true
+                        $processingReason = "⚠ Limpiando referencias a campos de fórmula removidos..."
+                    }
+                    
+                    if ($needsProcessing) {
+                        Write-Output "      $processingReason"
+                        
+                        # Extraer ZIP completo
+                        $tempExtractDir = "$tempPath\${solToExport}_extract"
+                        [System.IO.Compression.ZipFile]::ExtractToDirectory($solutionPath, $tempExtractDir)
+                        
+                        # 1. Eliminar carpeta Formulas/ (si existe)
+                        $formulasPath = Join-Path $tempExtractDir "Formulas"
+                        if (Test-Path $formulasPath) {
+                            Remove-Item $formulasPath -Recurse -Force
+                        }
+                        
+                        # 2. Limpiar customizations.xml para eliminar referencias a fórmulas
+                        $customizationsXmlPath = Join-Path $tempExtractDir "customizations.xml"
+                        
+                        # Inicializar array si esta es la primera solución con fórmulas
+                        if (-not $script:formulaFieldsToExclude) {
+                            $script:formulaFieldsToExclude = @()
+                        }
+                        
+                        if (Test-Path $customizationsXmlPath) {
+                            [xml]$customXml = Get-Content $customizationsXmlPath -Raw
+                            
+                            # PASO 2A: Identificar todos los atributos de fórmula (solo si esta solución tiene Formulas/)
+                            if ($hasFormulas) {
+                                $formulaAttributes = $customXml.SelectNodes("//attribute[FormulaDefinitionFileName]")
+                                $removedCount = 0
+                                
+                                foreach ($attr in $formulaAttributes) {
+                                    # Guardar el nombre del campo (LogicalName) para filtrar datos después
+                                    $fieldLogicalName = $attr.SelectSingleNode("LogicalName")
+                                    if ($fieldLogicalName -and $fieldLogicalName.InnerText) {
+                                        if ($script:formulaFieldsToExclude -notcontains $fieldLogicalName.InnerText) {
+                                            $script:formulaFieldsToExclude += $fieldLogicalName.InnerText
+                                        }
+                                    }
+                                    
+                                    # Eliminar el nodo completo del atributo de fórmula
+                                    $attr.ParentNode.RemoveChild($attr) | Out-Null
+                                    $removedCount++
+                                }
+                                
+                                if ($removedCount -gt 0) {
+                                    Write-Output "        → Eliminados $removedCount campos de fórmula: $($script:formulaFieldsToExclude -join ', ')"
+                                }
+                            }
+                            
+                            # PASO 2B: Limpiar referencias en vistas (SavedQueries) - para TODAS las soluciones
+                            if ($script:formulaFieldsToExclude.Count -gt 0) {
+                                $cleanedReferences = 0
+                                
+                                foreach ($fieldName in $script:formulaFieldsToExclude) {
+                                    # 1. Eliminar celdas en layoutxml de vistas
+                                    $cellNodes = $customXml.SelectNodes("//savedquery//layoutxml//cell[@name='$fieldName']")
+                                    foreach ($cell in $cellNodes) {
+                                        $cell.ParentNode.RemoveChild($cell) | Out-Null
+                                        $cleanedReferences++
+                                    }
+                                    
+                                    # 2. Eliminar atributos en fetchxml de vistas
+                                    $attrNodes = $customXml.SelectNodes("//savedquery//fetch//attribute[@name='$fieldName']")
+                                    foreach ($attrNode in $attrNodes) {
+                                        $attrNode.ParentNode.RemoveChild($attrNode) | Out-Null
+                                        $cleanedReferences++
+                                    }
+                                    
+                                    # 3. Eliminar referencias en color
+                                    $colorNodes = $customXml.SelectNodes("//savedquery//layoutxml//color[text()='$fieldName']")
+                                    foreach ($colorNode in $colorNodes) {
+                                        $colorNode.ParentNode.RemoveChild($colorNode) | Out-Null
+                                        $cleanedReferences++
+                                    }
+                                    
+                                    # 4. Eliminar referencias en parámetros de PCF controls
+                                    $pcfParamNodes = $customXml.SelectNodes("//savedquery//layoutxml//controlDescription//parameters//*[text()='$fieldName']")
+                                    foreach ($pcfParam in $pcfParamNodes) {
+                                        $pcfParam.ParentNode.RemoveChild($pcfParam) | Out-Null
+                                        $cleanedReferences++
+                                    }
+                                    
+                                    # 5. Eliminar referencias en columnwidths
+                                    $colWidthNodes = $customXml.SelectNodes("//savedquery//columnwidths/column[@name='$fieldName']")
+                                    foreach ($colWidth in $colWidthNodes) {
+                                        $colWidth.ParentNode.RemoveChild($colWidth) | Out-Null
+                                        $cleanedReferences++
+                                    }
+                                    
+                                    # 6. Eliminar de filtros (filter conditions)
+                                    $filterNodes = $customXml.SelectNodes("//savedquery//fetch//filter/condition[@attribute='$fieldName']")
+                                    foreach ($filterNode in $filterNodes) {
+                                        $filterNode.ParentNode.RemoveChild($filterNode) | Out-Null
+                                        $cleanedReferences++
+                                    }
+                                    
+                                    # 7. Eliminar de order (ordenamiento)
+                                    $orderNodes = $customXml.SelectNodes("//savedquery//fetch//order[@attribute='$fieldName']")
+                                    foreach ($orderNode in $orderNodes) {
+                                        $orderNode.ParentNode.RemoveChild($orderNode) | Out-Null
+                                        $cleanedReferences++
+                                    }
+                                }
+                                
+                                if ($cleanedReferences -gt 0) {
+                                    # Guardar XML modificado
+                                    $customXml.Save($customizationsXmlPath)
+                                    Write-Output "        → Limpiadas $cleanedReferences referencias en vistas y queries"
+                                }
+                            }
+                        }
+                        
+                        # 3. Re-comprimir sin fórmulas
+                        Remove-Item $solutionPath -Force
+                        [System.IO.Compression.ZipFile]::CreateFromDirectory($tempExtractDir, $solutionPath)
+                        
+                        # Limpiar directorio temporal
+                        Remove-Item $tempExtractDir -Recurse -Force
+                        
+                        $newSize = [Math]::Round((Get-Item $solutionPath).Length / 1MB, 2)
+                        Write-Output "      ✓ Procesamiento completado (compatibilidad cross-environment)"
+                        if ($hasFormulas) {
+                            Write-Output "        Tamaño: $solSize MB → $newSize MB"
+                        }
+                    }
+                } catch {
+                    Write-Output "      ⚠ No se pudo procesar fórmulas: $($_.Exception.Message)"
+                    Write-Output "        Continuando con solución original..."
+                }
+                
                 $exportedCount++
                 
             } catch {
@@ -593,10 +784,10 @@ try {
     } catch {
         Write-Output "[PASO 3 ERROR] Fallo al exportar soluciones"
         Write-Output "Detalle: $($_.Exception.Message)"
-        Write-Output "Solución: $solutionName"
+        Write-Output "Organization ID: $organizationId"
         Write-Output "Dataverse URL: $dataverseUrl"
         Write-Output "Posibles causas:"
-        Write-Output "  1. Solución no existe (uniquename incorrecto)"
+        Write-Output "  1. No hay soluciones custom en el environment"
         Write-Output "  2. Service Principal sin rol 'System Administrator' en Dataverse"
         Write-Output "  3. Token de acceso expirado o inválido"
         Write-Output "  4. Environment no tiene Dataverse habilitado"
@@ -613,12 +804,121 @@ try {
     try {
         Write-Output "  Dataverse URL: $dataverseUrl"
         
-        # Tablas críticas principales (LogicalName - singular)
-        $criticalTables = @("cr8df_actividadcalendario", "cr391_calendario2", "cr391_casosfluentpivot", "cr8df_usuario")
-        Write-Output "  Tablas críticas: $($criticalTables.Count)"
+        # LISTA DE EXCLUSIÓN MÍNIMA: Solo tablas core del sistema sin datos de negocio
+        # 
+        # ESTRATEGIA DE BACKUP:
+        #   ✅ BACKUP COMPLETO: Exportar TODO (incluye appaction*, aiplugin*, agent*, etc.)
+        #   🚫 RESTORE INTELIGENTE: Filtro automático en Restore-PowerPlatform.ps1
+        # 
+        # Las 32 tablas system-managed (appaction*, aiplugin*, agent*) se EXPORTAN
+        # pero el runbook de restore las FILTRA automáticamente (no intenta importarlas)
+        # 
+        $systemTablesToExclude = @(
+            # Core system tables (no contienen datos de negocio)
+            'activityparty',           # Gestionada automáticamente (relaciones de actividades)
+            'activitypointer',         # Tabla virtual base de todas las actividades
+            'asyncoperation',          # Jobs y procesos del sistema
+            'bulkdeletefailure',       # Logs de operaciones de eliminación masiva
+            'duplicaterecord',         # Sistema de detección de duplicados
+            'principalobjectattributeaccess',  # Control de acceso a nivel de campo
+            'syncerror',               # Errores de sincronización del sistema
+            'processsession',          # Sesiones de workflows/procesos
+            'workflowlog',             # Logs de workflows
+            'plugintracelog',          # Logs de plugins
+            'organizationstatistic',   # Estadísticas del sistema
+            'systemuser',              # Usuarios del sistema (mejor gestionar via AAD)
+            'team',                    # Equipos (mejor gestionar via UI)
+            'businessunit',            # Unidades de negocio (estructura org)
+            'organization'             # Configuración de la organización
+        )
         
-        # Detectar tablas relacionadas automáticamente
-        Write-Output "  [4a] Detectando relaciones y obteniendo EntitySetNames..."
+        # NOTA: Las siguientes tablas SE EXPORTAN en el backup (para auditoría completa)
+        # pero el runbook Restore-PowerPlatform.ps1 las FILTRA automáticamente:
+        #   - appaction* (Command Bar - 5 tablas, ~5,300 registros)
+        #   - aicopilot (AI Copilot - 2 registros)
+        #   - aiplugin* (AI Plugins - 15 tablas)
+        #   - agent* (Agent System - 8 tablas)
+        #   - aiskillconfig, allowedmcpclient
+        # Total: 32 tablas adicionales en backup, 0 en restore (filtradas automáticamente)
+        
+        Write-Output "  ⚠ Tablas del sistema excluidas: $($systemTablesToExclude.Count)"
+        Write-DetailedLog "Tablas del sistema que serán excluidas del backup: $($systemTablesToExclude -join ', ')" "INFO"
+        
+        # AUTO-DETECTAR TODAS LAS TABLAS CUSTOM
+        Write-Output "  [4a] Auto-detectando TODAS las tablas custom del environment..."
+        Write-DetailedLog "Auto-detección de tablas custom" "INFO"
+        
+        # Obtener todas las tablas del environment
+        $allTablesMetadata = "$dataverseUrl/api/data/v9.2/EntityDefinitions?`$select=LogicalName,EntitySetName,IsCustomEntity,IsCustomizable&`$filter=IsCustomEntity eq true or IsCustomizable/Value eq true"
+        
+        Write-DetailedLog "Consultando metadata de tablas: $allTablesMetadata" "INFO"
+        $allTablesResponse = Invoke-RestMethod -Uri $allTablesMetadata -Method Get -Headers $headers
+        
+        # ESTRATEGIA DE DETECCIÓN GENÉRICA
+        if ($CustomPrefixes.Count -gt 0) {
+            # Si hay prefijos especificados, filtrar por prefijos + IsCustomEntity
+            Write-Output "    Estrategia: Prefijos ($($CustomPrefixes -join ', ')) + IsCustomEntity"
+            
+            $customTablesByPrefix = $allTablesResponse.value | Where-Object {
+                $tableName = $_.LogicalName
+                $matchesPrefix = $false
+                foreach ($prefix in $CustomPrefixes) {
+                    if ($tableName -like "$prefix*") {
+                        $matchesPrefix = $true
+                        break
+                    }
+                }
+                $matchesPrefix
+            }
+            
+            $customTablesByFlag = $allTablesResponse.value | Where-Object { $_.IsCustomEntity -eq $true }
+            
+            # Combinar ambos criterios (unión)
+            $allCustomTables = @()
+            $allCustomTables += $customTablesByPrefix
+            $allCustomTables += $customTablesByFlag
+            $allCustomTables = $allCustomTables | Select-Object -Unique -Property LogicalName, EntitySetName, IsCustomEntity
+            
+        } else {
+            # Sin prefijos = SOLO IsCustomEntity (100% genérico)
+            Write-Output "    Estrategia: Solo IsCustomEntity (genérico para cualquier tenant)"
+            
+            $allCustomTables = $allTablesResponse.value | Where-Object { 
+                $_.IsCustomEntity -eq $true 
+            }
+        }
+        
+        # Excluir solo tablas en la lista de exclusión (sin wildcards)
+        # Permitir exportar appaction*, aiplugin*, etc. - se manejan errores en restore
+        $criticalTables = $allCustomTables | Where-Object {
+            $systemTablesToExclude -notcontains $_.LogicalName
+        } | Select-Object -ExpandProperty LogicalName
+        
+        Write-Output "    ✓ Tablas custom encontradas: $($criticalTables.Count)"
+        Write-DetailedLog "Tablas custom detectadas: $($criticalTables.Count)" "SUCCESS"
+        
+        foreach ($table in $criticalTables) {
+            Write-Output "      • $table"
+        }
+        
+        # Agregar tablas del sistema si se solicitó
+        if ($IncludeSystemTables) {
+            Write-Output ""
+            Write-Output "  [4a.1] Agregando tablas del sistema esenciales (parámetro IncludeSystemTables=true)..."
+            
+            $essentialSystemTables = @("account", "contact", "appointment", "task", "email")
+            foreach ($sysTable in $essentialSystemTables) {
+                if ($criticalTables -notcontains $sysTable) {
+                    $criticalTables += $sysTable
+                    Write-Output "      • $sysTable (sistema)"
+                }
+            }
+            
+            Write-DetailedLog "Tablas del sistema agregadas: $($essentialSystemTables.Count)" "INFO"
+        }
+        
+        Write-Output ""
+        Write-Output "  [4b] Detectando relaciones y obteniendo EntitySetNames..."
         
         # Mapa de LogicalName → EntitySetName (necesario para queries OData)
         $tableNameMap = @{}
@@ -651,12 +951,10 @@ try {
                 foreach ($rel in $n1Relationships.value) {
                     $relatedTable = $rel.ReferencedEntity
                     
-                    # Filtrar tablas del sistema y duplicados
+                    # FILTRADO MEJORADO: Excluir tablas del sistema
                     if ($relatedTable -and 
                         $relatedTable -notlike 'system*' -and
-                        $relatedTable -ne 'organization' -and
-                        $relatedTable -ne 'businessunit' -and
-                        $relatedTable -ne 'owner' -and
+                        $systemTablesToExclude -notcontains $relatedTable -and
                         $allTablesToExport -notcontains $relatedTable) {
                         
                         # Obtener EntitySetName para la tabla relacionada
@@ -684,12 +982,10 @@ try {
                 foreach ($rel in $1nRelationships.value) {
                     $relatedTable = $rel.ReferencingEntity
                     
-                    # Filtrar tablas del sistema y duplicados
+                    # FILTRADO MEJORADO: Excluir tablas del sistema
                     if ($relatedTable -and 
                         $relatedTable -notlike 'system*' -and
-                        $relatedTable -ne 'organization' -and
-                        $relatedTable -ne 'businessunit' -and
-                        $relatedTable -ne 'owner' -and
+                        $systemTablesToExclude -notcontains $relatedTable -and
                         $allTablesToExport -notcontains $relatedTable) {
                         
                         # Obtener EntitySetName para la tabla relacionada
@@ -720,6 +1016,9 @@ try {
         Write-Output "  [INFO] Total tablas a exportar: $totalTablasCount"
         Write-Output "    - Tablas criticas: $criticasCount"
         Write-Output "    - Tablas relacionadas: $relacionesCount"
+        Write-Output "    - Tablas del sistema excluidas: $($systemTablesToExclude.Count)"
+        
+        Write-DetailedLog "Detección completada: $totalTablasCount tablas, $($systemTablesToExclude.Count) excluidas" "SUCCESS"
         
         Write-Output "  [4b] Exportando datos de tablas..."
         
@@ -753,8 +1052,21 @@ try {
                 
                 $response = Invoke-RestMethod -Uri $apiUrl -Method Get -Headers $headers
                 
+                # Filtrar campos de fórmula de los datos antes de guardar
+                $cleanedRecords = @()
+                foreach ($record in $response.value) {
+                    $cleanRecord = @{}
+                    foreach ($prop in $record.PSObject.Properties) {
+                        # Excluir campos de fórmula identificados previamente
+                        if ($prop.Name -notin $script:formulaFieldsToExclude) {
+                            $cleanRecord[$prop.Name] = $prop.Value
+                        }
+                    }
+                    $cleanedRecords += $cleanRecord
+                }
+                
                 # Guardar con LogicalName para consistencia
-                $response.value | ConvertTo-Json -Depth 10 | Out-File "$dataversePath\$logicalName.json" -Encoding UTF8
+                $cleanedRecords | ConvertTo-Json -Depth 10 | Out-File "$dataversePath\$logicalName.json" -Encoding UTF8
                 
                 $recordCount = $response.value.Count
                 $totalRecords += $recordCount
@@ -787,6 +1099,93 @@ try {
     }
     
     Write-Output "  Exportación de Dataverse completada"
+    
+    # ==========================================
+    # 4.5. EXPORTAR CONFIGURACIÓN DEL ENVIRONMENT
+    # ==========================================
+    
+    Write-Output "`n[4.5/6] Exportando configuración del environment..."
+    Write-DetailedLog "PASO 4.5: Exportar metadata del environment" "INFO"
+    
+    try {
+        # Construir objeto de configuración
+        $envConfig = @{
+            BackupMetadata = @{
+                Date = $date
+                BackupId = [guid]::NewGuid().ToString()
+                OrganizationId = $organizationId
+                DataverseUrl = $dataverseUrl
+                Version = "5.0"
+            }
+            Solutions = @()
+            Tables = @{
+                Custom = @()
+                System = @()
+            }
+            Components = @{
+                PCFControls = $script:pcfControlsInSolution
+                TotalComponents = $script:totalComponentsCount
+            }
+            Parameters = @{
+                IncludeSystemTables = $IncludeSystemTables
+                CustomPrefixes = $CustomPrefixes
+            }
+            Statistics = @{
+                SolutionsExported = $solutionsToExport.Count
+                TablesExported = $allTablesToExport.Count
+                RecordsExported = $totalRecords
+                FormulasRemoved = $script:formulaFieldsToExclude.Count
+            }
+        }
+        
+        # Agregar info de soluciones
+        if ($customSolutions) {
+            foreach ($sol in $customSolutions) {
+                $envConfig.Solutions += @{
+                    UniqueName = $sol.uniquename
+                    FriendlyName = $sol.friendlyname
+                    Version = $sol.version
+                    SolutionId = $sol.solutionid
+                }
+            }
+        }
+        
+        # Agregar info de tablas (distinguir custom vs system)
+        $systemTablesList = @("account", "contact", "appointment", "task", "email", "phonecall", "letter", "fax", "recurringappointmentmaster", "socialactivity")
+        
+        foreach ($table in $criticalTables) {
+            if ($systemTablesList -contains $table) {
+                $envConfig.Tables.System += $table
+            } else {
+                $envConfig.Tables.Custom += $table
+            }
+        }
+        
+        # Agregar info de fórmulas eliminadas
+        if ($script:formulaFieldsToExclude.Count -gt 0) {
+            $envConfig.FormulasRemoved = @{
+                Count = $script:formulaFieldsToExclude.Count
+                Fields = $script:formulaFieldsToExclude
+                Note = "Estas fórmulas deben recrearse manualmente después del restore"
+            }
+        }
+        
+        # Guardar a JSON
+        $configPath = "$tempPath\environment-config.json"
+        $envConfig | ConvertTo-Json -Depth 10 | Out-File $configPath -Encoding UTF8
+        
+        Write-Output "  ✓ Configuración exportada: environment-config.json"
+        Write-Output "    - Soluciones: $($envConfig.Solutions.Count)"
+        Write-Output "    - Tablas custom: $($envConfig.Tables.Custom.Count)"
+        Write-Output "    - Tablas sistema: $($envConfig.Tables.System.Count)"
+        Write-Output "    - Componentes: $($envConfig.Components.TotalComponents)"
+        
+        Write-DetailedLog "Environment config exportado exitosamente" "SUCCESS"
+        
+    } catch {
+        Write-Output "  ⚠ No se pudo exportar configuración (no crítico): $($_.Exception.Message)"
+        Write-DetailedLog "Error exportando environment config: $($_.Exception.Message)" "WARNING"
+    }
     
     # ==========================================
     # 5. COMPRIMIR Y SUBIR A STORAGE
@@ -862,17 +1261,21 @@ try {
             timestamp = (Get-Date).ToUniversalTime().ToString("o")
             service = "PowerPlatform"
             status = "success"
-            environment = $environmentName
-            solution = $solutionName
+            backupVersion = "5.0"
+            environment = $organizationId
             solutionsExported = $solutionsToExport
-            pcfSolutionsDetected = $pcfSolutionNames
-            autoDetectedPCF = $pcfSolutionNames.Count
-            criticalTables = $criticalTables
-            relatedTablesDetected = $relatedTablesFound
+            solutionsCount = $solutionsToExport.Count
+            tablesCustom = $criticalTables
+            tablesRelated = $relatedTablesFound
             totalTablesExported = $allTablesToExport.Count
             totalRecords = $totalRecords
             backupFile = $zipFileName
             backupSizeMB = $backupSize
+            parameters = @{
+                IncludeSystemTables = $IncludeSystemTables
+                CustomPrefixes = $CustomPrefixes
+            }
+            formulasRemoved = $script:formulaFieldsToExclude.Count
             errors = @()
         } | ConvertTo-Json
         
@@ -907,48 +1310,66 @@ try {
     Write-Output "BACKUP COMPLETADO EXITOSAMENTE"
     Write-Output "======================================"
     Write-Output ""
-    Write-Output "SOLUCIONES EXPORTADAS:"
-    Write-Output "  Solución principal: $solutionName (v$solutionVersion)"
+    Write-Output "✅ BACKUP AUTOMÁTICO COMPLETO (v5.0)"
+    Write-Output ""
+    Write-Output "SOLUCIONES EXPORTADAS (AUTO-DETECTADAS):"
     
-    if ($pcfSolutionNames.Count -gt 0) {
-        Write-Output "  PCF solutions adicionales: $($pcfSolutionNames -join ', ')"
-        $totalSol = $solutionsToExport.Count
-        $pcfSol = $pcfSolutionNames.Count
-        Write-Output "  Total: $totalSol soluciones ($($totalSol - $pcfSol) principal + $pcfSol PCF)"
+    if ($solutionsToExport.Count -gt 0) {
+        Write-Output "  Total: $($solutionsToExport.Count) soluciones custom"
+        foreach ($sol in $customSolutions) {
+            Write-Output "    • $($sol.friendlyname) ($($sol.uniquename)) - v$($sol.version)"
+        }
     } else {
-        Write-Output "  Total: 1 solución"
+        Write-Output "  ⚠ Ninguna solución custom encontrada"
     }
     
-    # Mostrar PCF controls detectados dentro de la solución
-    if ($script:pcfControlsInSolution) {
+    # Mostrar PCF controls
+    if ($script:pcfControlsInSolution -and $script:pcfControlsInSolution.Count -gt 0) {
         Write-Output ""
-        Write-Output "PCF CONTROLS INCLUIDOS EN LA SOLUCIÓN:"
+        Write-Output "PCF CONTROLS DETECTADOS:"
         foreach ($pcf in $script:pcfControlsInSolution) {
-            Write-Output "  • $pcf"
+            Write-Output "    • $pcf"
         }
-        Write-Output "  Total PCF: $($script:pcfControlsInSolution.Count)"
     }
     
     Write-Output ""
-    Write-Output "TABLAS DATAVERSE EXPORTADAS:"
-    Write-Output "  Tablas críticas: $($criticalTables.Count)"
-    foreach ($table in $criticalTables) {
+    Write-Output "TABLAS EXPORTADAS (AUTO-DETECTADAS):"
+    Write-Output "  Tablas custom: $($criticalTables.Count)"
+    
+    $customTablesForDisplay = $criticalTables | Select-Object -First 10
+    foreach ($table in $customTablesForDisplay) {
         Write-Output "    • $table"
     }
     
+    if ($criticalTables.Count -gt 10) {
+        Write-Output "    ... y $($criticalTables.Count - 10) más"
+    }
+    
     if ($relatedTablesFound.Count -gt 0) {
-        Write-Output "  Tablas relacionadas (auto-detectadas): $($relatedTablesFound.Count)"
-        foreach ($table in $relatedTablesFound) {
+        Write-Output ""
+        Write-Output "  Tablas relacionadas: $($relatedTablesFound.Count)"
+        $relatedForDisplay = $relatedTablesFound | Select-Object -First 5
+        foreach ($table in $relatedForDisplay) {
             Write-Output "    ↳ $table"
+        }
+        if ($relatedTablesFound.Count -gt 5) {
+            Write-Output "    ↳ ... y $($relatedTablesFound.Count - 5) más"
         }
     }
     
     $totalTablas = $allTablesToExport.Count
     $criticas = $criticalTables.Count
-    $relacionadas = $relatedTablesFound.Count
+    $relacionadas = if ($relatedTablesFound) { $relatedTablesFound.Count } else { 0 }
     
-    Write-Output "  Total tablas: $totalTablas ($criticas críticas + $relacionadas relacionadas)"
-    Write-Output "  Total registros exportados: $totalRecords"
+    Write-Output ""
+    Write-Output "  📊 ESTADÍSTICAS:"
+    Write-Output "    - Total tablas: $totalTablas ($criticas custom + $relacionadas relacionadas)"
+    Write-Output "    - Total registros: $totalRecords"
+    Write-Output "    - Componentes: $script:totalComponentsCount"
+    
+    if ($script:formulaFieldsToExclude.Count -gt 0) {
+        Write-Output "    - Fórmulas eliminadas: $($script:formulaFieldsToExclude.Count) (compatibilidad cross-environment)"
+    }
     
     Write-Output ""
     Write-Output "ARCHIVO DE BACKUP:"
@@ -957,12 +1378,19 @@ try {
     Write-Output "  Ubicación: pp-backup/$zipFileName"
     Write-Output "  Contenido:"
     Write-Output "    - $($solutionsToExport.Count) archivo(s) .zip de soluciones"
-    Write-Output "    - $totalTablas archivo(s) .json de tablas"
+    Write-Output "    - $totalTablas archivo(s) .json de datos"
+    Write-Output "    - 1 archivo environment-config.json (metadata)"
     Write-Output ""
-    Write-Output "Extras:"
-    Write-Output "  1. Verificar backup en Azure Portal → Storage Account → pp-backup"
-    Write-Output "  2. Revisar logs en: Storage Account → logs/powerplatform/"
-    Write-Output "  3. Para restaurar: Ejecutar runbook 'Restore-PowerPlatform'"
+    Write-Output "CONFIGURACIÓN:"
+    Write-Output "  Modo: Automático (sin parámetros)"
+    Write-Output "  Detección: IsCustomEntity (100% genérico)"
+    Write-Output "  Tablas sistema: $(if ($IncludeSystemTables) { 'Incluidas' } else { 'Excluidas' })"
+    Write-Output ""
+    Write-Output "PRÓXIMOS PASOS:"
+    Write-Output "  1. Verificar backup: Azure Portal → Storage Account → pp-backup"
+    Write-Output "  2. Revisar logs: Storage Account → logs/powerplatform/"
+    Write-Output "  3. Restaurar: Ejecutar runbook 'Restore-PowerPlatform'"
+    Write-Output "  4. Ver detalles: Descargar y abrir environment-config.json"
     Write-Output "======================================"
     
 } catch {
@@ -996,15 +1424,16 @@ try {
             }
             executionLog = $script:executionLog
             errorDetails = $script:errorDetails
-            environment = if ($environmentName) { $environmentName } else { "N/A" }
-            solution = if ($solutionName) { $solutionName } else { "N/A" }
+            environment = if ($organizationId) { $organizationId } else { "N/A" }
+            backupMode = "Auto-detect (Generic)"
             variables = @{
                 appId = if ($appId) { $appId.Substring(0,8) + "..." } else { "N/A" }
                 tenantId = if ($tenantId) { $tenantId.Substring(0,8) + "..." } else { "N/A" }
-                environmentName = if ($environmentName) { $environmentName } else { "N/A" }
-                solutionName = if ($solutionName) { $solutionName } else { "N/A" }
+                organizationId = if ($organizationId) { $organizationId } else { "N/A" }
                 dataverseUrl = if ($dataverseUrl) { $dataverseUrl } else { "N/A" }
                 storageAccount = if ($storageAccountName) { $storageAccountName } else { "N/A" }
+                customPrefixes = if ($CustomPrefixes) { $CustomPrefixes -join ',' } else { "None (IsCustomEntity only)" }
+                includeSystemTables = $IncludeSystemTables
             }
         } | ConvertTo-Json -Depth 10
         

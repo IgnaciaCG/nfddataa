@@ -1,0 +1,38 @@
+﻿[
+    {
+        "primaryimageattribute":  "msdyn_image",
+        "componentstate":  0,
+        "versionnumber":  741597,
+        "solutionid":  "a6a9eb08-73c2-4e0a-b234-36ac2ac25259",
+        "parententitylogicalname":  "msdyn_aibfile",
+        "@odata.etag":  "W/\"741597\"",
+        "ismanaged":  true,
+        "componentidunique":  "b9861dfb-f983-4fb2-be2b-ef69216dbbc2",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "entityimageconfigid":  "e98d5692-04d9-f011-8543-002248384659"
+    },
+    {
+        "primaryimageattribute":  "msdyn_imageblob",
+        "componentstate":  0,
+        "versionnumber":  2315934,
+        "solutionid":  "1c50881b-a1d9-4430-a16f-6f8e1889976b",
+        "parententitylogicalname":  "msdyn_richtextfile",
+        "@odata.etag":  "W/\"2315934\"",
+        "ismanaged":  true,
+        "componentidunique":  "67103c9c-f55d-45c4-8d3c-1c324c38ec8e",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "entityimageconfigid":  "cd811163-2fd9-f011-8543-002248384659"
+    },
+    {
+        "primaryimageattribute":  "entityimage",
+        "componentstate":  0,
+        "versionnumber":  2535064,
+        "solutionid":  "60202ef0-9d92-427f-996d-27259e5eba15",
+        "parententitylogicalname":  "contact",
+        "@odata.etag":  "W/\"2535064\"",
+        "ismanaged":  true,
+        "componentidunique":  "866d30e7-d00e-4838-9199-9037e9c5ff52",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "entityimageconfigid":  "853bdd65-d4dc-f011-8406-002248e10de6"
+    }
+]

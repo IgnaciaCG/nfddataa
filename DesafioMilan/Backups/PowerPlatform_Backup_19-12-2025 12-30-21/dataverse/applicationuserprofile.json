@@ -1,0 +1,466 @@
+﻿[
+    {
+        "applicationuserprofileid":  "fdf9700f-0fd9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  985939,
+        "componentidunique":  "bd85a6ce-6078-46f7-8b0b-2b5b47b5d0e4",
+        "fieldsecurityprofileid":  "9257ef5b-5a2b-4bad-b3b2-536322765fc0",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "21c99588-df60-4e61-bf92-30e4dd587955",
+        "solutionid":  "597014dd-480a-434b-a02c-10208b16d54e"
+    },
+    {
+        "applicationuserprofileid":  "0bfa700f-0fd9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  985943,
+        "componentidunique":  "62f479e7-23ec-4756-ad3d-bef4f2e0e1b9",
+        "fieldsecurityprofileid":  "9257ef5b-5a2b-4bad-b3b2-536322765fc0",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "6d210f42-718d-48c0-b78d-12103c85e9b9",
+        "solutionid":  "597014dd-480a-434b-a02c-10208b16d54e"
+    },
+    {
+        "applicationuserprofileid":  "1dfa700f-0fd9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  985951,
+        "componentidunique":  "f36386d5-9e8f-460e-9bac-cb37657af0d7",
+        "fieldsecurityprofileid":  "9257ef5b-5a2b-4bad-b3b2-536322765fc0",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "0370c2f0-8158-4929-a461-c0ec404a6cbb",
+        "solutionid":  "597014dd-480a-434b-a02c-10208b16d54e"
+    },
+    {
+        "applicationuserprofileid":  "85b28224-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1181808,
+        "componentidunique":  "a2ef1972-ca14-4573-ace0-6bce2315f11c",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "511d34cf-eb35-41f7-b60e-18b7ef2eda49",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "a3b28224-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1181830,
+        "componentidunique":  "dce6356b-12c6-4129-8c2b-532634310002",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "191ff95f-39f9-4170-9a98-b002dc0418d3",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "e2b28224-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1181868,
+        "componentidunique":  "f87d47d8-7c3c-4f37-aef3-cf2c4def202e",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "0a1debb8-2db4-4084-9714-00f26ee4b91b",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "24b38224-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1181880,
+        "componentidunique":  "27745fbe-e047-4aec-adf3-0f914ec3574e",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "d4e80ee7-3c1a-4f2f-af4e-2f3897b509f7",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "2cb38224-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1181976,
+        "componentidunique":  "527e7f91-8712-453c-b392-50af53dbe771",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "7f8e1525-142f-416d-93a9-1b6ca67ffc1a",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "0c197b2a-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1181994,
+        "componentidunique":  "cc6399af-678d-4683-ae3f-65046b255dac",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "29c16157-0610-4cda-a945-bc5ca896659c",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "e5197b2a-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182075,
+        "componentidunique":  "11d66030-3ba0-4ce4-9cc1-bd56be8b5ec5",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "79d88751-5c23-49d1-8a64-214727530312",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "fc197b2a-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182088,
+        "componentidunique":  "e71a7bb8-5a6c-4295-8c8a-90e4b7c293f8",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "33acf5d6-d4e3-4b05-a365-bcf21a3fc868",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "a2418430-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182124,
+        "componentidunique":  "b421f009-7531-4e24-bd6d-d00c8b754547",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "fc4a0217-2ca7-4028-8199-bc553d00a349",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "f1418430-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182163,
+        "componentidunique":  "814b5f80-edde-4adc-be56-376a2c442db5",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "dda32d6d-baee-4af6-8c2a-887650f8ad76",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "02428430-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182175,
+        "componentidunique":  "800feea8-5a1b-4bf1-bfc3-d59e2545c667",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "18a02d3c-1e64-4bee-98a1-0521562851a5",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "06428430-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182182,
+        "componentidunique":  "cd98d6e4-fdc4-45e3-87e2-f436fe61b137",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "48595a24-3b8c-4ea7-91a2-0f4144a74aea",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "0a428430-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182188,
+        "componentidunique":  "6b9372a1-b04b-4299-891d-d7a0479137bd",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "95fe0ae4-1994-4a50-a16a-46e93f0f7bc0",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "3a428430-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182222,
+        "componentidunique":  "f2887062-da03-4ec7-943b-d82f2e39a8fb",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "90ffc0fc-757d-4098-90cb-e0c092d23f33",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "c9198b36-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182255,
+        "componentidunique":  "57873bba-bebf-40df-9b95-67ec3d4bc484",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "358fd751-04ae-45be-9047-70a09dda4902",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "0e1a8b36-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182303,
+        "componentidunique":  "c4ec831e-a023-4ce6-b46a-d092c444d98b",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "4cb3fb8a-e42a-4f90-97c9-7bb9be0424a5",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "251a8b36-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182339,
+        "componentidunique":  "745919d4-13f3-4032-9f6e-7dc3b4d9b71b",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "3bf9cc14-5e27-467c-b136-405747922913",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "2c1a8b36-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182348,
+        "componentidunique":  "6eebce3b-3700-441a-8bd0-2fd5adff6ad9",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "1afe1d71-4b19-4af3-bbe7-793086d87330",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "0c549b3c-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182379,
+        "componentidunique":  "49e49836-35d6-4d6b-a59a-fbd54300b147",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "35dd0fc3-f276-449e-9487-26fde5b75345",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "2c549b3c-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182400,
+        "componentidunique":  "1e87a5d2-4052-41b1-a70b-087aac4e7ca3",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "88219bc7-af79-4341-b39c-9d65c578d332",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "6c549b3c-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182437,
+        "componentidunique":  "6a49f055-1dd7-45f1-9ad4-bf36ccaf4321",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "d8b59677-16f1-4fe4-8b13-3cff4f1e5517",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "87549b3c-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182452,
+        "componentidunique":  "7aa6a2b3-3a87-4a5d-806e-c2c21d097c6f",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "26b809dc-dc99-49e2-8685-fc77f2c8fbe7",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "bc549b3c-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182486,
+        "componentidunique":  "897ef6bd-2947-422c-b433-84c73c1d15ff",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "a37e867e-0d1a-4633-960a-145ad72f4e6a",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "f0f79a42-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182501,
+        "componentidunique":  "417cb928-ec1d-449a-9d62-00f97337c89a",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "67c027d0-1a89-486e-a277-5cc8ac172373",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "2ef89a42-1ed9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1182561,
+        "componentidunique":  "ad61aea3-c609-421b-9472-65171a6b82de",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "b814912c-dbdf-4b0b-9d5b-c06e1fecd959",
+        "solutionid":  "46f48081-d50f-48f9-a043-32bc12664b07"
+    },
+    {
+        "applicationuserprofileid":  "3f7fdc5e-36d9-f011-8543-002248384659",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "versionnumber":  1847903,
+        "componentidunique":  "641dfdd4-2bc5-4b4e-8c55-4bf02847596c",
+        "fieldsecurityprofileid":  "572329c1-a042-4e22-be47-367c6374ea45",
+        "iscustomizable":  {
+                               "Value":  false,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "componentstate":  0,
+        "ismanaged":  true,
+        "applicationuserid":  "0b63dd49-3762-44fc-8c61-8796449819cc",
+        "solutionid":  "2d537e75-20ff-49ac-b756-adef8e7246b6"
+    }
+]

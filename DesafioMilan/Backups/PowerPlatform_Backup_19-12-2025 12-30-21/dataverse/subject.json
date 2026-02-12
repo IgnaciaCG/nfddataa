@@ -1,0 +1,20 @@
+﻿{
+    "overriddencreatedon":  null,
+    "description":  "Asunto predeterminado rellenado para la migración. Puede cambiarlo para adaptarlo a su organización.",
+    "_parentsubject_value":  null,
+    "importsequencenumber":  null,
+    "_modifiedonbehalfby_value":  null,
+    "@odata.etag":  "W/\"2080207\"",
+    "featuremask":  1,
+    "_organizationid_value":  "660b64c6-c0d9-f011-89f6-002248e0aee4",
+    "_modifiedbyexternalparty_value":  null,
+    "subjectid":  "5a79374d-0cd9-f011-8543-002248384659",
+    "title":  "Asunto predeterminado",
+    "modifiedon":  "2025-12-14T16:45:32Z",
+    "createdon":  "2025-12-14T16:45:32Z",
+    "_createdby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3",
+    "_createdonbehalfby_value":  null,
+    "versionnumber":  2080207,
+    "_createdbyexternalparty_value":  null,
+    "_modifiedby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3"
+}

@@ -1,0 +1,21 @@
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25122.139" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25122.00142">
+  <Entities></Entities>
+  <Roles></Roles>
+  <Workflows></Workflows>
+  <FieldSecurityProfiles></FieldSecurityProfiles>
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls>
+    <CustomControl>
+      <Name>cr8df_BeverControls.ScheduleBoardView</Name>
+      <FileName>/Controls/cr8df_BeverControls.ScheduleBoardView/ControlManifest.xml</FileName>
+    </CustomControl>
+  </CustomControls>
+  <EntityDataProviders />
+  <Languages>
+    <Language>3082</Language>
+  </Languages>
+</ImportExportXml>

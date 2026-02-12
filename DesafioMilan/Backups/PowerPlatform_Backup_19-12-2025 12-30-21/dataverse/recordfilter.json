@@ -1,0 +1,33 @@
+﻿{
+    "statecode":  0,
+    "overriddencreatedon":  null,
+    "overwritetime":  "1900-01-01T00:00:00Z",
+    "timezoneruleversionnumber":  null,
+    "displayname":  "All Records",
+    "iscustomizable":  {
+                           "Value":  false,
+                           "CanBeChanged":  true,
+                           "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                       },
+    "versionnumber":  2073869,
+    "_modifiedby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3",
+    "importsequencenumber":  null,
+    "_modifiedonbehalfby_value":  null,
+    "_createdby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3",
+    "componentstate":  0,
+    "ismanaged":  true,
+    "_createdonbehalfby_value":  null,
+    "componentidunique":  "6b6d4554-7b27-4257-8368-8821f2e1fadb",
+    "createdon":  "2025-12-14T14:46:04Z",
+    "filterlinkedrecords":  true,
+    "solutionid":  "a5d3204d-e256-43cb-a167-2d3bbcd2fc40",
+    "@odata.etag":  "W/\"2073869\"",
+    "isrolebusinessunitquery":  false,
+    "_organizationid_value":  "660b64c6-c0d9-f011-89f6-002248e0aee4",
+    "modifiedon":  "2025-12-14T14:46:04Z",
+    "fetchxml":  null,
+    "utcconversiontimezonecode":  null,
+    "statuscode":  1,
+    "recordfilterid":  "f155be0e-f9ac-456a-8a9a-2c5aab0f54c7",
+    "uniquename":  "msft_Global"
+}

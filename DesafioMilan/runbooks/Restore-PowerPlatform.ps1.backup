@@ -1,0 +1,2556 @@
+<#
+.SYNOPSIS
+    Runbook para restaurar soluciones de Power Platform en un nuevo environment
+
+.DESCRIPTION
+    Este runbook restaura SOLUCIONES Y DATOS desde un backup ZIP almacenado en Azure Storage.
+    Restaura la solución (metadata, forms, views, PCF) y datos de ~46 tablas Dataverse.
+    
+    *** MODO RECOMENDADO: NewEnvironment (restaura solución + DATOS completos) ***
+    *** MODOS CreateCopy y UpdateCurrent: DESHABILITADOS (no restauran datos) ***
+    
+    Utiliza Azure Automation con Managed Identity y Service Principal para autenticación.
+    
+    CARACTERÍSTICAS DEL RESTORE (modo NewEnvironment):
+    
+    [OK] Auto-crea environment nuevo con Dataverse
+    [OK] Importa solución como nueva instalación
+    [OK] Restaura DATOS completos de todas las tablas (environment limpio)
+    [OK] Datos sin marcadores cr8df_backupid (restauración limpia)
+    [OK] Manejo inteligente de timeouts con retry
+    [OK] Verificación automática de permisos de admin
+    [OK] 3 estrategias para obtener Dataverse URL (failover automático)
+    
+    IMPORTANTE:
+    - Modo NewEnvironment: Restaura solución + TODOS los datos
+    - Modos CreateCopy/UpdateCurrent: Solo importan solución (SIN datos)
+    
+    CASOS DE USO:
+    - Prod -> Dev (clonar environment productivo a desarrollo)
+    - Disaster Recovery (restaurar desde backup en nuevo environment)
+    - Testing (probar actualizaciones en environment aislado)
+    - Migración entre tenants o regiones
+
+.PARAMETER BackupFileName
+    Nombre del archivo ZIP de backup en Azure Storage
+    Ejemplo: "PowerPlatform_Backup_11-12-2025 13-31-13.zip"
+
+.PARAMETER RestoreMode
+    Modo de restore - DEBE SER "NewEnvironment"
+    Otros modos (UpdateCurrent, CreateCopy) no están soportados en esta versión
+
+.PARAMETER NewEnvironmentName
+    Nombre del nuevo environment a crear (solo si RestoreMode = "NewEnvironment")
+    El runbook creará automáticamente el environment y obtendrá su GUID
+    Ejemplo: "Dev-Restore-20251211"
+
+.PARAMETER ExistingEnvironmentId
+    GUID de un environment ya creado para continuar restore (solo NewEnvironment)
+    Útil si el provisionamiento de Dataverse excedió el timeout inicial
+    Si se proporciona, se omite la creación y se valida que Dataverse esté listo
+    Ejemplo: "12345678-1234-1234-1234-123456789abc"
+
+.PARAMETER NewEnvironmentRegion
+    Región del nuevo environment (solo si se crea automáticamente)
+    Default: "unitedstates"
+    
+    VALORES VÁLIDOS:
+    - "unitedstates"    - "europe"         - "asia"           - "australia"
+    - "india"           - "japan"          - "canada"         - "southamerica"
+    - "unitedkingdom"   - "france"         - "germany"        - "switzerland"
+    - "norway"          - "korea"          - "southafrica"    - "uae"
+    - "brazil"
+    
+    IMPORTANTE: Debe coincidir con región del backup para evitar problemas
+
+.PARAMETER NewEnvironmentType
+    Tipo de environment a crear (solo si se crea automáticamente)
+    Default: "Sandbox"
+    
+    VALORES VÁLIDOS:
+    - "Sandbox"      - Entorno de pruebas (recomendado)
+    - "Production"   - Entorno productivo
+    - "Trial"        - Entorno de prueba temporal
+    - "Developer"    - Entorno de desarrollo individual
+
+.PARAMETER CreateBackupBeforeRestore
+    Crea un backup preventivo antes de restaurar:
+    - $true (default): Crea backup de seguridad antes de comenzar
+    - $false: Omite el backup preventivo (usar solo en escenarios automatizados)
+
+.PARAMETER Force
+    Omite la confirmación interactiva:
+    - $false (default): Pide confirmación mostrando resumen detallado
+    - $true: Ejecuta directamente sin confirmación (para scripts automatizados)
+
+.EXAMPLE
+    # Modo 1A: Restore en entorno existente (Prod -> Dev existente)
+    .\Restore-PowerPlatform.ps1 `
+        -BackupFileName "PowerPlatform_Backup_PROD_11-12-2025.zip" `
+        -RestoreMode "NewEnvironment" `
+
+.EXAMPLE
+    # Modo 1B: Restore auto-creando nuevo entorno
+    .\Restore-PowerPlatform.ps1 `
+        -BackupFileName "PowerPlatform_Backup_PROD_11-12-2025.zip" `
+        -RestoreMode "NewEnvironment" `
+        -NewEnvironmentName "Dev-Restore-20251211" `
+        -NewEnvironmentRegion "unitedstates" `
+        -NewEnvironmentType "Sandbox"
+
+.EXAMPLE
+    # Modo 2: Actualizar solución actual (Rollback destructivo)
+    .\Restore-PowerPlatform.ps1 `
+        -BackupFileName "PowerPlatform_Backup_11-12-2025.zip" `
+        -RestoreMode "UpdateCurrent"
+
+.EXAMPLE
+    # Modo 3: Crear copia para comparación (No destructivo)
+    .\Restore-PowerPlatform.ps1 `
+        -BackupFileName "PowerPlatform_Backup_11-12-2025.zip" `
+        -RestoreMode "CreateCopy"
+
+.EXAMPLE
+    # Restore automatizado sin confirmación
+    .\Restore-PowerPlatform.ps1 `
+        -BackupFileName "PowerPlatform_Backup_11-12-2025.zip" `
+        -RestoreMode "CreateCopy" `
+        -Force $true `
+        -CreateBackupBeforeRestore $false
+
+.NOTES
+    Autor: Milan
+    Versión: 4.2
+    Fecha: 16-12-2025
+    
+    Cambios v4.2:
+    - FEATURE: Modo NewEnvironment ahora restaura TODOS los datos de las tablas
+    - Datos se inyectan sin marcadores (environment limpio, listo para producción)
+    - Modos CreateCopy y UpdateCurrent: DESHABILITADOS (solo importan solución, sin datos)
+    - Simplificación: Un solo modo productivo (NewEnvironment)
+    
+    Cambios v4.1:
+    - FIX: CreateCopy ahora SÍ crea solución nueva con sufijo '_Restored_<timestamp>'
+    - FIX: cr8df_backupid ahora se crea como GUID (UniqueIdentifier) en vez de texto
+    - CreateCopy modifica solution.xml para cambiar UniqueName antes de importar
+    - Ambas soluciones coexisten (original + restaurada) en modo CreateCopy
+    - ConvertToManaged NO se aplica en CreateCopy (solución nueva, no existe)
+    
+    Cambios v4.0:
+    - Restore completo: Soluciones + Datos (~46 tablas)
+    - 3 modos de operación flexibles
+    - Auto-creación de campos marcadores (UpdateCurrent y CreateCopy)
+    - NewEnvironment: Datos limpios sin marcadores
+    - UpdateCurrent/CreateCopy: Datos con marcadores para comparación
+    - Proceso completo en 9 pasos
+    
+    Requisitos:
+    - Azure Automation Account con Managed Identity habilitado
+    - Service Principal con permisos en Power Platform
+    - Módulos PowerShell: Az.Accounts, Az.Storage, Microsoft.PowerApps.Administration.PowerShell
+    
+    Variables de Automation requeridas:
+    - PP-ServicePrincipal-TenantId: GUID del tenant Azure AD
+    - PP-EnvironmentName: GUID del environment Power Platform
+    - StorageAccountName: Nombre del Storage Account
+    - StorageAccountKey: Access Key del Storage Account (encriptada)
+    
+    Credential de Automation requerida:
+    - PP-ServicePrincipal (username = AppId, password = ClientSecret)
+#>
+
+param(
+    [Parameter(Mandatory=$true, HelpMessage="Nombre del archivo ZIP de backup en Azure Storage")]
+    [string]$BackupFileName,
+    
+    [Parameter(Mandatory=$false, HelpMessage="Modo de restore: SOLO NewEnvironment soportado (restaura solución + datos)")]
+    [ValidateSet("NewEnvironment")]
+    [string]$RestoreMode = "NewEnvironment",
+    
+    [Parameter(Mandatory=$false, HelpMessage="Nombre para auto-crear environment (solo NewEnvironment)")]
+    [string]$NewEnvironmentName = "",
+    
+    [Parameter(Mandatory=$false, HelpMessage="ID de environment existente para continuar restore (si ya fue creado)")]
+    [string]$ExistingEnvironmentId = "",
+    
+    [Parameter(Mandatory=$false, HelpMessage="Región del nuevo environment")]
+    [ValidateSet("unitedstates", "europe", "asia", "australia", "india", "japan", "canada", "southamerica", "unitedkingdom", "france", "germany", "switzerland", "norway", "korea", "southafrica", "uae", "brazil")]
+    [string]$NewEnvironmentRegion = "unitedstates",
+    
+    [Parameter(Mandatory=$false, HelpMessage="Tipo de environment: Sandbox, Production, Trial, o Developer")]
+    [ValidateSet("Sandbox", "Production", "Trial", "Developer")]
+    [string]$NewEnvironmentType = "Sandbox",
+    
+    [Parameter(Mandatory=$false, HelpMessage="Crear backup preventivo antes de restaurar")]
+    [bool]$CreateBackupBeforeRestore = $true,
+    
+    [Parameter(Mandatory=$false, HelpMessage="Omitir confirmación interactiva")]
+    [bool]$Force = $false
+)
+
+# ==========================================
+# CONFIGURACIÓN INICIAL
+# ==========================================
+
+$script:startTime = Get-Date
+$script:logEntries = @()
+$script:errors = @()
+
+# Estadísticas de restore
+$script:restoreStats = @{
+    backupFileName = $BackupFileName
+    restoreMode = $RestoreMode
+    newEnvironmentName = $NewEnvironmentName
+    newEnvironmentId = ""
+    newEnvironmentRegion = $NewEnvironmentRegion
+    newEnvironmentType = $NewEnvironmentType
+    newEnvironmentCreated = $false
+    createBackupBeforeRestore = $CreateBackupBeforeRestore
+    backupId = [guid]::NewGuid().ToString()
+    solutionImported = $false
+    solutionName = ""
+    solutionVersion = ""
+    solutionDisplayName = ""
+    fieldsCreated = 0
+    tablesUpdated = 0
+    tablesProcessed = 0
+    tablesSuccess = 0
+    tablesError = 0
+    recordsRestored = 0
+    recordsError = 0
+}
+
+Write-Output "=========================================="
+Write-Output "RESTORE POWER PLATFORM - INICIO"
+Write-Output "=========================================="
+Write-Output "Fecha/Hora: $(Get-Date -Format 'dd-MM-yyyy HH:mm:ss')"
+Write-Output "Backup File: $BackupFileName"
+Write-Output "Modo Restore: $RestoreMode"
+
+if ($RestoreMode -eq "NewEnvironment") {
+    if (-not [string]::IsNullOrWhiteSpace($NewEnvironmentName)) {
+        Write-Output "New Environment: $NewEnvironmentName (auto-crear)"
+        Write-Output "  Region: $NewEnvironmentRegion"
+        Write-Output "  Type: $NewEnvironmentType"
+    }
+} else {
+    Write-Output "Target Environment: Same as backup"
+}
+
+Write-Output "Create Backup Before: $CreateBackupBeforeRestore"
+Write-Output "Force: $Force"
+Write-Output "=========================================="
+Write-Output ""
+
+# ==========================================
+# FUNCIONES AUXILIARES
+# ==========================================
+
+function Write-DetailedLog {
+    param(
+        [string]$Message,
+        [string]$Level = "INFO"
+    )
+    
+    $timestamp = Get-Date -Format "HH:mm:ss"
+    $logEntry = @{
+        timestamp = $timestamp
+        level = $Level
+        message = $Message
+    }
+    $script:logEntries += $logEntry
+}
+
+function Write-ErrorDetail {
+    param(
+        $ErrorRecord,
+        [string]$Step
+    )
+    
+    $errorInfo = @{
+        step = $Step
+        message = $ErrorRecord.Exception.Message
+        stackTrace = $ErrorRecord.ScriptStackTrace
+        timestamp = Get-Date -Format "HH:mm:ss"
+    }
+    $script:errors += $errorInfo
+    
+    Write-Output "  ERROR: $($ErrorRecord.Exception.Message)"
+}
+
+function Add-ServicePrincipalToEnvironment {
+    <#
+    .SYNOPSIS
+        Agrega el Service Principal como Application User al environment con roles de System Admin
+    
+    .DESCRIPTION
+        Esta función es CRÍTICA para que el Service Principal pueda acceder a Dataverse
+        después de crear o conectarse a un environment. Sin esto, el SP no tiene permisos.
+        
+        Usa múltiples métodos para garantizar que funcione:
+        1. Power Platform Admin API (BAP API) - Con asignación automática de roles
+        2. PowerApps cmdlet como fallback
+        3. Instrucciones manuales si todo falla
+    
+    .PARAMETER EnvironmentId
+        GUID del environment donde agregar el Service Principal
+    
+    .PARAMETER AppId
+        Application ID del Service Principal a agregar
+    
+    .PARAMETER TenantId
+        Tenant ID para autenticación
+    
+    .PARAMETER ClientSecret
+        Client Secret del Service Principal
+    
+    .OUTPUTS
+        Boolean - True si se agregó exitosamente, False si falló
+    #>
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$EnvironmentId,
+        
+        [Parameter(Mandatory=$true)]
+        [string]$AppId,
+        
+        [Parameter(Mandatory=$false)]
+        [string]$TenantId,
+        
+        [Parameter(Mandatory=$false)]
+        [string]$ClientSecret
+    )
+    
+    Write-Host "    Agregando Service Principal como Application User..."
+    Write-Host "      Environment: $EnvironmentId"
+    Write-Host "      App ID: $AppId"
+    Write-Host ""
+    
+    $success = $false
+    
+    # MÉTODO 1: Power Platform Admin API (BAP API) - EL MÁS COMPLETO
+    if (-not [string]::IsNullOrWhiteSpace($TenantId) -and -not [string]::IsNullOrWhiteSpace($ClientSecret)) {
+        Write-Host "      Método 1: Power Platform Admin API (con asignación de roles)..."
+        
+        try {
+            # Obtener token para BAP API
+            $tokenBody = @{
+                client_id = $AppId
+                client_secret = $ClientSecret
+                scope = "https://service.powerapps.com/.default"
+                grant_type = "client_credentials"
+            }
+            
+            $tokenUrl = "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token"
+            $bapToken = Invoke-RestMethod -Uri $tokenUrl -Method Post -Body $tokenBody -ContentType "application/x-www-form-urlencoded" -TimeoutSec 30 -ErrorAction Stop
+            
+            $bapHeaders = @{
+                "Authorization" = "Bearer $($bapToken.access_token)"
+                "Content-Type" = "application/json"
+            }
+            
+            # Paso 1: Verificar si el Application User ya existe
+            $checkUserUrl = "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$EnvironmentId/applicationUsers?api-version=2023-06-01"
+            
+            try {
+                $existingUsers = Invoke-RestMethod -Uri $checkUserUrl -Headers $bapHeaders -Method Get -TimeoutSec 30 -ErrorAction Stop
+                
+                $existingUser = $existingUsers.value | Where-Object { $_.properties.applicationId -eq $AppId }
+                
+                if ($existingUser) {
+                    Write-Host "      ✓ Application User ya existe"
+                    Write-Host "        User ID: $($existingUser.name)"
+                    $success = $true
+                } else {
+                    Write-Host "      Application User no existe, creando..."
+                    
+                    # Paso 2: Crear Application User con rol System Administrator
+                    $createUserUrl = "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$EnvironmentId/applicationUsers?api-version=2023-06-01"
+                    
+                    $userBody = @{
+                        properties = @{
+                            applicationId = $AppId
+                            securityRoles = @(
+                                @{
+                                    name = "System Administrator"
+                                }
+                            )
+                        }
+                    } | ConvertTo-Json -Depth 10
+                    
+                    try {
+                        $newUser = Invoke-RestMethod -Uri $createUserUrl -Headers $bapHeaders -Method Post -Body $userBody -TimeoutSec 30 -ErrorAction Stop
+                        
+                        Write-Host "      ✓ Application User creado exitosamente vía BAP API"
+                        Write-Host "        User ID: $($newUser.name)"
+                        Write-Host "        Role asignado: System Administrator"
+                        Write-Host ""
+                        $success = $true
+                        
+                    } catch {
+                        $errorDetails = ""
+                        if ($_.ErrorDetails.Message) {
+                            try {
+                                $errorObj = $_.ErrorDetails.Message | ConvertFrom-Json
+                                $errorDetails = $errorObj.error.message
+                            } catch {
+                                $errorDetails = $_.ErrorDetails.Message
+                            }
+                        } else {
+                            $errorDetails = $_.Exception.Message
+                        }
+                        
+                        Write-Host "      ✗ Error creando Application User vía BAP API"
+                        Write-Host "        Error: $errorDetails"
+                        
+                        # Si el error es de permisos, es posible que el SP no tenga permisos de admin
+                        if ($errorDetails -like "*403*" -or $errorDetails -like "*Forbidden*" -or $errorDetails -like "*Unauthorized*") {
+                            Write-Host "        Causa probable: Service Principal sin permisos de Power Platform Admin"
+                        }
+                    }
+                }
+                
+            } catch {
+                Write-Host "      ⚠ No se pudo verificar/crear Application User vía BAP API"
+                Write-Host "        Error: $($_.Exception.Message)"
+            }
+            
+        } catch {
+            Write-Host "      ✗ Error obteniendo token BAP API"
+            Write-Host "        Error: $($_.Exception.Message)"
+        }
+    } else {
+        Write-Host "      ⚠ Método 1 omitido (TenantId o ClientSecret no proporcionados)"
+    }
+    
+    # MÉTODO 2: PowerApps cmdlet (fallback)
+    if (-not $success) {
+        Write-Host ""
+        Write-Host "      Método 2: PowerApps cmdlet (fallback)..."
+        
+        $cmdletAvailable = Get-Command -Name "New-PowerAppManagementApp" -ErrorAction SilentlyContinue
+        
+        if ($cmdletAvailable) {
+            try {
+                New-PowerAppManagementApp `
+                    -EnvironmentName $EnvironmentId `
+                    -ApplicationId $AppId `
+                    -ErrorAction Stop | Out-Null
+                
+                Write-Host "      ✓ Application User agregado vía cmdlet"
+                Write-Host "        IMPORTANTE: Debes asignar el rol manualmente en Power Platform Admin Center"
+                Write-Host ""
+                $success = $true
+                
+            } catch {
+                Write-Host "      ✗ Cmdlet falló: $($_.Exception.Message)"
+            }
+        } else {
+            Write-Host "      ⚠ Cmdlet New-PowerAppManagementApp no disponible"
+        }
+    }
+    
+    # MÉTODO 3: Instrucciones manuales
+    if (-not $success) {
+        Write-Host ""
+        Write-Host "      ═══════════════════════════════════════════════════"
+        Write-Host "      ⚠ TODOS LOS MÉTODOS AUTOMÁTICOS FALLARON"
+        Write-Host "      ═══════════════════════════════════════════════════"
+        Write-Host ""
+        Write-Host "      ACCIÓN MANUAL REQUERIDA (5 minutos):"
+        Write-Host ""
+        Write-Host "      1. Ve a: https://admin.powerplatform.microsoft.com"
+        Write-Host "      2. Environments → Busca el environment"
+        Write-Host "      3. Settings → Users + permissions → Application users"
+        Write-Host "      4. Click: + New app user"
+        Write-Host "      5. Buscar app: $AppId"
+        Write-Host "      6. Click: Add"
+        Write-Host "      7. Seleccionar app → Edit security roles"
+        Write-Host "      8. Marcar: System Administrator"
+        Write-Host "      9. Click: Save"
+        Write-Host "      10. Esperar 2-5 minutos para propagación"
+        Write-Host ""
+        Write-Host "      Después, re-ejecuta el restore con:"
+        Write-Host "        -ExistingEnvironmentId '$EnvironmentId'"
+        Write-Host ""
+        Write-Host "      ═══════════════════════════════════════════════════"
+        Write-Host ""
+    }
+    
+    return $success
+}
+
+function Get-DataverseUrl {
+    <#
+    .SYNOPSIS
+        Obtiene la URL de Dataverse de un environment de Power Platform
+    
+    .DESCRIPTION
+        Función auxiliar que intenta obtener la URL de Dataverse usando 3 estrategias:
+        1. Discovery Service (Microsoft oficial - más confiable)
+        2. API REST de Power Platform (fallback)
+        3. Variable de Automation PP-DataverseUrl (fallback manual)
+    
+    .PARAMETER EnvironmentId
+        GUID del environment de Power Platform
+    
+    .PARAMETER TenantId
+        GUID del tenant Azure AD
+    
+    .PARAMETER AppId
+        Application ID del Service Principal
+    
+    .PARAMETER ClientSecret
+        Client Secret del Service Principal
+    
+    .OUTPUTS
+        String con la URL de Dataverse (ej: https://orgXXXXX.crm.dynamics.com)
+    #>
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$EnvironmentId,
+        
+        [Parameter(Mandatory=$true)]
+        [string]$TenantId,
+        
+        [Parameter(Mandatory=$true)]
+        [string]$AppId,
+        
+        [Parameter(Mandatory=$true)]
+        [string]$ClientSecret
+    )
+    
+    Write-Host "  Obteniendo Dataverse URL para environment: $EnvironmentId"
+    Write-Host ""
+    
+    # ESTRATEGIA 1: Discovery Service (oficial de Microsoft - MÁS CONFIABLE)
+    try {
+        Write-Host "  [Estrategia 1] Discovery Service..."
+        
+        # Obtener token OAuth para Discovery Service
+        # IMPORTANTE: El scope correcto es https://disco.crm.dynamics.com/.default
+        $tokenParams = @{
+            Method = 'POST'
+            Uri = "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token"
+            Headers = @{ 'Content-Type' = 'application/x-www-form-urlencoded' }
+            Body = @{
+                client_id = $AppId
+                client_secret = $ClientSecret
+                scope = 'https://disco.crm.dynamics.com/.default'
+                grant_type = 'client_credentials'
+            }
+        }
+        
+        $tokenResponse = Invoke-RestMethod @tokenParams -ErrorAction Stop
+        
+        # Consultar Discovery Service para obtener todas las instances del tenant
+        $discoveryHeaders = @{
+            'Authorization' = "Bearer $($tokenResponse.access_token)"
+            'Accept' = 'application/json'
+            'OData-MaxVersion' = '4.0'
+            'OData-Version' = '4.0'
+        }
+        
+        $discoveryUrl = "https://globaldisco.crm.dynamics.com/api/discovery/v2.0/Instances"
+        $instancesResponse = Invoke-RestMethod -Uri $discoveryUrl -Headers $discoveryHeaders -Method Get -ErrorAction Stop
+        
+        # Buscar environment específico por ID (GUID)
+        $targetInstance = $instancesResponse.value | Where-Object { $_.Id -eq $EnvironmentId }
+        
+        if ($targetInstance -and -not [string]::IsNullOrWhiteSpace($targetInstance.Url)) {
+            Write-Host "    ✓ URL obtenida via Discovery Service"
+            Write-Host "      Environment: $($targetInstance.FriendlyName)"
+            Write-Host "      Región: $($targetInstance.Region)"
+            Write-Host "      State: $($targetInstance.State)"
+            Write-Host "      URL: $($targetInstance.Url)"
+            return $targetInstance.Url
+        } else {
+            throw "Environment '$EnvironmentId' no encontrado en Discovery Service"
+        }
+        
+    } catch {
+        Write-Host "    ✗ Discovery Service falló: $($_.Exception.Message)"
+    }
+    
+    # ESTRATEGIA 2: API REST de Power Platform
+    try {
+        Write-Host "  [Estrategia 2] API REST de Power Platform..."
+        
+        # Obtener token OAuth
+        $tokenParams = @{
+            Method = 'POST'
+            Uri = "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token"
+            Headers = @{ 'Content-Type' = 'application/x-www-form-urlencoded' }
+            Body = @{
+                client_id = $AppId
+                client_secret = $ClientSecret
+                scope = 'https://api.bap.microsoft.com/.default'
+                grant_type = 'client_credentials'
+            }
+        }
+        
+        $tokenResponse = Invoke-RestMethod @tokenParams -ErrorAction Stop
+        
+        # Consultar environment via API REST
+        $apiHeaders = @{
+            'Authorization' = "Bearer $($tokenResponse.access_token)"
+            'Content-Type' = 'application/json'
+        }
+        
+        $apiUrl = "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/scopes/admin/environments/$EnvironmentId`?api-version=2023-06-01"
+        $envResponse = Invoke-RestMethod -Uri $apiUrl -Headers $apiHeaders -Method Get -ErrorAction Stop
+        
+        # Extraer Dataverse URL
+        $dataverseUrl = $envResponse.properties.linkedEnvironmentMetadata.instanceUrl
+        
+        if (-not [string]::IsNullOrWhiteSpace($dataverseUrl)) {
+            Write-Host "    URL obtenida via API REST"
+            Write-Host "    Environment: $($envResponse.properties.displayName)"
+            return $dataverseUrl
+        } else {
+            throw "URL de Dataverse vacía en respuesta de API"
+        }
+        
+    } catch {
+        Write-Host "    API REST falló: $($_.Exception.Message)"
+    }
+    
+    # ESTRATEGIA 3: Variable de Automation por Environment (fallback manual específico)
+    try {
+        Write-Host "  [Estrategia 3] Variable de Automation por environment..."
+        
+        # Intentar variable específica para este environment primero
+        $envVarName = "PP-DataverseUrl-$EnvironmentId"
+        $envSpecificUrl = Get-AutomationVariable -Name $envVarName -ErrorAction SilentlyContinue
+        
+        if (-not [string]::IsNullOrWhiteSpace($envSpecificUrl)) {
+            Write-Host "    URL obtenida de variable específica: $envVarName"
+            Write-Host "    URL: $envSpecificUrl"
+            return $envSpecificUrl
+        }
+        
+        # Si no hay variable específica, intentar variable genérica
+        $fallbackUrl = Get-AutomationVariable -Name "PP-DataverseUrl" -ErrorAction SilentlyContinue
+        
+        if (-not [string]::IsNullOrWhiteSpace($fallbackUrl)) {
+            Write-Host "    URL obtenida de variable genérica PP-DataverseUrl"
+            Write-Host "    ⚠ ADVERTENCIA: Esta URL fue configurada manualmente"
+            Write-Host "    ⚠ Verifica que corresponda al environment correcto: $EnvironmentId"
+            return $fallbackUrl
+        }
+        
+        Write-Host "    No hay variables de Automation configuradas"
+        
+    } catch {
+        Write-Host "    Error accediendo variables de Automation: $($_.Exception.Message)"
+    }
+    
+    # Si todas las estrategias fallaron
+    Write-Host ""
+    Write-Host "  ══════════════════════════════════════════════════════════"
+    Write-Host "  ERROR: No se pudo obtener Dataverse URL con ninguna estrategia"
+    Write-Host "  ══════════════════════════════════════════════════════════"
+    Write-Host ""
+    Write-Host "  DIAGNÓSTICO:"
+    Write-Host "    • Discovery Service: Falló (problema de red o permisos)"
+    Write-Host "    • BAP Admin API: Falló (Service Principal sin permisos admin)"
+    Write-Host "    • Variables de Automation: No configuradas"
+    Write-Host ""
+    Write-Host "  SOLUCIÓN 1: Agregar Service Principal al environment"
+    Write-Host "    1. Ve a: https://admin.powerplatform.microsoft.com"
+    Write-Host "    2. Environment → Settings → Application users"
+    Write-Host "    3. + New app user → Buscar: $AppId"
+    Write-Host "    4. Add → Edit security roles → System Administrator → Save"
+    Write-Host "    5. Esperar 5 minutos"
+    Write-Host "    6. Re-ejecutar restore"
+    Write-Host ""
+    Write-Host "  SOLUCIÓN 2: Hardcodear URL en variable de Automation (más rápido)"
+    Write-Host "    1. Ve a: https://admin.powerplatform.microsoft.com"
+    Write-Host "    2. Selecciona el environment (ID: $EnvironmentId)"
+    Write-Host "    3. Copia la 'Environment URL' (ej: https://orgXXXXX.crm2.dynamics.com)"
+    Write-Host "    4. En Azure Portal → Automation Account → Variables:"
+    Write-Host "       Nombre: PP-DataverseUrl-$EnvironmentId"
+    Write-Host "       Valor: <URL copiada>"
+    Write-Host "       Tipo: String"
+    Write-Host "       Encrypted: No"
+    Write-Host "    5. Save y re-ejecutar restore inmediatamente"
+    Write-Host ""
+    Write-Host "  RECOMENDACIÓN: Usa Solución 2 para pruebas rápidas,"
+    Write-Host "                  luego implementa Solución 1 para producción"
+    Write-Host ""
+    Write-Host "  ══════════════════════════════════════════════════════════"
+    Write-Host ""
+    
+    throw "No se pudo determinar Dataverse URL para environment: $EnvironmentId. Implementa una de las soluciones arriba."
+}
+
+# ==========================================
+# PASO 0: VALIDAR ENTORNO Y PARÁMETROS
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 0: VALIDAR ENTORNO"
+Write-Output "=========================================="
+
+try {
+    Write-Output "Validando módulos PowerShell..."
+    
+    $requiredModules = @(
+        "Az.Accounts",
+        "Az.Storage",
+        "Microsoft.PowerApps.Administration.PowerShell"
+    )
+    
+    foreach ($module in $requiredModules) {
+        if (-not (Get-Module -ListAvailable -Name $module)) {
+            throw "Módulo requerido no instalado: $module"
+        }
+        Write-Output "  $module"
+    }
+    
+    Write-Output ""
+    Write-Output "Validando parámetros para modo NewEnvironment..."
+    
+    # Validar que solo se use modo NewEnvironment
+    if ($RestoreMode -ne "NewEnvironment") {
+        throw "Este runbook está optimizado SOLO para modo 'NewEnvironment'. Modo actual: $RestoreMode"
+    }
+    
+    # Validar parámetros mutuamente exclusivos
+    $hasNewEnvName = -not [string]::IsNullOrWhiteSpace($NewEnvironmentName)
+    $hasExistingEnvId = -not [string]::IsNullOrWhiteSpace($ExistingEnvironmentId)
+    
+    if (-not $hasNewEnvName -and -not $hasExistingEnvId) {
+        throw "Modo 'NewEnvironment' requiere NewEnvironmentName (crear nuevo) O ExistingEnvironmentId (continuar existente)"
+    }
+    
+    if ($hasNewEnvName -and $hasExistingEnvId) {
+        throw "Parámetros mutuamente exclusivos: Proporciona NewEnvironmentName (crear) O ExistingEnvironmentId (continuar), no ambos"
+    }
+    
+    if ($hasNewEnvName) {
+        Write-Output "  Modo: Crear nuevo environment '$NewEnvironmentName'"
+    } else {
+        Write-Output "  Modo: Continuar restore en environment existente '$ExistingEnvironmentId'"
+    }
+    
+    # Validar formato de GUID si se proporciona ExistingEnvironmentId
+    if ($hasExistingEnvId) {
+        try {
+            [System.Guid]::Parse($ExistingEnvironmentId) | Out-Null
+            Write-Output "  GUID válido: $ExistingEnvironmentId"
+        } catch {
+            throw "ExistingEnvironmentId debe ser un GUID válido. Actual: $ExistingEnvironmentId"
+        }
+    }
+    
+    Write-Output ""
+    Write-Output "Validación de entorno completada"
+    Write-DetailedLog "Environment validation successful" "INFO"
+    
+} catch {
+    Write-Output ""
+    Write-Output "Error en validación de entorno"
+    Write-ErrorDetail $_ "EnvironmentValidation"
+    throw
+}
+
+# Ahora sí, configurar ErrorActionPreference
+$ErrorActionPreference = "Stop"
+
+# ==========================================
+# PASO 1: LEER VARIABLES DE AUTOMATION
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 1: LEER VARIABLES DE AUTOMATION"
+Write-Output "=========================================="
+
+try {
+    # Leer credenciales del Service Principal
+    $spCredential = Get-AutomationPSCredential -Name "PP-ServicePrincipal"
+    $appId = $spCredential.UserName
+    $clientSecret = $spCredential.GetNetworkCredential().Password
+    
+    # Leer variables de Automation
+    $tenantId = Get-AutomationVariable -Name "PP-ServicePrincipal-TenantId"
+    $storageAccountName = Get-AutomationVariable -Name "StorageAccountName"
+    $storageAccountKey = Get-AutomationVariable -Name "StorageAccountKey"
+    
+    Write-Output '  [OK] Service Principal: $appId'
+    Write-Output '  [OK] Tenant ID: $tenantId'
+    Write-Output '  [OK] Storage Account: $storageAccountName'
+    Write-Output ""
+    
+    # DataverseUrl se obtendrá en PASO 5 después de crear/validar el environment
+    $dataverseUrl = ""
+    
+    Write-DetailedLog "Automation variables loaded successfully" "INFO"
+    
+} catch {
+    Write-Output ""
+    Write-Output '[ERROR] Error leyendo variables de Automation'
+    Write-ErrorDetail $_ "ReadAutomationVariables"
+    throw
+}
+
+# ==========================================
+# PASO 2: AUTENTICAR EN AZURE Y POWER PLATFORM
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 2: AUTENTICAR"
+Write-Output "=========================================="
+
+try {
+    Write-Output "Autenticando en Azure con Managed Identity..."
+    Connect-AzAccount -Identity | Out-Null
+    Write-Output "  Azure autenticado (Managed Identity)"
+    
+    Write-Output ""
+    Write-Output "Autenticando en Power Platform con Service Principal..."
+    
+    # Intentar Add-PowerAppsAccount con manejo de errores mejorado
+    try {
+        Add-PowerAppsAccount -TenantID $tenantId -ApplicationId $appId -ClientSecret $clientSecret -ErrorAction Stop | Out-Null
+        Write-Output "  Power Platform autenticado"
+        
+        # Verificar permisos de administrador
+        Write-Output ""
+        Write-Output "Verificando permisos de administrador..."
+        
+        try {
+            # Intentar listar environments (requiere permisos de admin)
+            $testEnvs = Get-AdminPowerAppEnvironment -ErrorAction Stop | Select-Object -First 1
+            Write-Output "  Service Principal tiene permisos de Power Platform Admin"
+            
+        } catch {
+            Write-Output "  ERROR: Service Principal NO tiene permisos suficientes"
+            Write-Output ""
+            Write-Output "  PERMISOS REQUERIDOS:"
+            Write-Output "    1. Dynamics 365 Administrator (rol Azure AD)"
+            Write-Output "    2. Power Platform Administrator (rol Azure AD)"
+            Write-Output "    3. System Administrator en environment de Dataverse"
+            Write-Output ""
+            Write-Output "  CÓMO ASIGNAR PERMISOS:"
+            Write-Output "    1. Ve a Azure Portal -> Azure Active Directory -> Roles and Administrators"
+            Write-Output "    2. Busca 'Dynamics 365 Administrator' y 'Power Platform Administrator'"
+            Write-Output "    3. Agrega el Service Principal (App ID: $appId) a ambos roles"
+            Write-Output "    4. Espera 5-10 minutos para propagación de permisos"
+            Write-Output ""
+            throw "Service Principal sin permisos de administrador en Power Platform"
+        }
+        
+    } catch {
+        # Si falla Add-PowerAppsAccount, mostrar error detallado
+        Write-Output ""
+        Write-Output "  Error en Add-PowerAppsAccount:"
+        Write-Output "    $($_.Exception.Message)"
+        Write-Output "    Tipo: $($_.Exception.GetType().FullName)"
+        Write-Output ""
+        Write-Output "  Intentando alternativa de autenticación..."
+        
+        # Alternativa: obtener token OAuth manualmente
+        try {
+            $tokenBody = @{
+                grant_type = "client_credentials"
+                client_id = $appId
+                client_secret = $clientSecret
+                scope = "https://service.powerapps.com/.default"
+            }
+            
+            $tokenUrl = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+            $tokenResponse = Invoke-RestMethod -Uri $tokenUrl -Method Post -Body $tokenBody -ContentType "application/x-www-form-urlencoded" -ErrorAction Stop
+            
+            if (-not $tokenResponse.access_token) {
+                throw "No se obtuvo access_token de OAuth"
+            }
+            
+            Write-Output "  Token OAuth obtenido manualmente"
+            $script:powerAppsToken = $tokenResponse.access_token
+            
+        } catch {
+            Write-Output "  Ambos métodos de autenticación fallaron:"
+            Write-Output "    $($_.Exception.Message)"
+            throw
+        }
+    }
+    
+    Write-Output ""
+    
+    Write-DetailedLog "Authentication successful (Azure + Power Platform)" "INFO"
+    
+} catch {
+    Write-Output ""
+    Write-Output "Error en autenticación"
+    Write-ErrorDetail $_ "Authentication"
+    throw
+}
+
+# ==========================================
+# PASO 3: BACKUP PREVENTIVO (OPCIONAL)
+# ==========================================
+
+if ($CreateBackupBeforeRestore) {
+    Write-Output ""
+    Write-Output "=========================================="
+    Write-Output "PASO 3: BACKUP PREVENTIVO"
+    Write-Output "=========================================="
+    
+    try {
+        Write-Output "Creando backup de seguridad antes de restaurar..."
+        Write-Output "  (Este backup permitirá rollback si algo sale mal)"
+        
+        $preventiveBackupName = "PowerPlatform_Backup_PreRestore_$(Get-Date -Format 'dd-MM-yyyy HH-mm-ss').zip"
+        
+        # Aquí llamarías al runbook de backup o ejecutarías el backup directamente
+        # Por ahora, solo registramos la intención
+        
+        Write-Output ""
+        Write-Output '  [WARNING] NOTA: El backup preventivo debe ejecutarse manualmente o mediante otro runbook'
+        Write-Output "  Nombre sugerido: $preventiveBackupName"
+        Write-Output '  [INFO] Continuando con el restore...'
+        
+        Write-DetailedLog "Preventive backup step (manual execution required)" "WARNING"
+        
+    } catch {
+        Write-Output ""
+        Write-Output "Error creando backup preventivo"
+        Write-ErrorDetail $_ "PreventiveBackup"
+        Write-Output "  Continuando con el restore (riesgo de pérdida de datos)..."
+    }
+} else {
+    Write-Output ""
+    Write-Output "=========================================="
+    Write-Output "PASO 3: BACKUP PREVENTIVO"
+    Write-Output "=========================================="
+    Write-Output "  Backup preventivo deshabilitado (CreateBackupBeforeRestore=$false)"
+}
+
+# ==========================================
+# PASO 4: DESCARGAR Y EXTRAER BACKUP
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 4: DESCARGAR Y EXTRAER BACKUP"
+Write-Output "=========================================="
+
+try {
+    # Crear contexto de Storage Account
+    $ctx = New-AzStorageContext -StorageAccountName $storageAccountName -StorageAccountKey $storageAccountKey
+    
+    # Crear directorio temporal
+    $tempPath = Join-Path $env:TEMP "PPRestore_$(Get-Date -Format 'yyyyMMddHHmmss')"
+    New-Item -ItemType Directory -Path $tempPath -Force | Out-Null
+    
+    # Descargar archivo de backup
+    Write-Output "Descargando backup desde Storage Account..."
+    Write-Output "  Container: pp-backup"
+    Write-Output "  Archivo: $BackupFileName"
+    
+    $backupFilePath = Join-Path $tempPath $BackupFileName
+    Get-AzStorageBlobContent `
+        -Container "pp-backup" `
+        -Blob $BackupFileName `
+        -Destination $backupFilePath `
+        -Context $ctx `
+        -Force | Out-Null
+    
+    Write-Output "  Archivo descargado: $([math]::Round((Get-Item $backupFilePath).Length / 1MB, 2)) MB"
+    
+    # Extraer archivo ZIP
+    Write-Output ""
+    Write-Output "Extrayendo archivos..."
+    
+    $extractPath = Join-Path $tempPath "extracted"
+    Expand-Archive -Path $backupFilePath -DestinationPath $extractPath -Force
+    
+    $extractedFiles = Get-ChildItem -Path $extractPath -Recurse -File
+    $extractedFilesCount = $extractedFiles.Count
+    
+    Write-Output "  Archivos extraídos: $extractedFilesCount"
+    
+    Write-DetailedLog "Backup downloaded and extracted ($extractedFilesCount files)" "INFO"
+    
+} catch {
+    Write-Output ""
+    Write-Output "Error descargando/extrayendo backup"
+    Write-ErrorDetail $_ "DownloadExtract"
+    throw
+}
+
+# ==========================================
+# PASO 5: CREAR/VALIDAR ENVIRONMENT Y OBTENER DATAVERSE URL
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 5: ENVIRONMENT Y DATAVERSE URL"
+Write-Output "=========================================="
+
+try {
+    $targetEnvironmentId = ""
+    
+    # Determinar si crear nuevo o usar existente
+    if (-not [string]::IsNullOrWhiteSpace($ExistingEnvironmentId)) {
+        # OPCIÓN A: Continuar restore en environment existente
+        Write-Output "Continuando restore en environment existente..."
+        Write-Output "  Environment ID: $ExistingEnvironmentId"
+        Write-Output ""
+        
+        $targetEnvironmentId = $ExistingEnvironmentId
+        
+        # Validar que el environment existe y obtener URL de Dataverse
+        Write-Output "  [5a] Obteniendo información del environment..."
+        
+        try {
+            $existingEnv = $null
+            $dataverseUrl = $null
+            
+            # MÉTODO 1: Discovery Service (MÁS CONFIABLE)
+            Write-Output "    Método 1: Consultando Discovery Service..."
+            try {
+                # Obtener token para Discovery Service
+                $discoveryTokenBody = @{
+                    client_id = $appId
+                    client_secret = $clientSecret
+                    scope = "https://disco.crm.dynamics.com/.default"
+                    grant_type = "client_credentials"
+                }
+                
+                $tokenUrl = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+                $discoveryTokenResponse = Invoke-RestMethod -Uri $tokenUrl -Method Post -Body $discoveryTokenBody -ContentType "application/x-www-form-urlencoded"
+                
+                $discoveryHeaders = @{
+                    "Authorization" = "Bearer $($discoveryTokenResponse.access_token)"
+                    "Accept" = "application/json"
+                    "OData-MaxVersion" = "4.0"
+                    "OData-Version" = "4.0"
+                }
+                
+                # Consultar Discovery Service para obtener todos los instances
+                $discoveryUrl = "https://globaldisco.crm.dynamics.com/api/discovery/v2.0/Instances"
+                $instancesResponse = Invoke-RestMethod -Uri $discoveryUrl -Headers $discoveryHeaders -Method Get
+                
+                # Buscar el environment específico por ID
+                $targetInstance = $instancesResponse.value | Where-Object { $_.Id -eq $targetEnvironmentId }
+                
+                if ($targetInstance) {
+                    $dataverseUrl = $targetInstance.Url
+                    
+                    # Crear objeto compatible con el resto del script
+                    $existingEnv = [PSCustomObject]@{
+                        DisplayName = $targetInstance.FriendlyName
+                        EnvironmentName = $targetInstance.Id
+                        Location = $targetInstance.Region
+                        EnvironmentType = $targetInstance.Type
+                        DataverseUrl = $dataverseUrl
+                        State = $targetInstance.State
+                        Version = $targetInstance.Version
+                    }
+                    
+                    Write-Output "    ✓ Environment encontrado vía Discovery Service"
+                    Write-Output "      Display Name: $($existingEnv.DisplayName)"
+                    Write-Output "      Region: $($existingEnv.Location)"
+                    Write-Output "      Type: $($existingEnv.EnvironmentType)"
+                    Write-Output "      State: $($existingEnv.State)"
+                    Write-Output "      Dataverse URL: $dataverseUrl"
+                } else {
+                    throw "Environment no encontrado en Discovery Service"
+                }
+                
+            } catch {
+                Write-Output "    ✗ Discovery Service falló: $($_.Exception.Message)"
+                $existingEnv = $null
+                $dataverseUrl = $null
+            }
+            
+            # MÉTODO 2: BAP API (Fallback si Discovery falla)
+            if ([string]::IsNullOrWhiteSpace($dataverseUrl)) {
+                Write-Output "    Método 2: Consultando BAP API..."
+                try {
+                    # Obtener token para BAP API
+                    $bapTokenBody = @{
+                        client_id = $appId
+                        client_secret = $clientSecret
+                        scope = "https://service.powerapps.com/.default"
+                        grant_type = "client_credentials"
+                    }
+                    
+                    $bapTokenResponse = Invoke-RestMethod -Uri $tokenUrl -Method Post -Body $bapTokenBody -ContentType "application/x-www-form-urlencoded"
+                    
+                    $bapHeaders = @{
+                        "Authorization" = "Bearer $($bapTokenResponse.access_token)"
+                        "Content-Type" = "application/json"
+                    }
+                    
+                    # Consultar BAP API
+                    $envApiUrl = "https://api.bap.microsoft.com/providers/Microsoft.BusinessAppPlatform/environments/$targetEnvironmentId`?api-version=2023-06-01"
+                    $envInfo = Invoke-RestMethod -Uri $envApiUrl -Headers $bapHeaders -Method Get
+                    
+                    # Extraer URL de Dataverse
+                    if ($envInfo.properties.linkedEnvironmentMetadata.instanceUrl) {
+                        $dataverseUrl = $envInfo.properties.linkedEnvironmentMetadata.instanceUrl
+                        
+                        $existingEnv = [PSCustomObject]@{
+                            DisplayName = $envInfo.properties.displayName
+                            EnvironmentName = $targetEnvironmentId
+                            Location = $envInfo.location
+                            EnvironmentType = $envInfo.properties.environmentSku
+                            DataverseUrl = $dataverseUrl
+                        }
+                        
+                        Write-Output "    ✓ Environment encontrado vía BAP API"
+                        Write-Output "      Display Name: $($existingEnv.DisplayName)"
+                        Write-Output "      Dataverse URL: $dataverseUrl"
+                    } else {
+                        throw "BAP API no devolvió URL de Dataverse"
+                    }
+                    
+                } catch {
+                    Write-Output "    ✗ BAP API falló: $($_.Exception.Message)"
+                    $existingEnv = $null
+                    $dataverseUrl = $null
+                }
+            }
+            
+            # MÉTODO 3: DESHABILITADO - La URL NO se puede derivar del Environment ID
+            # Microsoft usa un hash interno que no es predecible
+            # Ejemplo: Environment ID: 5dd0ad2a-7835-e8be-91a0-5bed3d63a3e1
+            #          URL real: org0dcf824f.crm2.dynamics.com
+            #          El hash "0dcf824f" NO viene de "5dd0ad2a"
+            #
+            # Si llegas aquí, el SP no tiene permisos en el environment.
+            # SOLUCIONES:
+            #   1. Agregar SP manualmente al environment (recomendado)
+            #   2. Configurar variable: PP-DataverseUrl-{EnvironmentId}
+            if ([string]::IsNullOrWhiteSpace($dataverseUrl)) {
+                Write-Output "    Método 3: OMITIDO (construcción de URL no confiable)"
+                Write-Output ""
+                Write-Output "      NOTA: La URL de Dataverse NO se puede derivar del Environment ID"
+                Write-Output "      porque Microsoft usa un hash interno no predecible."
+                Write-Output ""
+            }
+            
+            # Verificar que tenemos lo mínimo necesario
+            if (-not $existingEnv -or [string]::IsNullOrWhiteSpace($dataverseUrl)) {
+                throw "Environment '$targetEnvironmentId' no existe o no es accesible"
+            }
+            
+            Write-Output ""
+            Write-Output "    [OK] Environment validado exitosamente"
+            Write-Output "    URL de Dataverse: $dataverseUrl"
+            Write-Output ""
+            
+        } catch {
+            $validationError = $_.Exception.Message
+            Write-Output ""
+            Write-Output "  ERROR validando environment existente"
+            Write-Output "    $validationError"
+            Write-Output ""
+            
+            # Si el error es por falta de permisos O si todos los métodos fallaron, intentar agregar el Service Principal
+            # Indicadores de falta de permisos:
+            # - "403" o "Forbidden" (error HTTP directo)
+            # - "not a member" (mensaje de Discovery Service)
+            # - "No se pudo obtener información" (cuando los 3 métodos fallan, probablemente por permisos)
+            if ($validationError -like "*403*" -or 
+                $validationError -like "*Forbidden*" -or 
+                $validationError -like "*not a member*" -or
+                $validationError -like "*No se pudo obtener información*") {
+                
+                Write-Output "  DIAGNÓSTICO: Probable falta de permisos del Service Principal"
+                Write-Output ""
+                Write-Output "  Intentando agregar Service Principal automáticamente..."
+                Write-Output ""
+                
+                $permissionsAdded = Add-ServicePrincipalToEnvironment `
+                    -EnvironmentId $targetEnvironmentId `
+                    -AppId $appId `
+                    -TenantId $tenantId `
+                    -ClientSecret $clientSecret
+                
+                if ($permissionsAdded) {
+                    Write-Output ""
+                    Write-Output "  ✓ Service Principal agregado exitosamente"
+                    Write-Output "    Esperando 30 segundos para propagación de permisos..."
+                    Start-Sleep -Seconds 30
+                    Write-Output ""
+                    Write-Output "  Reintentando validación del environment..."
+                    
+                    # Reintentar validación después de agregar permisos
+                    try {
+                        $dataverseUrl = Get-DataverseUrl -EnvironmentId $targetEnvironmentId -TenantId $tenantId -AppId $appId -ClientSecret $clientSecret
+                        
+                        if (-not [string]::IsNullOrWhiteSpace($dataverseUrl)) {
+                            Write-Output "  ✓ Environment ahora accesible: $dataverseUrl"
+                            
+                            $existingEnv = [PSCustomObject]@{
+                                DisplayName = "Environment-$targetEnvironmentId"
+                                EnvironmentName = $targetEnvironmentId
+                                DataverseUrl = $dataverseUrl
+                            }
+                        } else {
+                            throw "Aún no se puede acceder al environment. Espera 5 minutos más y re-ejecuta."
+                        }
+                        
+                    } catch {
+                        Write-Output "  ⚠ Aún no se puede acceder al environment"
+                        Write-Output "    Esto es normal, los permisos tardan 2-5 minutos en propagarse"
+                        Write-Output ""
+                        Write-Output "  ESPERA 5 MINUTOS y re-ejecuta con:"
+                        Write-Output "    -ExistingEnvironmentId '$targetEnvironmentId'"
+                        Write-Output ""
+                        throw "Permisos agregados pero aún no propagados. Espera 5 minutos y reintenta."
+                    }
+                } else {
+                    Write-Output ""
+                    Write-Output "  ══════════════════════════════════════════════════════════"
+                    Write-Output "  ⚠ NO SE PUDO AGREGAR SERVICE PRINCIPAL AUTOMÁTICAMENTE"
+                    Write-Output "  ══════════════════════════════════════════════════════════"
+                    Write-Output ""
+                    Write-Output "  OPCIÓN 1: Agregar Service Principal manualmente (5 min)"
+                    Write-Output "    1. https://admin.powerplatform.microsoft.com"
+                    Write-Output "    2. Environments → Dev-04 ($targetEnvironmentId)"
+                    Write-Output "    3. Settings → Application users → + New app user"
+                    Write-Output "    4. Buscar: $appId"
+                    Write-Output "    5. Add → Edit security roles → System Administrator → Save"
+                    Write-Output "    6. Esperar 5 minutos"
+                    Write-Output "    7. Re-ejecutar: -ExistingEnvironmentId '$targetEnvironmentId'"
+                    Write-Output ""
+                    Write-Output "  OPCIÓN 2: Variable de Automation (2 min - más rápido)"
+                    Write-Output "    1. https://admin.powerplatform.microsoft.com"
+                    Write-Output "    2. Busca Dev-04 → Copia 'Environment URL' completa"
+                    Write-Output "       Ejemplo: https://orgXXXXXXXX.crm2.dynamics.com"
+                    Write-Output "    3. Azure Portal → Automation Account → Variables → Add"
+                    Write-Output "       Nombre: PP-DataverseUrl-$targetEnvironmentId"
+                    Write-Output "       Valor: <URL copiada del paso 2>"
+                    Write-Output "       Encrypted: No"
+                    Write-Output "    4. Save y re-ejecutar inmediatamente"
+                    Write-Output ""
+                    Write-Output "  RECOMENDACIÓN: Usa Opción 2 para probar ahora,"
+                    Write-Output "                  luego Opción 1 para producción"
+                    Write-Output ""
+                    Write-Output "  ══════════════════════════════════════════════════════════"
+                    Write-Output ""
+                    throw "Service Principal sin permisos. Configura manualmente y reintenta."
+                }
+                
+            } else {
+                Write-Output "  VERIFICA:"
+                Write-Output "    1. El GUID es correcto: $targetEnvironmentId"
+                Write-Output "    2. El environment existe en Power Platform Admin Center"
+                Write-Output "    3. El Service Principal tiene permisos para acceder al environment"
+                Write-Output ""
+                throw
+            }
+        }
+        
+        $script:restoreStats.newEnvironmentCreated = $false
+        $script:restoreStats.newEnvironmentId = $targetEnvironmentId
+        $script:restoreStats.newEnvironmentName = if ($existingEnv.DisplayName) { $existingEnv.DisplayName } else { "Environment-$targetEnvironmentId" }
+        
+    } else {
+        # OPCIÓN B: Crear nuevo environment
+        Write-Output "Creando nuevo environment..."
+        Write-Output "  Nombre: $NewEnvironmentName"
+        Write-Output "  Región: $NewEnvironmentRegion"
+        Write-Output "  Tipo: $NewEnvironmentType"
+        Write-Output ""
+        
+        Write-Output "  [5a] Creando environment con Dataverse..."
+        Write-Output "      Parámetros:"
+        Write-Output "        DisplayName: $NewEnvironmentName"
+        Write-Output "        EnvironmentSku: $NewEnvironmentType"
+        Write-Output "        LocationName: $NewEnvironmentRegion"
+        Write-Output "        ProvisionDatabase: True"
+        Write-Output ""
+        
+        try {
+            $newEnvParams = @{
+                DisplayName = $NewEnvironmentName
+                EnvironmentSku = $NewEnvironmentType
+                LocationName = $NewEnvironmentRegion
+                ProvisionDatabase = $true
+            }
+            
+            $newEnvironment = New-AdminPowerAppEnvironment @newEnvParams -ErrorAction Stop
+            
+            if (-not $newEnvironment) {
+                throw "New-AdminPowerAppEnvironment retornó null"
+            }
+            
+            if (-not $newEnvironment.EnvironmentName) {
+                throw "Environment creado pero sin EnvironmentName (GUID). Objeto retornado: $($newEnvironment | ConvertTo-Json -Depth 2)"
+            }
+            
+            $targetEnvironmentId = $newEnvironment.EnvironmentName
+            
+            Write-Output "    Environment creado exitosamente"
+            Write-Output "      ID: $targetEnvironmentId"
+            Write-Output "      Display Name: $($newEnvironment.DisplayName)"
+            Write-Output ""
+            
+        } catch {
+            Write-Output ""
+            Write-Output '  [ERROR] No se pudo crear el environment'
+            Write-Output ""
+            
+            # Detectar error 403 (Forbidden) específicamente
+            $is403Error = $false
+            if ($_.Exception.Message -match "403" -or $_.Exception.Message -match "Forbidden" -or $_.Exception.Message -match "does not have permission") {
+                $is403Error = $true
+            }
+            
+            if ($is403Error) {
+                Write-Output "  ============================================"
+                Write-Output "  DIAGNOSTICO: ERROR 403 - PERMISOS INSUFICIENTES"
+                Write-Output "  ============================================"
+                Write-Output ""
+                Write-Output "  El Service Principal NO puede crear environments."
+                Write-Output ""
+                Write-Output "  CAUSAS POSIBLES (verifica TODAS):"
+                Write-Output ""
+                Write-Output "  1. ROLES AZURE AD FALTANTES O NO PROPAGADOS"
+                Write-Output "     Roles requeridos:"
+                Write-Output "       - Power Platform Administrator (rol Azure AD)"
+                Write-Output "       - Dynamics 365 Administrator (rol Azure AD)"
+                Write-Output ""
+                Write-Output "     Como verificar:"
+                Write-Output "       a) Azure Portal -> Azure AD -> Roles and administrators"
+                Write-Output "       b) Busca cada rol y verifica que el Service Principal este asignado"
+                Write-Output "       c) IMPORTANTE: Permisos tardan 15-30 minutos en propagarse (hasta 24h)"
+                Write-Output ""
+                Write-Output "  2. API PERMISSIONS EN APP REGISTRATION"
+                Write-Output "     El Service Principal necesita permisos explicitos:"
+                Write-Output ""
+                Write-Output "     Como configurar:"
+                Write-Output "       a) Azure Portal -> App Registrations"
+                Write-Output "       b) Busca tu app: 7fc4ef96-8566-4adb-a579-2030dbf71c35"
+                Write-Output "       c) API Permissions -> Add a permission"
+                Write-Output "       d) Agrega estos permisos:"
+                Write-Output "          - Dynamics CRM (Common Data Service):"
+                Write-Output "            * user_impersonation (Delegated)"
+                Write-Output "          - PowerApps Service:"
+                Write-Output "            * User (Application)"
+                Write-Output "       e) Click 'Grant admin consent' (CRITICO)"
+                Write-Output "       f) Espera 15-30 minutos"
+                Write-Output ""
+                Write-Output "  3. RESTRICCIONES DE TENANT"
+                Write-Output "     Tu tenant puede tener politicas que restringen creacion de environments:"
+                Write-Output ""
+                Write-Output "     Como verificar:"
+                Write-Output "       a) Power Platform Admin Center: https://admin.powerplatform.microsoft.com"
+                Write-Output "       b) Settings -> Power Platform settings"
+                Write-Output "       c) Governance -> Environment creation"
+                Write-Output "       d) Verifica que Service Principals puedan crear environments"
+                Write-Output "       e) Considera agregar el Service Principal a un Security Group permitido"
+                Write-Output ""
+                Write-Output "  4. LICENCIAS FALTANTES"
+                Write-Output "     El Service Principal puede necesitar licencia asignada:"
+                Write-Output ""
+                Write-Output "     Como verificar:"
+                Write-Output "       a) Azure Portal -> Azure AD -> Enterprise Applications"
+                Write-Output "       b) Busca: 555d7842-11a6-4bee-940d-4f2ac33f854c"
+                Write-Output "       c) Licenses (si esta disponible)"
+                Write-Output "       d) Considera asignar licencia de Power Apps o Dynamics 365"
+                Write-Output ""
+                Write-Output "  5. CONDITIONAL ACCESS POLICIES"
+                Write-Output "     Politicas de acceso condicional pueden estar bloqueando:"
+                Write-Output ""
+                Write-Output "     Como verificar:"
+                Write-Output "       a) Azure Portal -> Azure AD -> Security -> Conditional Access"
+                Write-Output "       b) Revisa politicas que apliquen a Service Principals"
+                Write-Output "       c) Excluye temporalmente el Service Principal para probar"
+                Write-Output ""
+                Write-Output "  6. LIMITACION DE NEW-ADMINPOWERAPPENVIRONMENT"
+                Write-Output "     Este cmdlet puede tener limitaciones con Service Principals:"
+                Write-Output ""
+                Write-Output "     Comportamiento conocido:"
+                Write-Output "       - Algunos cmdlets de PowerApps solo funcionan con usuarios delegados"
+                Write-Output "       - Service Principals pueden tener restricciones por diseño"
+                Write-Output "       - Microsoft recomienda creacion manual o via API REST"
+                Write-Output ""
+                Write-Output "  ============================================"
+                Write-Output "  SOLUCION RECOMENDADA: CREAR MANUALMENTE"
+                Write-Output "  ============================================"
+                Write-Output ""
+                Write-Output "  Debido a limitaciones de Service Principals con New-AdminPowerAppEnvironment,"
+                Write-Output "  la forma MAS CONFIABLE es crear el environment manualmente:"
+                Write-Output ""
+                Write-Output "  PASO 1: Crear environment en Power Platform Admin Center"
+                Write-Output "    1. Ve a: https://admin.powerplatform.microsoft.com"
+                Write-Output "    2. Environments -> + New"
+                Write-Output "    3. Configura:"
+                Write-Output "       - Name: $NewEnvironmentName"
+                Write-Output "       - Type: $NewEnvironmentType"
+                Write-Output "       - Region: $NewEnvironmentRegion"
+                Write-Output "       - Add a Dataverse database: YES"
+                Write-Output "       - Language: Español (o el que prefieras)"
+                Write-Output "       - Currency: USD (o la que uses)"
+                Write-Output "    4. Click 'Save'"
+                Write-Output "    5. Espera 5-15 min a que se complete el provisionamiento"
+                Write-Output "       (Veras 'Ready' en el Status)"
+                Write-Output "    6. Click en el environment creado"
+                Write-Output "    7. Copia el 'Environment ID' (formato GUID)"
+                Write-Output ""
+                Write-Output "  PASO 2: Ejecutar restore con el environment creado"
+                Write-Output "    Ejecuta este comando reemplazando <GUID>:"
+                Write-Output ""
+                Write-Output "    .\Restore-PowerPlatform.ps1 \"
+                Write-Output "      -BackupFileName '$BackupFileName' \"
+                Write-Output "      -RestoreMode 'NewEnvironment' \"
+                Write-Output "      -ExistingEnvironmentId '<GUID-DEL-ENVIRONMENT>'"
+                Write-Output ""
+                Write-Output "    Ejemplo REAL:"
+                Write-Output "    .\Restore-PowerPlatform.ps1 \"
+                Write-Output "      -BackupFileName '$BackupFileName' \"
+                Write-Output "      -RestoreMode 'NewEnvironment' \"
+                Write-Output "      -ExistingEnvironmentId 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'"
+                Write-Output ""
+                Write-Output "  VENTAJAS DE ESTE ENFOQUE:"
+                Write-Output "    - Evita problemas de permisos de Service Principal"
+                Write-Output "    - Mayor control sobre configuracion del environment"
+                Write-Output "    - Funciona siempre (no depende de API permissions)"
+                Write-Output "    - El restore automatizado funciona sin problemas"
+                Write-Output ""
+            } else {
+                Write-Output "  Mensaje: $($_.Exception.Message)"
+                Write-Output "  Tipo: $($_.Exception.GetType().FullName)"
+                Write-Output ""
+                Write-Output "  POSIBLES CAUSAS:"
+                Write-Output "    1. Región inválida: $NewEnvironmentRegion"
+                Write-Output "    2. Nombre duplicado: Ya existe un environment llamado '$NewEnvironmentName'"
+                Write-Output "    3. Tipo de environment no permitido: $NewEnvironmentType"
+                Write-Output "    4. Límite de environments alcanzado en el tenant"
+                Write-Output "    5. Problema de red o timeout"
+                Write-Output ""
+            }
+            
+            throw
+        }
+        
+        # Esperar a que Dataverse esté provisionado
+        Write-Output "  [5b] Esperando provisionamiento de Dataverse..."
+        Write-Output "      (Esto puede tomar 5-15 minutos, hasta 20 en casos excepcionales)"
+        Write-Output "      Environment ID: $targetEnvironmentId"
+        Write-Output ""
+        
+        $maxWaitMinutes = 20
+        $waitSeconds = 0
+        $provisioningComplete = $false
+        
+        while ($waitSeconds -lt ($maxWaitMinutes * 60) -and -not $provisioningComplete) {
+            Start-Sleep -Seconds 30
+            $waitSeconds += 30
+            
+            $checkEnv = Get-AdminPowerAppEnvironment -EnvironmentName $targetEnvironmentId
+            
+            if ($checkEnv.Internal.properties.linkedEnvironmentMetadata.instanceUrl) {
+                $provisioningComplete = $true
+                Write-Output "    Dataverse provisionado ($([math]::Round($waitSeconds/60, 1)) min)"
+            } else {
+                Write-Output "      ... provisionando ($([math]::Round($waitSeconds/60, 1)) min transcurridos)"
+            }
+        }
+        
+        if (-not $provisioningComplete) {
+            Write-Output ""
+            Write-Output "  TIMEOUT: Dataverse no completo provisionamiento despues de $maxWaitMinutes minutos"
+            Write-Output ""
+            Write-Output "  INFORMACION IMPORTANTE:"
+            Write-Output "    Environment fue CREADO: $targetEnvironmentId"
+            Write-Output "    Nombre: $NewEnvironmentName"
+            Write-Output "    Estado: Dataverse aún provisionando en background"
+            Write-Output ""
+            Write-Output '  [RETRY] PARA CONTINUAR EL RESTORE:'
+            Write-Output "    1. Espera 5-10 minutos adicionales"
+            Write-Output "    2. Verifica estado en: https://admin.powerplatform.microsoft.com"
+            Write-Output "    3. Cuando Dataverse esté listo, ejecuta:"
+            Write-Output ""
+            Write-Output "       .\\Restore-PowerPlatform.ps1"
+            Write-Output "         -BackupFileName '$BackupFileName'"
+            Write-Output "         -RestoreMode 'NewEnvironment'"
+            Write-Output "         -ExistingEnvironmentId '$targetEnvironmentId'"
+            Write-Output ""
+            Write-Output "    4. El restore continuará desde este punto (no se duplicará el environment)"
+            Write-Output ""
+            
+            # Guardar información para retry
+            $retryInfo = @{
+                timestamp = Get-Date -Format "dd-MM-yyyy HH:mm:ss"
+                environmentId = $targetEnvironmentId
+                environmentName = $NewEnvironmentName
+                region = $NewEnvironmentRegion
+                type = $NewEnvironmentType
+                status = "Provisionando Dataverse"
+                backupFileName = $BackupFileName
+                retryCommand = ".\\Restore-PowerPlatform.ps1 -BackupFileName '$BackupFileName' -RestoreMode 'NewEnvironment' -ExistingEnvironmentId '$targetEnvironmentId'"
+            }
+            
+            $retryInfoPath = Join-Path $env:TEMP "RestoreRetry_$targetEnvironmentId.json"
+            $retryInfo | ConvertTo-Json | Out-File -FilePath $retryInfoPath -Encoding UTF8
+            
+            Write-Output '  [SAVE] Información de retry guardada en:'
+            Write-Output "     $retryInfoPath"
+            Write-Output ""
+            
+            Write-DetailedLog "Timeout waiting for Dataverse provisioning. Environment created: $targetEnvironmentId" "WARNING"
+            throw "Timeout esperando provisionamiento de Dataverse. Environment creado: $targetEnvironmentId. Usa -ExistingEnvironmentId para continuar."
+        }
+        
+        $script:restoreStats.newEnvironmentCreated = $true
+        $script:restoreStats.newEnvironmentId = $targetEnvironmentId
+        $script:restoreStats.newEnvironmentName = $NewEnvironmentName
+        
+        Write-DetailedLog "New environment created: $targetEnvironmentId ($NewEnvironmentName)" "INFO"
+        
+        # CRÍTICO: Agregar Service Principal como Application User
+        Write-Output ""
+        Write-Output "  [5b-auto] Configurando permisos del Service Principal..."
+        Write-Output ""
+        Write-Output "    ⚠ IMPORTANTE: El Service Principal necesita acceso a Dataverse"
+        Write-Output "      para poder realizar el restore."
+        Write-Output ""
+        
+        # Intentar agregar automáticamente con todos los parámetros
+        $appUserAdded = Add-ServicePrincipalToEnvironment `
+            -EnvironmentId $targetEnvironmentId `
+            -AppId $appId `
+            -TenantId $tenantId `
+            -ClientSecret $clientSecret
+        
+        if (-not $appUserAdded) {
+            # Si falló la adición automática, dar opción de continuar o abortar
+            Write-Output ""
+            Write-Output "    ═══════════════════════════════════════════════════"
+            Write-Output "    OPCIONES PARA CONTINUAR:"
+            Write-Output "    ═══════════════════════════════════════════════════"
+            Write-Output ""
+            Write-Output "    A) PAUSAR Y CONFIGURAR MANUALMENTE (Recomendado)"
+            Write-Output "       1. Sigue las instrucciones arriba (5 minutos)"
+            Write-Output "       2. Re-ejecuta el restore con:"
+            Write-Output "          -ExistingEnvironmentId '$targetEnvironmentId'"
+            Write-Output ""
+            Write-Output "    B) CONTINUAR DE TODAS FORMAS (No recomendado)"
+            Write-Output "       - El restore probablemente fallará con error 403"
+            Write-Output "       - Tendrás que agregar permisos y re-ejecutar"
+            Write-Output ""
+            Write-Output "    Environment creado: $targetEnvironmentId"
+            Write-Output "    Nombre: $NewEnvironmentName"
+            Write-Output ""
+            Write-Output "    ═══════════════════════════════════════════════════"
+            Write-Output ""
+            
+            # En ambiente de Automation, pausar aquí para que el usuario vea las instrucciones
+            if (-not $Force) {
+                Write-Output "    El script se pausará para que agregues los permisos."
+                Write-Output "    Para continuar sin pausar, usa el parámetro -Force"
+                Write-Output ""
+                
+                throw "Service Principal sin permisos en el environment. Configura manualmente y re-ejecuta con -ExistingEnvironmentId '$targetEnvironmentId'"
+            } else {
+                Write-Output "    ⚠ Parámetro -Force detectado, continuando..."
+                Write-Output "      Si falla con error 403, agrega permisos manualmente"
+                Write-Output ""
+            }
+        } else {
+            Write-Output ""
+            Write-Output "    ✓ Service Principal configurado"
+            Write-Output "      Nota: Aún necesitas asignar el role 'System Administrator'"
+            Write-Output "      en Power Platform Admin Center para permisos completos"
+            Write-Output ""
+        }
+    }
+    
+    # Obtener Dataverse URL usando función auxiliar
+    Write-Output ""
+    Write-Output "  [5c] Obteniendo Dataverse URL..."
+    Write-Output ""
+    
+    $dataverseUrl = Get-DataverseUrl -EnvironmentId $targetEnvironmentId -TenantId $tenantId -AppId $appId -ClientSecret $clientSecret
+    
+    Write-Output ""
+    Write-Output '  [OK] Environment configurado:'
+    Write-Output "    ID: $targetEnvironmentId"
+    Write-Output "    Nombre: $($script:restoreStats.newEnvironmentName)"
+    Write-Output "    Dataverse URL: $dataverseUrl"
+    Write-Output "    Creado ahora: $(if ($script:restoreStats.newEnvironmentCreated) { 'Sí' } else { 'No (existente)' })"
+    
+    # Validar que tenemos URL antes de obtener token
+    if ([string]::IsNullOrWhiteSpace($dataverseUrl)) {
+        throw "No se pudo determinar la URL de Dataverse. Environment: $targetEnvironmentId"
+    }
+    
+    # Obtener token de acceso
+    Write-Output ""
+    Write-Output "  [5d] Obteniendo access token para Dataverse API..."
+    Write-Output "      Scope: $dataverseUrl/.default"
+    
+    $tokenBody = @{
+        client_id = $appId
+        client_secret = $clientSecret
+        scope = "$dataverseUrl/.default"
+        grant_type = "client_credentials"
+    }
+    
+    $tokenUrl = "https://login.microsoftonline.com/$tenantId/oauth2/v2.0/token"
+    $tokenResponse = Invoke-RestMethod -Uri $tokenUrl -Method Post -Body $tokenBody -ContentType "application/x-www-form-urlencoded"
+    
+    $script:headers = @{
+        "Authorization" = "Bearer $($tokenResponse.access_token)"
+        "Content-Type" = "application/json"
+        "OData-MaxVersion" = "4.0"
+        "OData-Version" = "4.0"
+    }
+    
+    Write-Output "  Access token obtenido"
+    
+    Write-DetailedLog "Dataverse access configured" "INFO"
+    
+} catch {
+    Write-Output ""
+    Write-Output "Error obteniendo URL/token de Dataverse"
+    Write-ErrorDetail $_ "DataverseAccess"
+    throw
+}
+
+# ==========================================
+# PASO 6: RESUMEN Y CONFIRMACIÓN
+# ==========================================
+
+if (-not $Force) {
+    Write-Output ""
+    Write-Output "=========================================="
+    Write-Output "PASO 6: RESUMEN Y CONFIRMACIÓN"
+    Write-Output "=========================================="
+    
+    Write-Output ""
+    Write-Output "DETALLES DEL BACKUP:"
+    Write-Output "  Archivo: $BackupFileName"
+    Write-Output "  Archivos extraídos: $extractedFilesCount"
+    
+    Write-Output ""
+    Write-Output "MODO DE RESTORE: NewEnvironment (Exclusivo)"
+    
+    if (-not [string]::IsNullOrWhiteSpace($ExistingEnvironmentId)) {
+        Write-Output "  -> Continuando restore en environment existente"
+        Write-Output "  -> Environment ID: $ExistingEnvironmentId"
+        Write-Output "  -> Nombre: $($script:restoreStats.newEnvironmentName)"
+    } else {
+        Write-Output "  -> Crear nuevo environment"
+        Write-Output "  -> Nombre: $NewEnvironmentName"
+        Write-Output "  -> Región: $NewEnvironmentRegion"
+        Write-Output "  -> Tipo: $NewEnvironmentType"
+    }
+    
+    Write-Output "  -> Solución se importa como nueva"
+    Write-Output "  -> Datos limpios SIN marcadores"
+    Write-Output "  -> IDEAL PARA: Prod -> Dev, Disaster Recovery, Testing"
+    
+    Write-Output ""
+    Write-Output "QUE SE VA A RESTAURAR:"
+    Write-Output '  [OK] Solucion completa (metadata, forms, views, PCF, workflows, etc.)'
+    Write-Output '  [OK] Datos de ~46 tablas Dataverse'
+    Write-Output "    -> Datos sin marcadores (environment limpio)"
+    Write-Output "    -> No afecta datos existentes (environment nuevo o vacio)"
+    
+    Write-Output ""
+    Write-Output "INFORMACIÓN:"
+    if (-not [string]::IsNullOrWhiteSpace($ExistingEnvironmentId)) {
+        Write-Output "  - Continuando restore en environment previamente creado"
+        Write-Output "  - Se verificará que Dataverse esté provisionado"
+    } else {
+        Write-Output "  - Se creará un nuevo environment con Dataverse"
+        Write-Output "  - Provisionamiento puede tomar 5-20 minutos"
+        Write-Output "  - Si hay timeout, usa -ExistingEnvironmentId para continuar"
+    }
+    if (-not $CreateBackupBeforeRestore) {
+        Write-Output "  - No se creará backup preventivo"
+    } else {
+        Write-Output "  - Se recomienda backup preventivo (manual)"
+    }
+    
+    Write-Output ""
+    Write-Output "=========================================="
+    
+    # Confirmación solo en ejecuciones locales (Azure Automation no tiene stdin)
+    try {
+        $confirmation = Read-Host "¿Desea continuar con el restore? (y/n)"
+        if ($confirmation -ne 'y' -and $confirmation -ne 'Y') {
+            Write-Output ""
+            Write-Output "Restore cancelado por el usuario"
+            exit 0
+        }
+    } catch {
+        Write-Output "  Confirmación omitida (ejecución en Azure Automation sin stdin)"
+    }
+    
+    Write-Output ""
+    Write-Output "Confirmación recibida - Continuando con restore..."
+}
+
+# ==========================================
+# PASO 7: IMPORTAR SOLUCIÓN
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 7: IMPORTAR SOLUCIÓN"
+Write-Output "=========================================="
+
+try {
+    # Buscar archivo de solución (excluir el backup ZIP principal)
+    $solutionFiles = Get-ChildItem -Path $extractPath -Filter "*.zip" -Recurse | Where-Object {
+        $_.Name -notlike "PowerPlatform_Backup*"
+    }
+    
+    if ($solutionFiles.Count -eq 0) {
+        throw "No se encontró archivo de solución en el backup"
+    }
+    
+    $solutionFile = $solutionFiles[0]
+    Write-Output "  Solución encontrada: $($solutionFile.Name)"
+    Write-Output "  Tamaño: $([math]::Round($solutionFile.Length / 1MB, 2)) MB"
+    
+    # Leer metadata de la solución desde el backup
+    $metadataPath = Join-Path $extractPath "solution_metadata.json"
+    $solutionMetadata = $null
+    $existingSolutionIsManaged = $null
+    $solutionUniqueName = $null
+    
+    # Intentar leer desde solution_metadata.json primero
+    if (Test-Path $metadataPath) {
+        try {
+            $metadataContent = Get-Content $metadataPath -Raw | ConvertFrom-Json
+            $solutionUniqueName = $metadataContent.uniquename
+            Write-Output "  Nombre único de solución (desde metadata): $solutionUniqueName"
+        } catch {
+            Write-Output "  No se pudo leer solution_metadata.json"
+        }
+    }
+    
+    # Si no hay metadata JSON, extraer del ZIP de la solución
+    if ([string]::IsNullOrWhiteSpace($solutionUniqueName)) {
+        Write-Output ""
+        Write-Output "  Extrayendo metadata del ZIP de solución..."
+        
+        try {
+            # Cargar el ZIP de la solución
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            $solutionZip = [System.IO.Compression.ZipFile]::OpenRead($solutionFile.FullName)
+            
+            # Buscar solution.xml dentro del ZIP
+            $solutionXmlEntry = $solutionZip.Entries | Where-Object { $_.Name -eq "solution.xml" } | Select-Object -First 1
+            
+            if ($solutionXmlEntry) {
+                $stream = $solutionXmlEntry.Open()
+                $reader = New-Object System.IO.StreamReader($stream)
+                $solutionXmlContent = $reader.ReadToEnd()
+                $reader.Close()
+                $stream.Close()
+                
+                # Parsear XML para obtener UniqueName
+                [xml]$solutionXml = $solutionXmlContent
+                $solutionUniqueName = $solutionXml.ImportExportXml.SolutionManifest.UniqueName
+                
+                Write-Output "  Nombre único extraído del ZIP: $solutionUniqueName"
+            } else {
+                Write-Output "  No se encontró solution.xml en el ZIP"
+            }
+            
+            $solutionZip.Dispose()
+            
+        } catch {
+            Write-Output "  Error extrayendo metadata del ZIP: $($_.Exception.Message)"
+        }
+    }
+    
+    # Verificar si la solución ya existe en el environment target
+    if (-not [string]::IsNullOrWhiteSpace($solutionUniqueName)) {
+        Write-Output ""
+        Write-Output "  Verificando si la solución ya existe en el environment..."
+        
+        $checkUrl = "$dataverseUrl/api/data/v9.2/solutions?`$filter=uniquename eq '$solutionUniqueName'`&`$select=solutionid,uniquename,friendlyname,ismanaged,version"
+        
+        try {
+            $existingSolution = Invoke-RestMethod -Uri $checkUrl -Headers $script:headers -Method Get
+            
+            if ($existingSolution.value -and $existingSolution.value.Count -gt 0) {
+                $existingSolutionIsManaged = $existingSolution.value[0].ismanaged
+                $existingVersion = $existingSolution.value[0].version
+                
+                Write-Output "  Solución YA EXISTE en el environment"
+                Write-Output "    Versión actual: $existingVersion"
+                Write-Output "    Tipo actual: $(if ($existingSolutionIsManaged) { 'Managed (Administrada)' } else { 'Unmanaged (No administrada)' })"
+                
+                # LOG DETALLADO: Mostrar valor exacto de ismanaged
+                Write-Output ""
+                Write-Output "  🔍 DEBUG - Valor raw de ismanaged:"
+                Write-Output "    Valor: '$existingSolutionIsManaged'"
+                Write-Output "    Tipo: $($existingSolutionIsManaged.GetType().Name)"
+                Write-Output "    Es `$true: $($existingSolutionIsManaged -eq $true)"
+                Write-Output "    Es `$false: $($existingSolutionIsManaged -eq $false)"
+            } else {
+                Write-Output "  Solución NO existe - será nueva instalación"
+            }
+        } catch {
+            Write-Output "  No se pudo verificar solución existente: $($_.Exception.Message)"
+        }
+    } else {
+        Write-Output ""
+        Write-Output "  No se pudo determinar el nombre de la solución"
+        Write-Output "    La importación continuará sin verificación previa"
+    }
+    
+    # Leer solución como bytes
+    $solutionBytes = [System.IO.File]::ReadAllBytes($solutionFile.FullName)
+    $solutionBase64 = [System.Convert]::ToBase64String($solutionBytes)
+    
+    # Determinar comportamiento según modo
+    $overwriteFlag = $false
+    $publishWorkflows = $true
+    
+    switch ($RestoreMode) {
+        "NewEnvironment" {
+            Write-Output ""
+            Write-Output "  Modo: NewEnvironment"
+            Write-Output "  -> Importando como nueva solución"
+            $overwriteFlag = $false
+        }
+        "UpdateCurrent" {
+            Write-Output ""
+            Write-Output "  Modo: UpdateCurrent (DESTRUCTIVO)"
+            Write-Output "  -> Sobrescribiendo solución existente"
+            $overwriteFlag = $true
+        }
+        "CreateCopy" {
+            Write-Output ""
+            Write-Output "  Modo: CreateCopy (NO DESTRUCTIVO)"
+            Write-Output "  -> Creando NUEVA solución con sufijo '_Restored'"
+            Write-Output "  -> Solución original permanece intacta"
+            $overwriteFlag = $false
+            
+            # PASO ESPECIAL: Modificar UniqueName de la solución para crear copia
+            Write-Output ""
+            Write-Output "  [CreateCopy] Preparando solución con nuevo UniqueName..."
+            
+            try {
+                # 1. Crear directorio temporal para modificar ZIP
+                $tempModifyPath = Join-Path $env:TEMP "ModifySolution_$(Get-Date -Format 'yyyyMMddHHmmss')"
+                New-Item -ItemType Directory -Path $tempModifyPath -Force | Out-Null
+                
+                # 2. Extraer ZIP de solución
+                Add-Type -AssemblyName System.IO.Compression.FileSystem
+                [System.IO.Compression.ZipFile]::ExtractToDirectory($solutionFile.FullName, $tempModifyPath)
+                
+                # 3. Leer solution.xml
+                $solutionXmlPath = Join-Path $tempModifyPath "solution.xml"
+                [xml]$solutionXmlContent = Get-Content $solutionXmlPath
+                
+                # 4. Obtener UniqueName original
+                $originalUniqueName = $solutionXmlContent.ImportExportXml.SolutionManifest.UniqueName
+                Write-Output "    Original UniqueName: $originalUniqueName"
+                
+                # 5. Generar nuevo UniqueName con sufijo
+                $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+                $newUniqueName = "${originalUniqueName}_Restored_${timestamp}"
+                Write-Output "    Nuevo UniqueName: $newUniqueName"
+                
+                # 6. Modificar UniqueName en XML
+                $solutionXmlContent.ImportExportXml.SolutionManifest.UniqueName = $newUniqueName
+                
+                # 7. Modificar LocalizedNames para reflejar que es una copia
+                $localizedNames = $solutionXmlContent.ImportExportXml.SolutionManifest.LocalizedNames.LocalizedName
+                if ($localizedNames) {
+                    foreach ($localizedName in $localizedNames) {
+                        $originalDisplayName = $localizedName.description
+                        $localizedName.description = "$originalDisplayName (Restored $timestamp)"
+                    }
+                }
+                
+                # 8. Guardar solution.xml modificado
+                $solutionXmlContent.Save($solutionXmlPath)
+                Write-Output "    solution.xml modificado"
+                
+                # 9. Recomprimir como nuevo ZIP
+                $modifiedZipPath = Join-Path $env:TEMP "${newUniqueName}.zip"
+                if (Test-Path $modifiedZipPath) { Remove-Item $modifiedZipPath -Force }
+                
+                [System.IO.Compression.ZipFile]::CreateFromDirectory($tempModifyPath, $modifiedZipPath)
+                Write-Output "    Solución reempaquetada: $modifiedZipPath"
+                
+                # 10. Actualizar referencia al archivo de solución
+                $solutionFile = Get-Item $modifiedZipPath
+                
+                # 11. Actualizar UniqueName global para uso posterior
+                $solutionUniqueName = $newUniqueName
+                
+                # 12. Limpiar directorio temporal de extracción
+                Remove-Item $tempModifyPath -Recurse -Force
+                
+                Write-Output "    Solución preparada para importar como NUEVA"
+                
+            } catch {
+                $errorMsg = "Error modificando solución para CreateCopy: $($_.Exception.Message)"
+                Write-Output "    $errorMsg"
+                Write-ErrorDetail $_ "ModifySolutionForCopy"
+                throw "No se pudo preparar solución para CreateCopy: $errorMsg"
+            }
+        }
+    }
+    
+    Write-Output "  (Este proceso puede tomar 1-3 minutos)"
+    
+    # Generar ImportJobId único
+    $importJobId = [guid]::NewGuid().ToString()
+    
+    # Re-leer el archivo de solución (puede haber sido modificado en CreateCopy)
+    if ($RestoreMode -eq "CreateCopy") {
+        Write-Output ""
+        Write-Output "  [CreateCopy] Codificando solución modificada a Base64..."
+        $solutionBytes = [System.IO.File]::ReadAllBytes($solutionFile.FullName)
+        $solutionBase64 = [System.Convert]::ToBase64String($solutionBytes)
+        $sizeInMB = [math]::Round($solutionBytes.Length / 1MB, 2)
+        Write-Output "    Solucion codificada: $sizeInMB MB"
+    }
+    
+    # Preparar parámetros de importación
+    $importBody = @{
+        OverwriteUnmanagedCustomizations = $overwriteFlag
+        PublishWorkflows = $publishWorkflows
+        CustomizationFile = $solutionBase64
+        ImportJobId = $importJobId
+    }
+    
+    # CRÍTICO: Si la solución ya existe, importar con el mismo tipo (managed/unmanaged)
+    # Si intentamos cambiar de unmanaged a managed (o viceversa), da error 0x80048033
+    # NOTA: En modo CreateCopy, la solución es NUEVA (UniqueName diferente), no aplica esta lógica
+    if ($existingSolutionIsManaged -ne $null -and $RestoreMode -ne "CreateCopy") {
+        # Forzar conversión a managed si la existente es managed
+        # Forzar conversión a unmanaged si la existente es unmanaged
+        $importBody.ConvertToManaged = $existingSolutionIsManaged
+        
+        Write-Output ""
+        Write-Output "  Solución existente detectada como: $(if ($existingSolutionIsManaged) { 'Managed' } else { 'Unmanaged' })"
+        Write-Output "  -> Importando con mismo tipo para evitar conflicto"
+        
+        # LOG DETALLADO: Confirmar asignación
+        Write-Output ""
+        Write-Output "  DEBUG - Asignación ConvertToManaged:"
+        Write-Output "    Valor asignado: '$($importBody.ConvertToManaged)'"
+        Write-Output "    Tipo: $($importBody.ConvertToManaged.GetType().Name)"
+    } else {
+        Write-Output ""
+        Write-Output "  No se detectó solución existente o modo es CreateCopy (solución nueva)"
+        Write-Output "  -> ConvertToManaged no será especificado (Dataverse decidirá)"
+        
+        if ($RestoreMode -eq "CreateCopy") {
+            Write-Output ""
+            Write-Output "   INFO: Modo CreateCopy"
+            Write-Output "    -> SOLUCIÓN: Nueva solución con sufijo '_Restored_<timestamp>'"
+            Write-Output "    -> DATOS: Nuevos registros con marcadores únicos"
+            Write-Output "    -> Resultado: Solución original + Solución restaurada (coexisten)"
+        }
+    }
+    
+    $importBodyJson = $importBody | ConvertTo-Json
+    
+    Write-Output ""
+    Write-Output "  Import Job ID: $importJobId"
+    
+    # LOG DETALLADO: Mostrar valor exacto de ConvertToManaged
+    if ($importBody.ContainsKey('ConvertToManaged')) {
+        $convertValue = $importBody['ConvertToManaged']
+        Write-Output "  Convert to Managed: $convertValue (tipo: $($convertValue.GetType().Name))"
+    } else {
+        Write-Output "  Convert to Managed: No especificado (clave no existe en hashtable)"
+    }
+    
+    # LOG DETALLADO: Mostrar JSON completo que se enviará
+    Write-Output ""
+    Write-Output "  JSON Request Body:"
+    Write-Output "  $importBodyJson"
+    Write-Output ""
+    
+    # Importar solución usando Dataverse API
+    $importUrl = "$dataverseUrl/api/data/v9.2/ImportSolution"
+    
+    $importResponse = Invoke-RestMethod -Uri $importUrl -Method Post -Headers $script:headers -Body $importBodyJson
+    
+    # Actualizar estadísticas
+    $script:restoreStats.solutionImported = $true
+    $script:restoreStats.solutionName = $solutionFile.BaseName
+    
+    Write-Output ""
+    Write-Output "  Solución importada exitosamente"
+    
+    Write-DetailedLog "Solution imported: $($solutionFile.Name) (Mode: $RestoreMode)" "INFO"
+    
+} catch {
+    $errorMsg = "Error importando solución: $($_.Exception.Message)"
+    Write-Output ""
+    Write-Output "  $errorMsg"
+    Write-ErrorDetail $_ "ImportSolution"
+    $script:errors += $errorMsg
+    throw
+}
+
+# ==========================================
+# PASO 7.5: CREAR CAMPOS MARCADORES (UpdateCurrent y CreateCopy)
+# ==========================================
+
+if ($RestoreMode -in @("UpdateCurrent", "CreateCopy")) {
+    Write-Output ""
+    Write-Output "=========================================="
+    Write-Output "PASO 7.5: CREAR CAMPOS MARCADORES"
+    Write-Output "=========================================="
+    Write-Output "  (Necesario para modos UpdateCurrent y CreateCopy)"
+    Write-Output ""
+    
+    try {
+        # Tablas críticas que necesitan los campos
+        $criticalTables = @(
+            "cr8df_actividadcalendario",
+            "cr391_calendario2",
+            "cr391_casosfluentpivot",
+            "cr8df_usuario"
+        )
+        
+        $fieldsCreated = 0
+        $tablesUpdated = 0
+        
+        foreach ($tableName in $criticalTables) {
+            Write-Output "Procesando tabla: $tableName"
+            
+            try {
+                # Obtener metadata de la tabla
+                $entityUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$tableName')"
+                $entityResponse = Invoke-RestMethod -Uri $entityUrl -Method Get -Headers $script:headers
+                $entityMetadataId = $entityResponse.MetadataId
+                
+                # URL para crear campos
+                $createFieldUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions($entityMetadataId)/Attributes"
+                
+                # ==========================================
+                # CAMPO 1: cr8df_backupid (UniqueIdentifier/GUID)
+                # ==========================================
+                
+                $field1 = @{
+                    '@odata.type' = "Microsoft.Dynamics.CRM.UniqueIdentifierAttributeMetadata"
+                    "AttributeType" = "Uniqueidentifier"
+                    "AttributeTypeName" = @{
+                        "Value" = "UniqueidentifierType"
+                    }
+                    "SchemaName" = "cr8df_backupid"
+                    "RequiredLevel" = @{
+                        "Value" = "None"
+                        "CanBeChanged" = $true
+                    }
+                    "DisplayName" = @{
+                        '@odata.type' = "Microsoft.Dynamics.CRM.Label"
+                        "LocalizedLabels" = @(
+                            @{
+                                '@odata.type' = "Microsoft.Dynamics.CRM.LocalizedLabel"
+                                "Label" = "Backup ID"
+                                "LanguageCode" = 1033
+                            }
+                        )
+                    }
+                    "Description" = @{
+                        '@odata.type' = "Microsoft.Dynamics.CRM.Label"
+                        "LocalizedLabels" = @(
+                            @{
+                                '@odata.type' = "Microsoft.Dynamics.CRM.LocalizedLabel"
+                                "Label" = "ID único del backup que originó este registro"
+                                "LanguageCode" = 1033
+                            }
+                        )
+                    }
+                }
+                
+                try {
+                    Invoke-RestMethod -Uri $createFieldUrl -Method Post -Headers $script:headers -Body ($field1 | ConvertTo-Json -Depth 10) | Out-Null
+                    Write-Output "    cr8df_backupid creado"
+                    $fieldsCreated++
+                } catch {
+                    if ($_.Exception.Message -like "*already exists*" -or $_.Exception.Message -like "*ya existe*") {
+                        Write-Output "    cr8df_backupid ya existe (skip)"
+                    } else {
+                        Write-Output "    Error creando cr8df_backupid: $($_.Exception.Message)"
+                    }
+                }
+                
+                # ==========================================
+                # CAMPO 2: cr8df_fecharestore (DateTime)
+                # ==========================================
+                
+                $field2 = @{
+                    '@odata.type' = "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata"
+                    "AttributeType" = "DateTime"
+                    "AttributeTypeName" = @{
+                        "Value" = "DateTimeType"
+                    }
+                    "Format" = "DateAndTime"
+                    "ImeMode" = "Disabled"
+                    "DateTimeBehavior" = @{
+                        "Value" = "UserLocal"
+                    }
+                    "SchemaName" = "cr8df_fecharestore"
+                    "RequiredLevel" = @{
+                        "Value" = "None"
+                        "CanBeChanged" = $true
+                    }
+                    "DisplayName" = @{
+                        '@odata.type' = "Microsoft.Dynamics.CRM.Label"
+                        "LocalizedLabels" = @(
+                            @{
+                                '@odata.type' = "Microsoft.Dynamics.CRM.LocalizedLabel"
+                                "Label" = "Fecha Restore"
+                                "LanguageCode" = 1033
+                            }
+                        )
+                    }
+                    "Description" = @{
+                        '@odata.type' = "Microsoft.Dynamics.CRM.Label"
+                        "LocalizedLabels" = @(
+                            @{
+                                '@odata.type' = "Microsoft.Dynamics.CRM.LocalizedLabel"
+                                "Label" = "Fecha y hora en que se restauró este registro desde backup"
+                                "LanguageCode" = 1033
+                            }
+                        )
+                    }
+                }
+                
+                try {
+                    Invoke-RestMethod -Uri $createFieldUrl -Method Post -Headers $script:headers -Body ($field2 | ConvertTo-Json -Depth 10) | Out-Null
+                    Write-Output "    cr8df_fecharestore creado"
+                    $fieldsCreated++
+                } catch {
+                    if ($_.Exception.Message -like "*already exists*" -or $_.Exception.Message -like "*ya existe*") {
+                        Write-Output "    cr8df_fecharestore ya existe (skip)"
+                    } else {
+                        Write-Output "    Error creando cr8df_fecharestore: $($_.Exception.Message)"
+                    }
+                }
+                
+                $tablesUpdated++
+                
+            } catch {
+                Write-Output "    Error procesando tabla: $($_.Exception.Message)"
+            }
+        }
+        
+        # Publicar customizaciones
+        Write-Output ""
+        Write-Output "Publicando customizaciones..."
+        
+        try {
+            $publishUrl = "$dataverseUrl/api/data/v9.2/PublishAllXml"
+            $publishBody = @{
+                ParameterXml = "<importexportxml></importexportxml>"
+            } | ConvertTo-Json
+            
+            Invoke-RestMethod -Uri $publishUrl -Method Post -Headers $script:headers -Body $publishBody | Out-Null
+            
+            Write-Output "  Customizaciones publicadas"
+            Write-Output "  Espera 1-2 minutos para que los cambios se propaguen"
+            
+        } catch {
+            Write-Output "  Error publicando customizaciones"
+            Write-Output "  Puede que necesites publicar manualmente"
+        }
+        
+        # Actualizar estadísticas
+        $script:restoreStats.fieldsCreated = $fieldsCreated
+        $script:restoreStats.tablesUpdated = $tablesUpdated
+        
+        Write-Output ""
+        Write-Output '  [OK] Campos marcadores: $fieldsCreated creados en $tablesUpdated tablas'
+        
+        Write-DetailedLog "Marker fields created: $fieldsCreated fields in $tablesUpdated tables" "INFO"
+        
+    } catch {
+        Write-Output ""
+        Write-Output "  Error creando campos marcadores"
+        Write-ErrorDetail $_ "CreateMarkerFields"
+        Write-Output "  Continuando con el restore (campos pueden ya existir)..."
+    }
+} else {
+    Write-Output ""
+    Write-Output "=========================================="
+    Write-Output "PASO 7.5: CREAR CAMPOS MARCADORES"
+    Write-Output "=========================================="
+    Write-Output " Paso omitido (solo necesario en modos UpdateCurrent y CreateCopy)"
+    Write-Output " Modo NewEnvironment: Datos sin marcadores (environment limpio)"
+}
+
+# ==========================================
+# PASO 8: RESTAURAR DATOS DE TABLAS
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 8: RESTAURAR DATOS DE TABLAS"
+Write-Output "=========================================="
+
+# VALIDACIÓN CRÍTICA: Solo modo NewEnvironment restaura datos
+if ($RestoreMode -ne "NewEnvironment") {
+    Write-Output "  ⚠ ADVERTENCIA: Modo '$RestoreMode' no restaura datos"
+    Write-Output "  Solo se importó la solución (metadata)"
+    Write-Output "  Para restaurar datos completos, usa: -RestoreMode 'NewEnvironment'"
+    Write-Output "  Saltando inyección de datos..."
+    Write-Output ""
+} else {
+    Write-Output "  ✓ Modo NewEnvironment: Restaurando TODOS los datos de las tablas"
+    Write-Output "  Datos se inyectarán sin marcadores (environment limpio)"
+    Write-Output ""
+
+try {
+    # Buscar directorio dataverse en el backup
+    $dataversePath = Get-ChildItem -Path $extractPath -Directory -Filter "dataverse" -Recurse | Select-Object -First 1
+    
+    if (-not $dataversePath) {
+        Write-Output "  No se encontró directorio 'dataverse' en el backup"
+        Write-Output "  El backup puede no contener datos de tablas"
+        Write-Output "  Continuando sin restaurar datos..."
+    } else {
+        Write-Output "  Directorio dataverse encontrado: $($dataversePath.FullName)"
+        
+        # Obtener todos los archivos JSON (cada uno es una tabla)
+        $dataFiles = Get-ChildItem -Path $dataversePath.FullName -Filter "*.json"
+        $totalTables = $dataFiles.Count
+        
+        Write-Output "  Tablas encontradas: $totalTables"
+        Write-Output ""
+        
+        if ($totalTables -eq 0) {
+            Write-Output "  No se encontraron archivos JSON de tablas"
+            Write-Output "  Continuando sin restaurar datos..."
+        } else {
+            # Obtener mapa de LogicalName -> EntitySetName para todas las tablas
+            Write-Output "  [8a] Obteniendo EntitySetNames de tablas..."
+            $tableNameMap = @{}
+            
+            foreach ($dataFile in $dataFiles) {
+                $logicalName = [System.IO.Path]::GetFileNameWithoutExtension($dataFile.Name)
+                
+                try {
+                    $metadataUrl = "$dataverseUrl/api/data/v9.2/EntityDefinitions(LogicalName='$logicalName')?`$select=EntitySetName"
+                    $entityDef = Invoke-RestMethod -Uri $metadataUrl -Method Get -Headers $script:headers -ErrorAction Stop
+                    $tableNameMap[$logicalName] = $entityDef.EntitySetName
+                } catch {
+                    # Fallback: asumir plural
+                    $tableNameMap[$logicalName] = "${logicalName}s"
+                    Write-Output "    $logicalName -> ${logicalName}s (fallback)"
+                }
+            }
+            
+            Write-Output "  Mapeo de nombres completado"
+            Write-Output ""
+            Write-Output "  [8b] Restaurando datos de tablas..."
+            
+            # NewEnvironment SIEMPRE inserta datos limpios sin marcadores
+            $useMarkers = $false  # SIEMPRE false para NewEnvironment
+            
+            Write-Output "  -> Modo NewEnvironment: Insertar SIN marcadores"
+            Write-Output "  -> Datos limpios (sin cr8df_backupid ni cr8df_fecharestore)"
+            Write-Output "  -> Environment listo para uso productivo"
+            Write-Output ""
+            
+            # NOTA: Los modos UpdateCurrent y CreateCopy (que usaban marcadores) están deshabilitados
+            # Si en el futuro se reactivan:
+            #   $useMarkers = $RestoreMode -in @("UpdateCurrent", "CreateCopy")
+            #   if ($useMarkers) { /* código para insertar con marcadores */ }
+            
+            $tablesProcessed = 0
+            $tablesSuccess = 0
+            $tablesError = 0
+            $totalRecordsRestored = 0
+            $totalRecordsError = 0
+            
+            foreach ($dataFile in $dataFiles) {
+                $logicalName = [System.IO.Path]::GetFileNameWithoutExtension($dataFile.Name)
+                $entitySetName = $tableNameMap[$logicalName]
+                
+                Write-Output "  [$($tablesProcessed + 1)/$totalTables] $logicalName -> $entitySetName"
+                $tablesProcessed++
+                
+                try {
+                    # Leer datos del archivo JSON
+                    $jsonContent = Get-Content $dataFile.FullName -Raw -Encoding UTF8
+                    $records = $jsonContent | ConvertFrom-Json
+                    
+                    if (-not $records -or $records.Count -eq 0) {
+                        Write-Output "      Sin registros (skip)"
+                        $tablesSuccess++
+                        continue
+                    }
+                    
+                    $recordCount = $records.Count
+                    Write-Output "      Registros: $recordCount"
+                    
+                    $successCount = 0
+                    $errorCount = 0
+                    
+                    # URL de la API para esta tabla
+                    $apiUrl = "$dataverseUrl/api/data/v9.2/$entitySetName"
+                    
+                    foreach ($record in $records) {
+                        try {
+                            # Crear nuevo registro (excluir ID y metadata OData)
+                            $newRecord = @{}
+                            
+                            foreach ($prop in $record.PSObject.Properties) {
+                                # Excluir propiedades del sistema y metadata
+                                if ($prop.Name -notlike '@*' -and 
+                                    $prop.Name -notlike '_*_value' -and 
+                                    $prop.Name -ne 'id' -and 
+                                    $null -ne $prop.Value) {
+                                    $newRecord[$prop.Name] = $prop.Value
+                                }
+                            }
+                            
+                            # AGREGAR MARCADORES si el modo lo requiere
+                            if ($useMarkers) {
+                                $newRecord['cr8df_backupid'] = $script:restoreStats.backupId
+                                $newRecord['cr8df_fecharestore'] = (Get-Date).ToUniversalTime().ToString("o")
+                            }
+                            
+                            # Convertir a JSON y hacer POST (siempre INSERT, nunca UPDATE)
+                            $recordJson = $newRecord | ConvertTo-Json -Depth 10 -Compress
+                            
+                            Invoke-RestMethod -Uri $apiUrl -Method Post -Headers $script:headers -Body $recordJson -ContentType "application/json" | Out-Null
+                            
+                            $successCount++
+                            $totalRecordsRestored++
+                            
+                        } catch {
+                            $errorCount++
+                            $totalRecordsError++
+                            
+                            # Solo mostrar primeros 3 errores por tabla para no saturar log
+                            if ($errorCount -le 3) {
+                                Write-Output "        Error registro: $($_.Exception.Message)"
+                            }
+                        }
+                    }
+                    
+                    if ($errorCount -eq 0) {
+                        Write-Output "      $successCount/$recordCount registros restaurados"
+                        $tablesSuccess++
+                    } else {
+                        Write-Output "      $successCount/$recordCount registros restaurados, $errorCount errores"
+                        if ($errorCount -gt 3) {
+                            Write-Output "        (solo se muestran primeros 3 errores)"
+                        }
+                        $tablesError++
+                    }
+                    
+                    Write-DetailedLog "Table restored: $logicalName - $successCount/$recordCount records" "INFO"
+                    
+                } catch {
+                    Write-Output "      Error procesando tabla: $($_.Exception.Message)"
+                    Write-ErrorDetail $_ "RestoreTable_$logicalName"
+                    $tablesError++
+                }
+                
+                Write-Output ""
+            }
+            
+            # Actualizar estadísticas
+            $script:restoreStats.tablesProcessed = $tablesProcessed
+            $script:restoreStats.tablesSuccess = $tablesSuccess
+            $script:restoreStats.tablesError = $tablesError
+            $script:restoreStats.recordsRestored = $totalRecordsRestored
+            $script:restoreStats.recordsError = $totalRecordsError
+            
+            Write-Output "=========================================="
+            Write-Output "RESUMEN RESTORE DE TABLAS:"
+            Write-Output "  Tablas procesadas: $tablesProcessed"
+            Write-Output "    Exitosas: $tablesSuccess"
+            Write-Output "    Con errores: $tablesError"
+            Write-Output "  Registros totales: $totalRecordsRestored restaurados, $totalRecordsError errores"
+            if ($useMarkers) {
+                Write-Output "  Backup ID (para filtros): $($script:restoreStats.backupId)"
+            }
+            Write-Output "=========================================="
+            
+            if ($tablesError -eq $tablesProcessed -and $tablesProcessed -gt 0) {
+                throw "Todas las tablas fallaron durante el restore"
+            }
+            
+            Write-DetailedLog "Data restore completed: $totalRecordsRestored records in $tablesSuccess tables" "INFO"
+        }
+    }
+    
+} catch {
+    $errorMsg = "Error restaurando datos de tablas: $($_.Exception.Message)"
+    Write-Output ""
+    Write-Output "  $errorMsg"
+    Write-ErrorDetail $_ "RestoreTables"
+    $script:errors += $errorMsg
+    
+    # No lanzar error fatal - continuar con el reporte
+    Write-Output "  Restore de datos falló, pero solución fue importada"
+    Write-Output "  Revisa los logs para más detalles"
+}
+
+} # FIN del bloque if RestoreMode == NewEnvironment
+
+# ==========================================
+# PASO 9: GENERAR REPORTE FINAL
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "PASO 9: REPORTE FINAL"
+Write-Output "=========================================="
+
+try {
+    $endTime = Get-Date
+    $duration = $endTime - $script:startTime
+    
+    # Crear log JSON
+    $logData = @{
+        timestamp = Get-Date -Format "dd-MM-yyyy HH:mm:ss"
+        operation = "Restore"
+        status = if ($script:errors.Count -eq 0) { "Success" } else { "Completed with errors" }
+        configuration = @{
+            backupFileName = $BackupFileName
+            restoreMode = $RestoreMode
+            createBackupBeforeRestore = $CreateBackupBeforeRestore
+            force = $Force
+        }
+        statistics = $script:restoreStats
+        duration = @{
+            totalMinutes = [math]::Round($duration.TotalMinutes, 2)
+            totalSeconds = [math]::Round($duration.TotalSeconds, 2)
+        }
+        executionLog = $script:logEntries
+        errors = $script:errors
+    }
+    
+    # Guardar log en archivo temporal
+    $logFileName = "log_Restore_PP_$(Get-Date -Format 'dd-MM-yyyy HH-mm-ss').json"
+    $logFilePath = Join-Path $env:TEMP $logFileName
+    $logData | ConvertTo-Json -Depth 10 | Out-File -FilePath $logFilePath -Encoding UTF8
+    
+    Write-Output "Log generado: $logFilePath"
+    
+    # Subir log a Storage Account
+    Write-Output "Subiendo log a Storage Account..."
+    
+    $logBlobPath = if ($script:errors.Count -eq 0) {
+        "logs/powerplatform/restore/$logFileName"
+    } else {
+        "logs/powerplatform/restore/errors/$logFileName"
+    }
+    
+    Set-AzStorageBlobContent `
+        -Container "pp-backup" `
+        -File $logFilePath `
+        -Blob $logBlobPath `
+        -Context $ctx `
+        -Force | Out-Null
+    
+    Write-Output "  Log subido: $logBlobPath"
+    
+    # Limpiar archivos temporales
+    Write-Output ""
+    Write-Output "Limpiando archivos temporales..."
+    Remove-Item -Path $tempPath -Recurse -Force
+    Write-Output "  Archivos temporales eliminados"
+    
+    Write-DetailedLog "Restore completed successfully" "INFO"
+    
+} catch {
+    Write-Output ""
+    Write-Output "Error generando reporte final"
+    Write-ErrorDetail $_ "GenerateReport"
+}
+
+# ==========================================
+# RESUMEN FINAL
+# ==========================================
+
+Write-Output ""
+Write-Output "=========================================="
+Write-Output "RESTORE COMPLETADO"
+Write-Output "=========================================="
+Write-Output "Duración total: $([math]::Round($duration.TotalMinutes, 2)) minutos"
+Write-Output ""
+Write-Output "RESULTADOS:"
+Write-Output "  Solución importada: $($script:restoreStats.solutionName)"
+Write-Output "  Modo: $RestoreMode"
+
+if ($script:restoreStats.newEnvironmentCreated) {
+    Write-Output "  Nuevo environment creado:"
+    Write-Output "    -> ID: $($script:restoreStats.newEnvironmentId)"
+    Write-Output "    -> Nombre: $($script:restoreStats.newEnvironmentName)"
+    Write-Output "    -> Región: $($script:restoreStats.newEnvironmentRegion)"
+    Write-Output "    -> Tipo: $($script:restoreStats.newEnvironmentType)"
+}
+
+Write-Output "  Tablas procesadas: $($script:restoreStats.tablesProcessed)"
+Write-Output "    -> Exitosas: $($script:restoreStats.tablesSuccess)"
+Write-Output "    -> Con errores: $($script:restoreStats.tablesError)"
+Write-Output "  Registros restaurados: $($script:restoreStats.recordsRestored)"
+
+if ($RestoreMode -in @("UpdateCurrent", "CreateCopy")) {
+    Write-Output "  Campos marcadores creados: $($script:restoreStats.fieldsCreated)"
+    Write-Output "  Backup ID: $($script:restoreStats.backupId)"
+}
+
+if ($script:errors.Count -gt 0) {
+    Write-Output ""
+    Write-Output "ADVERTENCIAS:"
+    Write-Output "  Errores encontrados: $($script:errors.Count)"
+    Write-Output "  Revisa el log para detalles: $logBlobPath"
+}
+
+Write-Output ""
+Write-Output "PRÓXIMOS PASOS:"
+if ($RestoreMode -eq "NewEnvironment") {
+    Write-Output "  1. Verifica la solución en Power Apps Maker Portal"
+    Write-Output "  2. Verifica que los datos estén completos en las tablas"
+    Write-Output "  3. Prueba funcionalidades críticas de la aplicación"
+    Write-Output "  4. Verifica flujos de Power Automate (pueden requerir re-activación)"
+    Write-Output "  5. Configura conexiones y permisos de usuarios"
+    Write-Output "  6. Si es disaster recovery, actualiza DNS/URLs productivas"
+    Write-Output ""
+    Write-Output "VERIFICACIÓN DE DATOS:"
+    Write-Output "  - Todos los datos fueron restaurados sin marcadores"
+    Write-Output "  - Environment está limpio y listo para uso productivo"
+    Write-Output "  - Total registros: $($script:restoreStats.recordsRestored)"
+} elseif ($RestoreMode -eq "CreateCopy") {
+    # MODO DESHABILITADO - No restaura datos
+    Write-Output "  ⚠ ADVERTENCIA: Modo CreateCopy está DESHABILITADO"
+    Write-Output "  Solo se importó la solución (metadata), NO se restauraron datos"
+    Write-Output "  Para restaurar datos, ejecuta con: -RestoreMode 'NewEnvironment'"
+} elseif ($RestoreMode -eq "UpdateCurrent") {
+    # MODO DESHABILITADO - No restaura datos
+    Write-Output "  ⚠ ADVERTENCIA: Modo UpdateCurrent está DESHABILITADO"
+    Write-Output "  Solo se importó la solución (metadata), NO se restauraron datos"
+    Write-Output "  Para restaurar datos, ejecuta con: -RestoreMode 'NewEnvironment'"
+    $backupIdValue = $script:restoreStats.backupId
+    Write-Output "  1. Verifica la solución en Power Apps Maker Portal"
+    Write-Output "  2. Compara datos originales vs backup:"
+    Write-Output "     Backup ID para filtros: $backupIdValue"
+    Write-Output "  3. Prueba funcionalidades críticas"
+    Write-Output "  4. Si hay problemas, elimina registros donde cr8df_backupid sea igual a: $backupIdValue"
+} else {
+    Write-Output "  1. Verifica la solución en Power Apps Maker Portal"
+    Write-Output "  2. Verifica que los datos se importaron correctamente"
+    Write-Output "  3. Prueba funcionalidades críticas en el nuevo environment"
+    Write-Output "  4. Configura permisos y usuarios según sea necesario"
+}
+
+Write-Output "=========================================="
+Write-Output ""
+Write-Output "Restore finalizado exitosamente"

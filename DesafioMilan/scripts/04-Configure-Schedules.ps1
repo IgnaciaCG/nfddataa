@@ -10,11 +10,24 @@
 .NOTES
     Autor: Milan Kurte
     Fecha: Diciembre 2025
-    Versión: 1.0
+    Versión: 1.5 (sin Key Vault)
+    
+    Zonas horarias comunes:
+    - "Eastern Standard Time" (US East)
+    - "Central Standard Time" (US Central)
+    - "Pacific Standard Time" (US West)
+    - "SA Pacific Standard Time" (Sudamérica - Colombia, Perú, Ecuador)
+    - "Argentina Standard Time" (Argentina)
+    - "GMT Standard Time" (UK)
+    - "Central European Standard Time" (Europa)
 #>
 
 [CmdletBinding()]
 param()
+
+# ==========================================
+# CONFIGURACIÓN CENTRALIZADA
+# ==========================================
 
 $ErrorActionPreference = "Stop"
 
@@ -22,10 +35,11 @@ Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "FASE 4: Configurar Schedules" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 
-# Variables
-$resourceGroupName = "rg-backups-nfd"
-$automationAccountName = "aa-backups-nfd"
-$timeZone = "Eastern Standard Time"  # Ajustar según tu zona horaria
+# Variables centralizadas (MODIFICA AQUÍ para tu proyecto)
+$resourceGroupName = "rg-backups-nfd"        # ← Mismo que 01, 02, 03
+$automationAccountName = "aa-backups-nfd"    # ← Mismo que 02, 03
+$timeZone = "Eastern Standard Time"          # ← Tu zona horaria (ver lista arriba)
+$backupHour = 2                               # ← Hora del backup (formato 24h: 0-23)
 
 # ==========================================
 # 1. SCHEDULE POWER PLATFORM
@@ -34,7 +48,8 @@ $timeZone = "Eastern Standard Time"  # Ajustar según tu zona horaria
 Write-Host "`n[1/2] Creando schedule para Power Platform..." -ForegroundColor Yellow
 
 try {
-    $startTime = (Get-Date "02:00").AddDays(1)
+    # Usar variable configurable
+    $startTime = (Get-Date).Date.AddDays(1).AddHours($backupHour)
     
     $schedulePP = New-AzAutomationSchedule `
         -ResourceGroupName $resourceGroupName `
@@ -65,10 +80,10 @@ try {
 Write-Host "`n[2/2] Creando schedule para Backup Físico..." -ForegroundColor Yellow
 
 try {
-    # Obtener próximo domingo
+    # Obtener próximo domingo usando variable configurable
     $today = Get-Date
     $daysUntilSunday = 7 - [int]$today.DayOfWeek
-    $nextSunday = $today.AddDays($daysUntilSunday).Date.AddHours(2)
+    $nextSunday = $today.AddDays($daysUntilSunday).Date.AddHours($backupHour)
     
     $schedulePhysical = New-AzAutomationSchedule `
         -ResourceGroupName $resourceGroupName `
@@ -100,12 +115,36 @@ try {
 Write-Host "`n=====================================" -ForegroundColor Cyan
 Write-Host "✓ FASE 4 COMPLETADA" -ForegroundColor Green
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "Schedules configurados: 2" -ForegroundColor White
-Write-Host "  - Power Platform: Diario 02:00 AM" -ForegroundColor Cyan
-Write-Host "  - Backup Físico: Domingo 02:00 AM" -ForegroundColor Cyan
-Write-Host "`nZona Horaria: $timeZone" -ForegroundColor White
-Write-Host "`n⚠ PRÓXIMOS PASOS:" -ForegroundColor Yellow
-Write-Host "1. Instalar Hybrid Runbook Worker (para backup físico)" -ForegroundColor Magenta
-Write-Host "2. Probar runbooks manualmente desde Azure Portal" -ForegroundColor Magenta
-Write-Host "3. Configurar alertas de monitoreo" -ForegroundColor Magenta
-Write-Host "=====================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "SCHEDULES CONFIGURADOS:" -ForegroundColor Yellow
+Write-Host "  Total: 2" -ForegroundColor White
+Write-Host "  ✓ Power Platform: Diario $($backupHour):00 AM" -ForegroundColor Green
+Write-Host "  ✓ Backup Físico: Semanal Domingo $($backupHour):00 AM" -ForegroundColor Green
+Write-Host ""
+Write-Host "CONFIGURACIÓN:" -ForegroundColor Yellow
+Write-Host "  Zona Horaria: $timeZone" -ForegroundColor Cyan
+Write-Host "  Hora de Backup: $($backupHour):00 (formato 24h)" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "════════════════════════════════════" -ForegroundColor Cyan
+Write-Host "🎉 SETUP COMPLETO - TODO LISTO" -ForegroundColor Green
+Write-Host "════════════════════════════════════" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "RECURSOS CREADOS:" -ForegroundColor Yellow
+Write-Host "  ✓ Resource Group" -ForegroundColor Green
+Write-Host "  ✓ Storage Account (con lifecycle policies)" -ForegroundColor Green
+Write-Host "  ✓ Automation Account (con Managed Identity)" -ForegroundColor Green
+Write-Host "  ✓ Variables + Credentials (6 variables + 1 credential)" -ForegroundColor Green
+Write-Host "  ✓ 3 Runbooks importados y publicados" -ForegroundColor Green
+Write-Host "  ✓ 2 Schedules automáticos configurados" -ForegroundColor Green
+Write-Host ""
+Write-Host "PRÓXIMOS PASOS (OPCIONALES):" -ForegroundColor Magenta
+Write-Host "  1. Probar runbooks manualmente:" -ForegroundColor White
+Write-Host "     Azure Portal → Automation Account → Runbooks → Backup-PowerPlatform → Start" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  2. Configurar Hybrid Worker (para backup físico):" -ForegroundColor White
+Write-Host "     Necesario solo si usas Backup-FisicoSemanal" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "  3. Configurar alertas de monitoreo:" -ForegroundColor White
+Write-Host "     Azure Portal → Automation Account → Alerts → New alert rule" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "════════════════════════════════════" -ForegroundColor Cyan

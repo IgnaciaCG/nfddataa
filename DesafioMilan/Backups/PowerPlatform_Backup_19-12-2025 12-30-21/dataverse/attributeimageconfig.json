@@ -1,0 +1,67 @@
+﻿[
+    {
+        "attributelogicalname":  "iconscolorimage",
+        "attributeimageconfigid":  "a2f62933-03d9-f011-8543-002248384659",
+        "versionnumber":  692088,
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "ismanaged":  true,
+        "parententitylogicalname":  "aiplugintitle",
+        "@odata.etag":  "W/\"692088\"",
+        "componentstate":  0,
+        "componentidunique":  "2a471e26-4f3d-4691-949b-acf4f4310b59",
+        "canstorefullimage":  true,
+        "solutionid":  "d3681d1a-15db-4803-b2c4-37f3f9dbc44f"
+    },
+    {
+        "attributelogicalname":  "iconsoutlineimage",
+        "attributeimageconfigid":  "a5f62933-03d9-f011-8543-002248384659",
+        "versionnumber":  692089,
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "ismanaged":  true,
+        "parententitylogicalname":  "aiplugintitle",
+        "@odata.etag":  "W/\"692089\"",
+        "componentstate":  0,
+        "componentidunique":  "ec41feb5-5c39-484b-a9fe-bc1452811eb1",
+        "canstorefullimage":  true,
+        "solutionid":  "d3681d1a-15db-4803-b2c4-37f3f9dbc44f"
+    },
+    {
+        "attributelogicalname":  "msdyn_image",
+        "attributeimageconfigid":  "ea8d5692-04d9-f011-8543-002248384659",
+        "versionnumber":  741598,
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "ismanaged":  true,
+        "parententitylogicalname":  "msdyn_aibfile",
+        "@odata.etag":  "W/\"741598\"",
+        "componentstate":  0,
+        "componentidunique":  "2d2c6f57-2a7b-4336-a995-0f9d8b788ac6",
+        "canstorefullimage":  true,
+        "solutionid":  "a6a9eb08-73c2-4e0a-b234-36ac2ac25259"
+    },
+    {
+        "attributelogicalname":  "msdyn_imageblob",
+        "attributeimageconfigid":  "d0811163-2fd9-f011-8543-002248384659",
+        "versionnumber":  2315935,
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "ismanaged":  true,
+        "parententitylogicalname":  "msdyn_richtextfile",
+        "@odata.etag":  "W/\"2315935\"",
+        "componentstate":  0,
+        "componentidunique":  "faccd5b2-eb84-4b70-8a4f-2e2a02da7cd0",
+        "canstorefullimage":  true,
+        "solutionid":  "1c50881b-a1d9-4430-a16f-6f8e1889976b"
+    },
+    {
+        "attributelogicalname":  "entityimage",
+        "attributeimageconfigid":  "863bdd65-d4dc-f011-8406-002248e10de6",
+        "versionnumber":  2535065,
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "ismanaged":  true,
+        "parententitylogicalname":  "contact",
+        "@odata.etag":  "W/\"2535065\"",
+        "componentstate":  0,
+        "componentidunique":  "b6d59b30-24c2-44b3-a804-586cae9a28ef",
+        "canstorefullimage":  true,
+        "solutionid":  "60202ef0-9d92-427f-996d-27259e5eba15"
+    }
+]

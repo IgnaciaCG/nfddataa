@@ -1,0 +1,674 @@
+﻿[
+    {
+        "appactionruleid":  "e73c9f84-6821-4c6d-a8ff-b9243ba3b188",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "2b024d4c-21d9-f011-8543-002248384659",
+        "versionnumber":  1454531,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "33bb73a4-6c73-4d52-a4e8-98f961ae054e",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "439b1a7c-3399-4960-891f-8f5b1f52c3f2",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "e12f7658-21d9-f011-8543-002248384659",
+        "versionnumber":  1454830,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "f7b73b12-d87b-46d6-b9d0-a999017a7591",
+        "componentidunique":  "5a999bb9-de4d-4977-9af7-7aee6ccfb546",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "64252830-5c5a-4bc2-a1b9-76c4e8d785bc",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "8178756a-21d9-f011-8543-002248384659",
+        "versionnumber":  1455220,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "57445d64-25c2-4543-a30c-cac47978051e",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "d1b590bf-1eb1-4757-8725-ecc35b5157c2",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "e1737770-21d9-f011-8543-002248384659",
+        "versionnumber":  1455300,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "9546a8ab-ec72-4cb4-9bdc-ddea087feb92",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "58f2499f-ee59-4fb1-a245-add3115b48b0",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "e2737770-21d9-f011-8543-002248384659",
+        "versionnumber":  1455302,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "c8fa5858-25ef-44ef-b98e-5c8f95144a45",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "f1479630-2c5d-43cc-9c09-c03f53534522",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "e1b18576-21d9-f011-8543-002248384659",
+        "versionnumber":  1455487,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "5e738dd8-dce2-41ff-af71-8df6dc0fa6da",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "9a65b3f6-4664-4629-a168-89c3606a1725",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "fdfb8d88-21d9-f011-8543-002248384659",
+        "versionnumber":  1455812,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "c55eea63-8769-4f2f-a496-7f5a0e5c2da1",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "baf6ee54-a199-4edb-a5c9-9d315583beea",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "fd288b8e-21d9-f011-8543-002248384659",
+        "versionnumber":  1455950,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "472add03-4127-4490-8e29-eea58a44e811",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "de3834fa-ffcc-4d48-81f5-820d1acdd8d8",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "490f8d9a-21d9-f011-8543-002248384659",
+        "versionnumber":  1456279,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "46e9875a-6ce4-481e-8a6b-e8dda334af40",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "39414d2b-a457-40f8-b6b2-73b3a21c0e32",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "76118fa0-21d9-f011-8543-002248384659",
+        "versionnumber":  1456410,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "efdc29ad-0719-48cb-8f7c-2b89239d4cbe",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "bca6e253-37d2-4f93-8f83-531569a2dd6d",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "7e118fa0-21d9-f011-8543-002248384659",
+        "versionnumber":  1456420,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "a13fe3a2-5200-4c17-b66a-111bc065bc09",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "cce032c6-8a25-45ae-98de-e477ee04241b",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "20f092ac-21d9-f011-8543-002248384659",
+        "versionnumber":  1456632,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "6ccc7d46-d73b-4dc3-858b-a7f0278a84e4",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "cfcd393e-4e64-4a06-9343-96dd617a5586",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "55f092ac-21d9-f011-8543-002248384659",
+        "versionnumber":  1456661,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "8fbd96da-2bce-4f65-9360-aca41778544c",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "09f33d7a-d45d-46aa-bc87-c504631c8ca0",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "bd4097b2-21d9-f011-8543-002248384659",
+        "versionnumber":  1456727,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "ec648fde-4c47-4e49-ae7a-b220f76bb145",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "1bc156b4-4cd2-4543-9b29-1407b3b74dba",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "1e4297b2-21d9-f011-8543-002248384659",
+        "versionnumber":  1456818,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "f3bab3f3-8d3b-4149-9f0d-f15c5bba1366",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "7132db8d-bcdc-44b1-8edd-e7e8b0741e00",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "869c8fbe-21d9-f011-8543-002248384659",
+        "versionnumber":  1457007,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "5b324b65-9581-4ca2-a581-0d893dda5edd",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "ed05a793-0ac7-49db-bfc2-27b8ba9473bd",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "2f7ea0c4-21d9-f011-8543-002248384659",
+        "versionnumber":  1457125,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "16db87c3-8e1d-4cdd-97c2-50ac97ec5177",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "fcb0240e-6a8a-4711-9a21-b4a1e7515a9f",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "12d581e2-21d9-f011-8543-002248384659",
+        "versionnumber":  1457692,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "16f9a80d-dcb6-4f91-bced-48d8ee880b8e",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "925bd3b6-6b1e-4e2b-ba1e-6f5d77e3c992",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "dd7675ee-21d9-f011-8543-002248384659",
+        "versionnumber":  1457999,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "56fab417-d49a-4912-b801-63a5a3df523c",
+        "componentidunique":  "c85c813e-af70-4e52-98be-e8c6a5760192",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "e91c6960-ca10-4be4-8a64-997eda5d7e46",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "0c7775ee-21d9-f011-8543-002248384659",
+        "versionnumber":  1458009,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "33b7e4b9-e85e-45fa-9f0c-34847f93307e",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "58c95284-d84c-4f8d-a699-3b41da4668d4",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "e80175f4-21d9-f011-8543-002248384659",
+        "versionnumber":  1458065,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "804f8027-8de5-440e-86a7-3218cceb4fce",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "a138f7c7-a120-4878-a932-668b519dbe93",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "3cd682fa-21d9-f011-8543-002248384659",
+        "versionnumber":  1458182,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "0797fa56-b964-4a8f-a5a9-bf22781b5f1c",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "89566360-fdb9-4d03-9863-61f86af57c0b",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "7b7b6b1e-22d9-f011-8543-002248384659",
+        "versionnumber":  1458999,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "84911e62-da71-4d5a-8821-5e386ba355f8",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "107e2043-4247-4e62-905e-b84b9a5be8df",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "59c26f2a-22d9-f011-8543-002248384659",
+        "versionnumber":  1459183,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "df97e01a-2232-405a-a75f-9b61cbf43504",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "1d8ac4e0-750d-4faf-879e-238228ecd226",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "7af5883c-22d9-f011-8543-002248384659",
+        "versionnumber":  1459527,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "eadeab5d-ac92-47d5-980f-94c54015eca3",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "4ebe7336-b38a-4c7a-81d9-98d4f7e674b5",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "1120b554-22d9-f011-8543-002248384659",
+        "versionnumber":  1459936,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "05d7aa16-860b-48ea-a9b0-681df6804fc3",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "1ca30b1e-afad-4d82-93ea-771c358ab54c",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "2297c05a-22d9-f011-8543-002248384659",
+        "versionnumber":  1460005,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "f26c7c01-f7c5-4ef0-bf26-92a37e672de8",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "37d7aa90-cf68-4726-8fc5-a001c46b3f48",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "baf7c260-22d9-f011-8543-002248384659",
+        "versionnumber":  1460173,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "d9c4bdb5-0c0c-459d-9f6c-887b0140d68c",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "2ce5e4fa-7bd6-4e3f-94e2-8987918730ac",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "65f8c260-22d9-f011-8543-002248384659",
+        "versionnumber":  1460278,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "52cbd727-64ca-44fd-a8d5-5170bef2dc99",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "16590612-0094-4633-91be-27186483015f",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "7eb5bd66-22d9-f011-8543-002248384659",
+        "versionnumber":  1460295,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "dd93e876-b7d4-4623-8018-9dba91b90374",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "a324691d-a08f-4ddf-8b27-9f21b3ed536b",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "fc6eba72-22d9-f011-8543-002248384659",
+        "versionnumber":  1460586,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "3571e6c0-036e-47c6-8649-9017aed11f69",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "a1b37e6d-f821-4017-8ce0-ed5157aeda9c",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "936fba72-22d9-f011-8543-002248384659",
+        "versionnumber":  1460642,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "a8aefd20-0ee0-4fe9-afbe-f0da1b28e7cb",
+        "componentidunique":  "e5784e06-823d-48a9-b3b5-429112fa5e3d",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "05004e48-b6b0-4d86-b98e-c75be3f6896d",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "0397ab7e-22d9-f011-8543-002248384659",
+        "versionnumber":  1460851,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "150ce02b-7f1b-4308-b7c8-11d1b68d71a5",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "8787310d-f0a4-4490-a7c0-501d8e374c09",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "e5379590-22d9-f011-8543-002248384659",
+        "versionnumber":  1461138,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "457d856c-bcfd-4023-9915-73119701053a",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "c338c6ee-1ef4-409f-9cf4-75a46962397c",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "71399590-22d9-f011-8543-002248384659",
+        "versionnumber":  1461218,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "69f71fe6-666c-4080-819e-aebfb131c073",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "97c3e9b3-ceb0-4edb-8b5e-e365220abfd4",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "16fb81c0-22d9-f011-8543-002248384659",
+        "versionnumber":  1462064,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "bfc0d582-954f-4584-9523-b92d002aaeda",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "f5d17f52-e001-4474-a7c3-900e90c349b2",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "204888cc-22d9-f011-8543-002248384659",
+        "versionnumber":  1462285,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "990a6580-b6a1-4fec-b9ba-0f9bbc0751c1",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "0accf3c0-5bbd-4382-93b3-89e2172903ff",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "545396d2-22d9-f011-8543-002248384659",
+        "versionnumber":  1462401,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "88de3196-e22c-43eb-8153-d760636e68ff",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "91c83fb2-bcd6-499d-b9a9-3c66313e57ab",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "b65396d2-22d9-f011-8543-002248384659",
+        "versionnumber":  1462419,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "561656e0-77d7-4db3-a4a0-e3c5787cc1d0",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "aa822f15-d44a-4fb2-9879-75c967e5db1f",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "76cb8ed8-22d9-f011-8543-002248384659",
+        "versionnumber":  1462521,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "9186e5d0-bc27-4dba-ab8e-733ba511fc98",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "63dde428-31e2-4c6d-8520-87d3eb4391b1"
+    },
+    {
+        "appactionruleid":  "1544f7fb-577b-44d8-9a24-048ed8ad3401",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "d52a63fb-28d9-f011-8543-002248384659",
+        "versionnumber":  1537861,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "7c7d9c60-7b6a-424b-99a3-634243cf53c7",
+        "componentidunique":  "9fcacff8-9b0c-4afa-9bde-b41598e895bc",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "13737806-aded-455b-b379-461ba875ef2f"
+    },
+    {
+        "appactionruleid":  "a2c8f33c-38ef-419f-a391-6a9f0d1a4a24",
+        "componentstate":  0,
+        "ismanaged":  true,
+        "appactionrule_webresource_scriptsid":  "db2a63fb-28d9-f011-8543-002248384659",
+        "versionnumber":  1537869,
+        "iscustomizable":  {
+                               "Value":  true,
+                               "CanBeChanged":  true,
+                               "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                           },
+        "webresourceid":  "adea1aea-b2aa-e611-80d6-00155d88c343",
+        "componentidunique":  "2cdb308d-216f-4b25-b818-c71c78ec8feb",
+        "overwritetime":  "1900-01-01T00:00:00Z",
+        "solutionid":  "13737806-aded-455b-b379-461ba875ef2f"
+    }
+]

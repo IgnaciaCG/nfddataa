@@ -6,20 +6,21 @@
     Este script crea:
     - Resource Group
     - Storage Account con ZRS
-    - Contenedores (pp-backup, logs) - SharePoint usa M365 Backup
+    - Contenedores (pp-backup, logs)
     - Lifecycle policies
+    - Se usan Variables + Credentials directamente
 
 .NOTES
     Autor: Milan Kurte
     Fecha: Diciembre 2025
-    Versión: 1.0
+    Versión: 1.5 (sin Key Vault)
 #>
 
 [CmdletBinding()]
 param()
 
 # ==========================================
-# CONFIGURACIÓN
+# CONFIGURACIÓN CENTRALIZADA
 # ==========================================
 
 $ErrorActionPreference = "Stop"
@@ -28,7 +29,7 @@ Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "FASE 1: Setup Azure Infrastructure" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 
-# Variables
+# Variables centralizadas (fácil de modificar para otros proyectos)
 $resourceGroupName = "rg-backups-nfd"
 $location = "EastUS"
 $storageAccountName = "backupnfd$(Get-Random -Minimum 1000 -Maximum 9999)"
@@ -37,7 +38,7 @@ $storageAccountName = "backupnfd$(Get-Random -Minimum 1000 -Maximum 9999)"
 # 1. CONECTAR A AZURE
 # ==========================================
 
-Write-Host "`n[1/5] Conectando a Azure..." -ForegroundColor Yellow
+Write-Host "`n[1/4] Conectando a Azure..." -ForegroundColor Yellow
 
 try {
     Connect-AzAccount -ErrorAction Stop
@@ -53,7 +54,7 @@ try {
 # 2. CREAR RESOURCE GROUP
 # ==========================================
 
-Write-Host "`n[2/5] Creando Resource Group..." -ForegroundColor Yellow
+Write-Host "`n[2/4] Creando Resource Group..." -ForegroundColor Yellow
 
 try {
     $rg = New-AzResourceGroup -Name $resourceGroupName -Location $location -Force
@@ -68,7 +69,7 @@ try {
 # 3. CREAR STORAGE ACCOUNT
 # ==========================================
 
-Write-Host "`n[3/5] Creando Storage Account..." -ForegroundColor Yellow
+Write-Host "`n[3/4] Creando Storage Account..." -ForegroundColor Yellow
 
 try {
     $storageAccount = New-AzStorageAccount `
@@ -95,10 +96,10 @@ try {
 }
 
 # ==========================================
-# 4. CREAR CONTENEDORES
+# 4. CREAR CONTENEDORES Y LIFECYCLE POLICY
 # ==========================================
 
-Write-Host "`n[4/5] Creando contenedores..." -ForegroundColor Yellow
+Write-Host "`n[4/4] Creando contenedores y lifecycle policy..." -ForegroundColor Yellow
 
 try {
     $ctx = $storageAccount.Context
@@ -119,11 +120,7 @@ try {
     exit 1
 }
 
-# ==========================================
-# 5. CONFIGURAR LIFECYCLE POLICY
-# ==========================================
-
-Write-Host "`n[5/5] Configurando lifecycle policy..." -ForegroundColor Yellow
+# Configurar lifecycle policy (dentro del mismo paso 4)
 
 try {
     # Crear policy usando objetos PowerShell (método correcto para Az module)
@@ -155,8 +152,7 @@ try {
     $rule = New-AzStorageAccountManagementPolicyRule `
         -Name "BackupRetentionPolicy" `
         -Action $actionDelete `
-        -Filter $filter `
-        -Enabled $true
+        -Filter $filter
     
     # Aplicar política al Storage Account
     $policy = Set-AzStorageAccountManagementPolicy `
@@ -203,10 +199,23 @@ try {
 Write-Host "`n=====================================" -ForegroundColor Cyan
 Write-Host "✓ FASE 1 COMPLETADA" -ForegroundColor Green
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "Resource Group: $resourceGroupName" -ForegroundColor White
-Write-Host "Storage Account: $storageAccountName" -ForegroundColor White
-Write-Host "Ubicación: $location" -ForegroundColor White
-Write-Host "Contenedores: pp-backup, logs" -ForegroundColor White
-Write-Host "`nNombre guardado en: ..\config\storage_account_name.txt" -ForegroundColor Yellow
-Write-Host "`nPróximo paso: .\02-Setup-Automation.ps1" -ForegroundColor Magenta
+Write-Host ""
+Write-Host "RECURSOS CREADOS:" -ForegroundColor Yellow
+Write-Host "  Resource Group:   $resourceGroupName" -ForegroundColor White
+Write-Host "  Storage Account:  $storageAccountName" -ForegroundColor White
+Write-Host "  Ubicación:        $location" -ForegroundColor White
+Write-Host "  Contenedores:     pp-backup, logs" -ForegroundColor White
+Write-Host "  Lifecycle Policy: 180 días (Hot→Cool→Cold→Delete)" -ForegroundColor White
+Write-Host ""
+Write-Host "MÉTODO DE SEGURIDAD:" -ForegroundColor Yellow
+Write-Host "  ✓ Variables + Credentials (Automation Account)" -ForegroundColor Cyan
+Write-Host "  ℹ Key Vault NO necesario" -ForegroundColor Gray
+Write-Host ""
+Write-Host "ARCHIVOS DE CONFIGURACIÓN:" -ForegroundColor Yellow
+Write-Host "  ..\config\storage_account_name.txt" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "PRÓXIMO PASO:" -ForegroundColor Magenta
+Write-Host "  .\02-Setup-Automation.ps1" -ForegroundColor White
+Write-Host "  (Creará Variables + Credentials)" -ForegroundColor Cyan
+Write-Host ""
 Write-Host "=====================================" -ForegroundColor Cyan

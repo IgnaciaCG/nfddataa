@@ -1,0 +1,33 @@
+﻿{
+    "overriddencreatedon":  null,
+    "overwritetime":  "1900-01-01T00:00:00Z",
+    "timezoneruleversionnumber":  null,
+    "dvfilesearchid":  "0afcaa9e-bed3-44e3-8da0-6bacd872275a",
+    "componentidunique":  "3c30c55c-1338-4491-b7a2-18b19a3d0efa",
+    "_owninguser_value":  "1b8c871e-1ed9-f011-8543-002248384659",
+    "iscustomizable":  {
+                           "Value":  true,
+                           "CanBeChanged":  true,
+                           "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                       },
+    "versionnumber":  2545443,
+    "_modifiedby_value":  "1b8c871e-1ed9-f011-8543-002248384659",
+    "importsequencenumber":  null,
+    "_modifiedonbehalfby_value":  null,
+    "_createdby_value":  "1b8c871e-1ed9-f011-8543-002248384659",
+    "componentstate":  0,
+    "ismanaged":  false,
+    "_dvtablesearch_value":  null,
+    "_owningbusinessunit_value":  "e22aeaf0-ead8-f011-8543-002248384659",
+    "solutionid":  "fd140aae-4df4-11dd-bd17-0019b9312238",
+    "@odata.etag":  "W/\"2545443\"",
+    "_ownerid_value":  "1b8c871e-1ed9-f011-8543-002248384659",
+    "statecode":  0,
+    "_createdonbehalfby_value":  null,
+    "_owningteam_value":  null,
+    "modifiedon":  "2025-12-19T12:19:03Z",
+    "utcconversiontimezonecode":  null,
+    "name":  "site-search-Portal_Search",
+    "statuscode":  1,
+    "createdon":  "2025-12-19T12:19:03Z"
+}

@@ -1,0 +1,38 @@
+﻿[
+    {
+        "_mspp_webtemplateid_value":  null,
+        "statecode":  0,
+        "mspp_modifiedon":  "2025-12-19T12:18:14Z",
+        "mspp_createdon":  "2025-12-19T12:17:14Z",
+        "_mspp_modifiedby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "mspp_name":  "Sidebar",
+        "_mspp_websiteid_value":  null,
+        "mspp_pollplacementid":  "835a17a6-d4dc-f011-8406-002248e10de6",
+        "_mspp_createdby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "statuscode":  1
+    },
+    {
+        "_mspp_webtemplateid_value":  null,
+        "statecode":  0,
+        "mspp_modifiedon":  "2025-12-19T12:17:55Z",
+        "mspp_createdon":  "2025-12-19T12:17:15Z",
+        "_mspp_modifiedby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "mspp_name":  "Sidebar2",
+        "_mspp_websiteid_value":  null,
+        "mspp_pollplacementid":  "9d5a17a6-d4dc-f011-8406-002248e10de6",
+        "_mspp_createdby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "statuscode":  1
+    },
+    {
+        "_mspp_webtemplateid_value":  null,
+        "statecode":  0,
+        "mspp_modifiedon":  "2025-12-19T12:17:57Z",
+        "mspp_createdon":  "2025-12-19T12:17:16Z",
+        "_mspp_modifiedby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "mspp_name":  "Home",
+        "_mspp_websiteid_value":  null,
+        "mspp_pollplacementid":  "e15a17a6-d4dc-f011-8406-002248e10de6",
+        "_mspp_createdby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "statuscode":  1
+    }
+]

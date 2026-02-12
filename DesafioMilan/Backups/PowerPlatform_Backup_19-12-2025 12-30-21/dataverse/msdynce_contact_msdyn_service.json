@@ -1,0 +1,338 @@
+﻿[
+    {
+        "versionnumber":  2544781,
+        "msdyn_serviceid":  "d3857b79-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "4ef5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "782569a4-ae36-ec11-8c64-0022482356e4"
+    },
+    {
+        "versionnumber":  2544782,
+        "msdyn_serviceid":  "d3857b79-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "4ff5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544783,
+        "msdyn_serviceid":  "d3857b79-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "50f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544784,
+        "msdyn_serviceid":  "d3857b79-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "51f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544788,
+        "msdyn_serviceid":  "446aad49-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "52f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "782569a4-ae36-ec11-8c64-0022482356e4"
+    },
+    {
+        "versionnumber":  2544785,
+        "msdyn_serviceid":  "d3857b79-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "53f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544786,
+        "msdyn_serviceid":  "d3857b79-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "54f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544789,
+        "msdyn_serviceid":  "446aad49-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "55f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544790,
+        "msdyn_serviceid":  "446aad49-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "56f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544791,
+        "msdyn_serviceid":  "446aad49-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "57f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544792,
+        "msdyn_serviceid":  "446aad49-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "58f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544793,
+        "msdyn_serviceid":  "446aad49-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "59f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544794,
+        "msdyn_serviceid":  "7f5095b2-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "5af5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "782569a4-ae36-ec11-8c64-0022482356e4"
+    },
+    {
+        "versionnumber":  2544795,
+        "msdyn_serviceid":  "735e9891-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "5bf5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "782569a4-ae36-ec11-8c64-0022482356e4"
+    },
+    {
+        "versionnumber":  2544796,
+        "msdyn_serviceid":  "7f5095b2-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "5cf5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544797,
+        "msdyn_serviceid":  "735e9891-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "5df5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544800,
+        "msdyn_serviceid":  "7f5095b2-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "5ef5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544798,
+        "msdyn_serviceid":  "735e9891-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "5ff5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544799,
+        "msdyn_serviceid":  "735e9891-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "60f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544801,
+        "msdyn_serviceid":  "735e9891-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "61f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544803,
+        "msdyn_serviceid":  "7f5095b2-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "62f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544802,
+        "msdyn_serviceid":  "735e9891-a139-ec11-8c64-000d3a8fd36d",
+        "msdynce_contact_msdyn_serviceid":  "63f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544804,
+        "msdyn_serviceid":  "7f5095b2-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "64f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544805,
+        "msdyn_serviceid":  "7f5095b2-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "65f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b74143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544806,
+        "msdyn_serviceid":  "2d645d37-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "66f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544807,
+        "msdyn_serviceid":  "2d645d37-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "67f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544808,
+        "msdyn_serviceid":  "2d645d37-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "68f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544809,
+        "msdyn_serviceid":  "2d645d37-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "69f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544810,
+        "msdyn_serviceid":  "2d645d37-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "6af5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544812,
+        "msdyn_serviceid":  "80b78df3-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "6bf5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544811,
+        "msdyn_serviceid":  "b2e767fa-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "6cf5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544813,
+        "msdyn_serviceid":  "b2e767fa-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "6df5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544814,
+        "msdyn_serviceid":  "80b78df3-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "6ef5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544815,
+        "msdyn_serviceid":  "b2e767fa-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "6ff5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544816,
+        "msdyn_serviceid":  "80b78df3-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "70f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544817,
+        "msdyn_serviceid":  "b2e767fa-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "71f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544818,
+        "msdyn_serviceid":  "80b78df3-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "72f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544819,
+        "msdyn_serviceid":  "b2e767fa-a039-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "73f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544820,
+        "msdyn_serviceid":  "80b78df3-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "74f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544821,
+        "msdyn_serviceid":  "e6e88ee8-a139-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "75f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544822,
+        "msdyn_serviceid":  "e6e88ee8-a139-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "76f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544823,
+        "msdyn_serviceid":  "e6e88ee8-a139-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "77f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544824,
+        "msdyn_serviceid":  "8ed906d9-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "78f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "782569a4-ae36-ec11-8c64-0022482356e4"
+    },
+    {
+        "versionnumber":  2544825,
+        "msdyn_serviceid":  "e6e88ee8-a139-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "79f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544826,
+        "msdyn_serviceid":  "8ed906d9-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "7af5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544828,
+        "msdyn_serviceid":  "e6e88ee8-a139-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "7bf5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544827,
+        "msdyn_serviceid":  "8ed906d9-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "7cf5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544829,
+        "msdyn_serviceid":  "8ed906d9-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "7df5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544830,
+        "msdyn_serviceid":  "8ed906d9-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "7ef5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544831,
+        "msdyn_serviceid":  "8ed906d9-9f39-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "7ff5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b74143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544832,
+        "msdyn_serviceid":  "84db8b0c-a239-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "80f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "782569a4-ae36-ec11-8c64-0022482356e4"
+    },
+    {
+        "versionnumber":  2544833,
+        "msdyn_serviceid":  "84db8b0c-a239-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "81f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "ea082411-fb4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544834,
+        "msdyn_serviceid":  "84db8b0c-a239-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "82f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "bb4143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544835,
+        "msdyn_serviceid":  "84db8b0c-a239-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "83f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "3f64eba8-fc4b-ec11-8f8e-0022482b15a9"
+    },
+    {
+        "versionnumber":  2544836,
+        "msdyn_serviceid":  "84db8b0c-a239-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "84f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b54143ab-fc4b-ec11-8f8e-00224825ff61"
+    },
+    {
+        "versionnumber":  2544837,
+        "msdyn_serviceid":  "84db8b0c-a239-ec11-a819-0022484cc822",
+        "msdynce_contact_msdyn_serviceid":  "85f5bdd4-d4dc-f011-8406-002248e10de6",
+        "contactid":  "b84143ab-fc4b-ec11-8f8e-00224825ff61"
+    }
+]

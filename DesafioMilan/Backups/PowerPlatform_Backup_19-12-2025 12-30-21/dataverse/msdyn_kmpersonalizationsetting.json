@@ -1,0 +1,21 @@
+﻿{
+    "overriddencreatedon":  null,
+    "utcconversiontimezonecode":  null,
+    "msdyn_languagecontrol":  null,
+    "importsequencenumber":  null,
+    "_createdonbehalfby_value":  null,
+    "msdyn_filtercontroldata":  null,
+    "@odata.etag":  "W/\"2186855\"",
+    "_organizationid_value":  "660b64c6-c0d9-f011-89f6-002248e0aee4",
+    "msdyn_name":  "Personalización",
+    "modifiedon":  "2025-12-14T17:14:15Z",
+    "_modifiedonbehalfby_value":  null,
+    "msdyn_kmpersonalizationsettingid":  "a5345e2f-51d9-436b-a001-75948d548a16",
+    "createdon":  "2025-12-14T17:14:15Z",
+    "_createdby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3",
+    "statuscode":  1,
+    "statecode":  0,
+    "timezoneruleversionnumber":  null,
+    "versionnumber":  2186855,
+    "_modifiedby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3"
+}

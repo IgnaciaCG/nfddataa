@@ -1,0 +1,32 @@
+﻿[
+    {
+        "mspp_managesitemarkers":  true,
+        "mspp_createdon":  "2025-12-19T12:17:14Z",
+        "_mspp_websiteid_value":  "38880ab8-d4dc-f011-8406-002248e10de6",
+        "mspp_manageweblinksets":  true,
+        "_mspp_modifiedby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "mspp_name":  "Permisos administrativos para el portal básico",
+        "_mspp_createdby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "mspp_managecontentsnippets":  true,
+        "mspp_previewunpublishedentities":  true,
+        "statuscode":  1,
+        "statecode":  0,
+        "mspp_websiteaccessid":  "935a17a6-d4dc-f011-8406-002248e10de6",
+        "mspp_modifiedon":  "2025-12-19T12:18:42Z"
+    },
+    {
+        "mspp_managesitemarkers":  false,
+        "mspp_createdon":  "2025-12-19T12:17:17Z",
+        "_mspp_websiteid_value":  "38880ab8-d4dc-f011-8406-002248e10de6",
+        "mspp_manageweblinksets":  false,
+        "_mspp_modifiedby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "mspp_name":  "Permiso de vista previa para el portal básico",
+        "_mspp_createdby_value":  "d431eaf0-ead8-f011-8543-002248384659",
+        "mspp_managecontentsnippets":  false,
+        "mspp_previewunpublishedentities":  true,
+        "statuscode":  1,
+        "statecode":  0,
+        "mspp_websiteaccessid":  "fb5a17a6-d4dc-f011-8406-002248e10de6",
+        "mspp_modifiedon":  "2025-12-19T12:17:58Z"
+    }
+]

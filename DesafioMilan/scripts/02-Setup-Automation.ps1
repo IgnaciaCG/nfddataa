@@ -5,15 +5,15 @@
 .DESCRIPTION
     Este script crea:
     - Automation Account
-    - Managed Identity
-    - Roles RBAC
-    - Variables de configuración
-    - Credentials del Service Principal
-
+    - Managed Identity (para Storage Account)
+    - Roles RBAC (Storage Blob Data Contributor)
+    - Variables de configuración (6 variables)
+    - Credentials del Service Principal (1 credential)
+    
 .NOTES
     Autor: Milan Kurte
     Fecha: Diciembre 2025
-    Versión: 1.0
+    Versión: 1.5 (sin Key Vault)
 #>
 
 [CmdletBinding()]
@@ -25,21 +25,21 @@ Write-Host "=====================================" -ForegroundColor Cyan
 Write-Host "FASE 2: Setup Automation Account" -ForegroundColor Cyan
 Write-Host "=====================================" -ForegroundColor Cyan
 
-# Variables
+# Variables centralizadas
 $resourceGroupName = "rg-backups-nfd"
 $location = "EastUS"
 $automationAccountName = "aa-backups-nfd"
 
-# Leer storage account name
+# Leer configuraciones creadas en Fase 1
 $storageAccountName = Get-Content "..\config\storage_account_name.txt" -ErrorAction Stop
-
 Write-Host "`nStorage Account detectado: $storageAccountName" -ForegroundColor Cyan
+Write-Host "Configuración: Variables + Credentials" -ForegroundColor Yellow
 
 # ==========================================
 # 1. CREAR AUTOMATION ACCOUNT
 # ==========================================
 
-Write-Host "`n[1/4] Creando Automation Account..." -ForegroundColor Yellow
+Write-Host "`n[1/3] Creando Automation Account..." -ForegroundColor Yellow
 
 try {
     $automationAccount = New-AzAutomationAccount `
@@ -64,7 +64,7 @@ try {
 # 2. ASIGNAR RBAC A MANAGED IDENTITY
 # ==========================================
 
-Write-Host "`n[2/4] Configurando permisos RBAC..." -ForegroundColor Yellow
+Write-Host "`n[2/3] Configurando permisos RBAC..." -ForegroundColor Yellow
 
 try {
     # Obtener el principal ID de la Managed Identity
@@ -78,7 +78,7 @@ try {
     $storageAccountId = (Get-AzStorageAccount `
         -ResourceGroupName $resourceGroupName `
         -Name $storageAccountName).Id
-    
+
     New-AzRoleAssignment `
         -ObjectId $principalId `
         -RoleDefinitionName "Storage Blob Data Contributor" `
@@ -91,18 +91,39 @@ try {
 }
 
 # ==========================================
-# 3. CONFIGURAR VARIABLES
+# 3. CONFIGURAR VARIABLES Y CREDENTIAL
 # ==========================================
 
-Write-Host "`n[3/4] Creando variables de configuración..." -ForegroundColor Yellow
+Write-Host "`n[3/3] Creando variables y credential..." -ForegroundColor Yellow
 
-# Pedir información al usuario
-Write-Host "`nIngresa la siguiente información:" -ForegroundColor Cyan
+# Solicitar valores de forma interactiva
+Write-Host "`nIngresa la configuración de Power Platform:" -ForegroundColor Cyan
+Write-Host "(Puedes obtener estos valores de Power Platform Admin Center y Azure Portal)" -ForegroundColor Gray
+Write-Host ""
 
-$ppAppId = Read-Host "Service Principal - Application ID"
-$ppTenantId = Read-Host "Service Principal - Tenant ID (nfddata.com)"
-$ppEnvironmentName = Read-Host "Power Platform - Environment Name"
-$ppSolutionName = Read-Host "Power Platform - Solution Name"
+# App ID del Service Principal
+Write-Host "Service Principal Application ID:" -ForegroundColor Yellow
+Write-Host "  (De Azure Portal → App Registrations → Tu App → Application ID)" -ForegroundColor DarkGray
+$ppAppId = Read-Host "  App ID"
+
+# Tenant ID
+Write-Host "`nTenant ID:" -ForegroundColor Yellow
+Write-Host "  (De Azure Portal → App Registrations → Tu App → Directory ID)" -ForegroundColor DarkGray
+$ppTenantId = Read-Host "  Tenant ID"
+
+# Organization ID
+Write-Host "`nOrganization ID:" -ForegroundColor Yellow
+Write-Host "  (De Power Platform Admin Center → Environments → Tu Env → Details → Id. de la organización)" -ForegroundColor DarkGray
+$ppOrganizationId = Read-Host "  Organization ID"
+
+# Solution Name
+Write-Host "`nSolution Name:" -ForegroundColor Yellow
+Write-Host "  (De Power Apps → Solutions → Nombre exacto de tu solución)" -ForegroundColor DarkGray
+
+Write-Host "`n✓ Configuración capturada:" -ForegroundColor Green
+Write-Host "  • App ID: $($ppAppId.Substring(0,8))..." -ForegroundColor Gray
+Write-Host "  • Tenant ID: $($ppTenantId.Substring(0,8))..." -ForegroundColor Gray
+Write-Host "  • Organization ID: $ppOrganizationId" -ForegroundColor Gray
 
 # Obtener Storage Account Key (necesario para que runbooks accedan a blobs)
 Write-Host "`nObteniendo Storage Account Key..." -ForegroundColor Cyan
@@ -110,30 +131,17 @@ $storageKey = (Get-AzStorageAccountKey `
     -ResourceGroupName $resourceGroupName `
     -Name $storageAccountName)[0].Value
 
-# Crear variables (solo Power Platform)
+# Crear variables (6 variables en total)
+Write-Host "`nCreando 6 variables de configuración..." -ForegroundColor Cyan
+
 $variables = @{
-    "StorageAccountName" = $storageAccountName
     "PP-ServicePrincipal-AppId" = $ppAppId
     "PP-ServicePrincipal-TenantId" = $ppTenantId
-    "PP-EnvironmentName" = $ppEnvironmentName
-    "PP-SolutionName" = $ppSolutionName
+    "PP-OrganizationId" = $ppOrganizationId
+    "StorageAccountName" = $storageAccountName
 }
 
-# Crear variable ENCRIPTADA para Storage Key
-Write-Host "Creando variable encriptada para Storage Account Key..." -ForegroundColor Cyan
-try {
-    New-AzAutomationVariable `
-        -ResourceGroupName $resourceGroupName `
-        -AutomationAccountName $automationAccountName `
-        -Name "StorageAccountKey" `
-        -Value $storageKey `
-        -Encrypted $true | Out-Null
-    
-    Write-Host "  ✓ Variable encriptada creada: StorageAccountKey" -ForegroundColor Green
-} catch {
-    Write-Warning "  ⚠ Error creando StorageAccountKey: $_"
-}
-
+# Crear cada variable
 foreach ($key in $variables.Keys) {
     try {
         New-AzAutomationVariable `
@@ -149,11 +157,24 @@ foreach ($key in $variables.Keys) {
     }
 }
 
-# ==========================================
-# 4. CREAR CREDENTIAL
-# ==========================================
+# Crear variable ENCRIPTADA para Storage Key
+Write-Host "`nCreando variable encriptada para Storage Account Key..." -ForegroundColor Cyan
+try {
+    New-AzAutomationVariable `
+        -ResourceGroupName $resourceGroupName `
+        -AutomationAccountName $automationAccountName `
+        -Name "StorageAccountKey" `
+        -Value $storageKey `
+        -Encrypted $true | Out-Null
+    
+    Write-Host "  ✓ Variable encriptada creada: StorageAccountKey" -ForegroundColor Green
+} catch {
+    Write-Warning "  ⚠ Error creando StorageAccountKey: $_"
+}
 
-Write-Host "`n[4/4] Configurando credential del Service Principal..." -ForegroundColor Yellow
+# Crear Credential del Service Principal
+Write-Host "`nCreando credential del Service Principal..." -ForegroundColor Cyan
+Write-Host "  Ingresa el Client Secret cuando se solicite" -ForegroundColor Yellow
 
 $clientSecret = Read-Host "Service Principal - Client Secret" -AsSecureString
 
@@ -167,11 +188,15 @@ try {
         -Value $credential | Out-Null
     
     Write-Host "  ✓ Credential creado: PP-ServicePrincipal" -ForegroundColor Green
+    Write-Host "    Username: $ppAppId" -ForegroundColor Gray
+    Write-Host "    Password: ************** (encriptado)" -ForegroundColor Gray
     
 } catch {
     Write-Error "Error creando credential: $_"
     exit 1
 }
+
+
 
 # ==========================================
 # RESUMEN
@@ -180,9 +205,27 @@ try {
 Write-Host "`n=====================================" -ForegroundColor Cyan
 Write-Host "✓ FASE 2 COMPLETADA" -ForegroundColor Green
 Write-Host "=====================================" -ForegroundColor Cyan
-Write-Host "Automation Account: $automationAccountName" -ForegroundColor White
-Write-Host "Managed Identity: Habilitada" -ForegroundColor White
-Write-Host "Variables configuradas: $($variables.Count + 1) (incluye StorageAccountKey)" -ForegroundColor White
-Write-Host "Credentials configurados: 1" -ForegroundColor White
-Write-Host "`nPróximo paso: .\03-Import-Runbooks.ps1" -ForegroundColor Magenta
+Write-Host ""
+Write-Host "RECURSOS CONFIGURADOS:" -ForegroundColor Yellow
+Write-Host "  ✓ Automation Account: $automationAccountName" -ForegroundColor White
+Write-Host "  ✓ Managed Identity: Habilitada (para Storage)" -ForegroundColor White
+Write-Host "  ✓ RBAC: Storage Blob Data Contributor" -ForegroundColor White
+Write-Host "  ✓ Variables: 6 (5 texto + 1 encriptada)" -ForegroundColor White
+Write-Host "  ✓ Credential: PP-ServicePrincipal" -ForegroundColor White
+Write-Host ""
+Write-Host "VARIABLES CREADAS:" -ForegroundColor Yellow
+Write-Host "  • PP-ServicePrincipal-AppId: $ppAppId" -ForegroundColor Gray
+Write-Host "  • PP-ServicePrincipal-TenantId: $ppTenantId" -ForegroundColor Gray
+Write-Host "  • PP-OrganizationId: $ppOrganizationId" -ForegroundColor Gray
+Write-Host "  • StorageAccountName: $storageAccountName" -ForegroundColor Gray
+Write-Host "  • StorageAccountKey: ************** (encriptado)" -ForegroundColor Gray
+Write-Host ""
+Write-Host "CREDENTIAL CREADO:" -ForegroundColor Yellow
+Write-Host "  • PP-ServicePrincipal" -ForegroundColor Gray
+Write-Host "    Username: $ppAppId" -ForegroundColor DarkGray
+Write-Host "    Password: ************** (encriptado)" -ForegroundColor DarkGray
+Write-Host ""
+Write-Host "PRÓXIMO PASO:" -ForegroundColor Magenta
+Write-Host "  pwsh .\03-Import-Runbooks.ps1" -ForegroundColor White
+Write-Host ""
 Write-Host "=====================================" -ForegroundColor Cyan

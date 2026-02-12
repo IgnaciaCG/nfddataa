@@ -1,0 +1,237 @@
+<ImportExportXml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.25122.139" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.25122.00142">
+  <Entities>
+    <Entity>
+      <Name LocalizedName="TablaCalendario" OriginalName="TablaCalendario">cr8df_TablaCalendario</Name>
+      <EntityInfo>
+        <entity Name="cr8df_TablaCalendario">
+          <LocalizedNames>
+            <LocalizedName description="TablaCalendario" languagecode="1033" />
+            <LocalizedName description="TablaCalendario" languagecode="3082" />
+          </LocalizedNames>
+          <LocalizedCollectionNames>
+            <LocalizedCollectionName description="TablaCalendarios" languagecode="1033" />
+            <LocalizedCollectionName description="TablaCalendarios" languagecode="3082" />
+          </LocalizedCollectionNames>
+          <Descriptions>
+            <Description description="" languagecode="1033" />
+            <Description description="" languagecode="3082" />
+          </Descriptions>
+          <attributes />
+          <EntitySetName>cr8df_tablacalendarios</EntitySetName>
+          <IsDuplicateCheckSupported>1</IsDuplicateCheckSupported>
+          <IsBusinessProcessEnabled>0</IsBusinessProcessEnabled>
+          <IsRequiredOffline>0</IsRequiredOffline>
+          <IsInteractionCentricEnabled>0</IsInteractionCentricEnabled>
+          <IsCollaboration>0</IsCollaboration>
+          <AutoRouteToOwnerQueue>0</AutoRouteToOwnerQueue>
+          <IsConnectionsEnabled>0</IsConnectionsEnabled>
+          <IsDocumentManagementEnabled>0</IsDocumentManagementEnabled>
+          <AutoCreateAccessTeams>0</AutoCreateAccessTeams>
+          <IsOneNoteIntegrationEnabled>0</IsOneNoteIntegrationEnabled>
+          <IsKnowledgeManagementEnabled>0</IsKnowledgeManagementEnabled>
+          <IsSLAEnabled>0</IsSLAEnabled>
+          <IsDocumentRecommendationsEnabled>0</IsDocumentRecommendationsEnabled>
+          <IsBPFEntity>0</IsBPFEntity>
+          <OwnershipTypeMask>UserOwned</OwnershipTypeMask>
+          <IsAuditEnabled>0</IsAuditEnabled>
+          <IsRetrieveAuditEnabled>0</IsRetrieveAuditEnabled>
+          <IsRetrieveMultipleAuditEnabled>0</IsRetrieveMultipleAuditEnabled>
+          <IsActivity>0</IsActivity>
+          <ActivityTypeMask></ActivityTypeMask>
+          <IsActivityParty>0</IsActivityParty>
+          <IsReplicated>0</IsReplicated>
+          <IsReplicationUserFiltered>0</IsReplicationUserFiltered>
+          <IsMailMergeEnabled>1</IsMailMergeEnabled>
+          <IsVisibleInMobile>0</IsVisibleInMobile>
+          <IsVisibleInMobileClient>0</IsVisibleInMobileClient>
+          <IsReadOnlyInMobileClient>0</IsReadOnlyInMobileClient>
+          <IsOfflineInMobileClient>1</IsOfflineInMobileClient>
+          <DaysSinceRecordLastModified>0</DaysSinceRecordLastModified>
+          <MobileOfflineFilters></MobileOfflineFilters>
+          <IsMapiGridEnabled>1</IsMapiGridEnabled>
+          <IsReadingPaneEnabled>1</IsReadingPaneEnabled>
+          <IsQuickCreateEnabled>0</IsQuickCreateEnabled>
+          <SyncToExternalSearchIndex>0</SyncToExternalSearchIndex>
+          <IntroducedVersion>1.0</IntroducedVersion>
+          <IsCustomizable>1</IsCustomizable>
+          <IsRenameable>1</IsRenameable>
+          <IsMappable>1</IsMappable>
+          <CanModifyAuditSettings>1</CanModifyAuditSettings>
+          <CanModifyMobileVisibility>1</CanModifyMobileVisibility>
+          <CanModifyMobileClientVisibility>1</CanModifyMobileClientVisibility>
+          <CanModifyMobileClientReadOnly>1</CanModifyMobileClientReadOnly>
+          <CanModifyMobileClientOffline>1</CanModifyMobileClientOffline>
+          <CanModifyConnectionSettings>1</CanModifyConnectionSettings>
+          <CanModifyDuplicateDetectionSettings>1</CanModifyDuplicateDetectionSettings>
+          <CanModifyMailMergeSettings>1</CanModifyMailMergeSettings>
+          <CanModifyQueueSettings>1</CanModifyQueueSettings>
+          <CanCreateAttributes>1</CanCreateAttributes>
+          <CanCreateForms>1</CanCreateForms>
+          <CanCreateCharts>1</CanCreateCharts>
+          <CanCreateViews>1</CanCreateViews>
+          <CanModifyAdditionalSettings>1</CanModifyAdditionalSettings>
+          <CanEnableSyncToExternalSearchIndex>1</CanEnableSyncToExternalSearchIndex>
+          <EnforceStateTransitions>0</EnforceStateTransitions>
+          <CanChangeHierarchicalRelationship>1</CanChangeHierarchicalRelationship>
+          <EntityHelpUrlEnabled>0</EntityHelpUrlEnabled>
+          <ChangeTrackingEnabled>1</ChangeTrackingEnabled>
+          <CanChangeTrackingBeEnabled>1</CanChangeTrackingBeEnabled>
+          <IsEnabledForExternalChannels>0</IsEnabledForExternalChannels>
+          <IsMSTeamsIntegrationEnabled>0</IsMSTeamsIntegrationEnabled>
+          <IsSolutionAware>0</IsSolutionAware>
+        </entity>
+      </EntityInfo>
+      <SavedQueries>
+        <savedqueries>
+          <savedquery>
+            <IsCustomizable>1</IsCustomizable>
+            <CanBeDeleted>0</CanBeDeleted>
+            <isquickfindquery>0</isquickfindquery>
+            <isprivate>0</isprivate>
+            <isdefault>1</isdefault>
+            <savedqueryid>{68bd43e3-406b-4ebf-93b9-dec98c98d1cf}</savedqueryid>
+            <layoutxml>
+              <grid name="resultset" jump="cr8df_id" select="1" icon="1" preview="1">
+                <row name="result" id="cr8df_tablacalendarioid">
+                  <cell name="cr8df_id" width="300" />
+                  <cell name="cr8df_titulo" width="150" />
+                  <cell name="cr8df_fechayhorainicioo" width="152" />
+                  <cell name="cr8df_fechayhoratermino" width="150" />
+                  <cell name="cr8df_descripcion" width="150" />
+                  <cell name="cr8df_eventocolor" width="107" />
+                  <cell name="cr8df_eventocolorhex" width="127" />
+                  <cell name="cr8df_hipervinculo" width="111" />
+                  <cell name="cr8df_nombrelink" width="109" />
+                </row>
+                <controlDescriptions>
+                  <controlDescription>
+                    <customControl id="{E7A81278-8635-4D9E-8D4D-59480B391C5B}">
+                      <parameters />
+                    </customControl>
+                    <customControl formFactor="0" name="cr8df_BeverControls.ScheduleBoardView">
+                      <parameters>
+                        <data-set name="DataSet">
+                          <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
+                        </data-set>
+                        <name static="true" type="SingleLine.Text">cr8df_titulo</name>
+                        <startdate static="true" type="SingleLine.Text">cr8df_fechayhorainicioo</startdate>
+                        <enddate static="true" type="SingleLine.Text">cr8df_fechayhoratermino</enddate>
+                        <color static="true" type="SingleLine.Text">cr8df_eventocolorhex</color>
+                        <description static="true" type="SingleLine.Text">cr8df_descripcion</description>
+                        <hyperlink static="true" type="SingleLine.Text">cr8df_hipervinculo</hyperlink>
+                        <name_label static="true" type="SingleLine.Text">titulo</name_label>
+                        <description_label static="true" type="SingleLine.Text">descripcion</description_label>
+                        <hyperlink_label static="true" type="SingleLine.Text">link</hyperlink_label>
+                        <startdate_label static="true" type="SingleLine.Text">ini</startdate_label>
+                        <enddate_label static="true" type="SingleLine.Text">fin</enddate_label>
+                        <tooltip_color static="true" type="SingleLine.Text">#ff0fff</tooltip_color>
+                        <language static="true" type="SingleLine.Text">es</language>
+                        <font_size static="true" type="SingleLine.Text">20</font_size>
+                        <hyperlink_name static="true" type="SingleLine.Text">cr8df_nombrelink</hyperlink_name>
+                      </parameters>
+                    </customControl>
+                    <customControl formFactor="1" name="cr8df_BeverControls.ScheduleBoardView">
+                      <parameters>
+                        <data-set name="DataSet">
+                          <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
+                        </data-set>
+                        <name static="true" type="SingleLine.Text">cr8df_titulo</name>
+                        <startdate static="true" type="SingleLine.Text">cr8df_fechayhorainicioo</startdate>
+                        <enddate static="true" type="SingleLine.Text">cr8df_fechayhoratermino</enddate>
+                        <color static="true" type="SingleLine.Text">cr8df_eventocolorhex</color>
+                        <description static="true" type="SingleLine.Text">cr8df_descripcion</description>
+                        <hyperlink static="true" type="SingleLine.Text">cr8df_hipervinculo</hyperlink>
+                        <name_label static="true" type="SingleLine.Text">titulo</name_label>
+                        <description_label static="true" type="SingleLine.Text">descripcion</description_label>
+                        <hyperlink_label static="true" type="SingleLine.Text">link</hyperlink_label>
+                        <startdate_label static="true" type="SingleLine.Text">ini</startdate_label>
+                        <enddate_label static="true" type="SingleLine.Text">fin</enddate_label>
+                        <tooltip_color static="true" type="SingleLine.Text">#ff0fff</tooltip_color>
+                        <language static="true" type="SingleLine.Text">es</language>
+                        <font_size static="true" type="SingleLine.Text">20</font_size>
+                        <hyperlink_name static="true" type="SingleLine.Text">cr8df_nombrelink</hyperlink_name>
+                      </parameters>
+                    </customControl>
+                    <customControl formFactor="2" name="cr8df_BeverControls.ScheduleBoardView">
+                      <parameters>
+                        <data-set name="DataSet">
+                          <ViewId>00000000-0000-0000-0000-000000000000</ViewId>
+                        </data-set>
+                        <name static="true" type="SingleLine.Text">cr8df_titulo</name>
+                        <startdate static="true" type="SingleLine.Text">cr8df_fechayhorainicioo</startdate>
+                        <enddate static="true" type="SingleLine.Text">cr8df_fechayhoratermino</enddate>
+                        <color static="true" type="SingleLine.Text">cr8df_eventocolorhex</color>
+                        <description static="true" type="SingleLine.Text">cr8df_descripcion</description>
+                        <hyperlink static="true" type="SingleLine.Text">cr8df_hipervinculo</hyperlink>
+                        <name_label static="true" type="SingleLine.Text">titulo</name_label>
+                        <description_label static="true" type="SingleLine.Text">descripcion</description_label>
+                        <hyperlink_label static="true" type="SingleLine.Text">link</hyperlink_label>
+                        <startdate_label static="true" type="SingleLine.Text">ini</startdate_label>
+                        <enddate_label static="true" type="SingleLine.Text">fin</enddate_label>
+                        <tooltip_color static="true" type="SingleLine.Text">#ff0fff</tooltip_color>
+                        <language static="true" type="SingleLine.Text">es</language>
+                        <font_size static="true" type="SingleLine.Text">20</font_size>
+                        <hyperlink_name static="true" type="SingleLine.Text">cr8df_nombrelink</hyperlink_name>
+                      </parameters>
+                    </customControl>
+                  </controlDescription>
+                </controlDescriptions>
+              </grid>
+            </layoutxml>
+            <querytype>0</querytype>
+            <fetchxml>
+              <fetch version="1.0" mapping="logical">
+                <entity name="cr8df_tablacalendario">
+                  <attribute name="cr8df_id" />
+                  <order attribute="cr8df_id" descending="false" />
+                  <filter type="and">
+                    <condition attribute="statecode" operator="eq" value="0" />
+                  </filter>
+                  <attribute name="cr8df_titulo" />
+                  <attribute name="cr8df_fechayhoratermino" />
+                  <attribute name="cr8df_descripcion" />
+                  <attribute name="cr8df_tablacalendarioid" />
+                  <attribute name="cr8df_fechayhorainicioo" />
+                  <attribute name="cr8df_eventocolor" />
+                  <attribute name="cr8df_eventocolorhex" />
+                  <attribute name="cr8df_hipervinculo" />
+                  <attribute name="cr8df_nombrelink" />
+                </entity>
+              </fetch>
+            </fetchxml>
+            <IntroducedVersion>1.0</IntroducedVersion>
+            <LocalizedNames>
+              <LocalizedName description="TablaCalendarios activo" languagecode="3082" />
+            </LocalizedNames>
+          </savedquery>
+        </savedqueries>
+      </SavedQueries>
+      <RibbonDiffXml>
+        <CustomActions />
+        <Templates>
+          <RibbonTemplates Id="Mscrm.Templates"></RibbonTemplates>
+        </Templates>
+        <CommandDefinitions />
+        <RuleDefinitions>
+          <TabDisplayRules />
+          <DisplayRules />
+          <EnableRules />
+        </RuleDefinitions>
+        <LocLabels />
+      </RibbonDiffXml>
+    </Entity>
+  </Entities>
+  <Roles></Roles>
+  <Workflows></Workflows>
+  <FieldSecurityProfiles></FieldSecurityProfiles>
+  <Templates />
+  <EntityMaps />
+  <EntityRelationships />
+  <OrganizationSettings />
+  <optionsets />
+  <CustomControls />
+  <EntityDataProviders />
+  <Languages>
+    <Language>3082</Language>
+  </Languages>
+</ImportExportXml>

@@ -1,24 +1,6 @@
-Eres un Arquitecto de software Senoir, Estoy haciendo un desafio de arquitectura, quiero que leas los requisitos primero y luego de eso leer mi Solución para el desafio, si consideras que hay mejores opciones para resolver este problema házmelo saber, de caso contrario y que mi solución este bien revisa la estructura del informe. No quiero que cambies nada por ahora.
 
-Como voy a manejar la redundanica. Quiero dos sites dos lectura y uno con estritura
-
-Tamaño del bloque en los blobs, los datos en su mayoría son pdf.
-
-Revisar la posibilidad de descargar los datos directamente desde el blob.
 
 30 en hot, 30-60 en cool, >60 cold
-
-6 meses de backup
-
-  "backup":{
-
-    "retention":{
-
-    "coolTierAfterDays":7,
-
-    "deleteAfterDays":30
-
-    },
 
 Agregar credenciales Storage
 
@@ -30,27 +12,9 @@ Debe respaldar tablas especificas, flujos de Power Automate y app
 * Días 8-60: **Cool tier**
 * Días 61-180: **Cold tier**
 * > 180 días: **Eliminación automática**
-  >
 
 Revisar si la solucion real usa Environment Variables para hacerles backup
 
-Opciones para habilitar URL dinámica:
-OPCIÓN 1: Asignar Power Platform Administrator (NO RECOMENDADO)
-Pros:
-
-* URL dinámica funcionaría
-* Portable entre environments
-  Contras:
-* MUY PELIGROSO: Da control total sobre TODOS los environments del tenant
-* Security risk innecesario para un backup automation
-
-**Cómo hacerlo:**
-
-1. Power Platform Admin Center → https://admin.powerplatform.com
-2. Settings → Users + permissions → Security roles
-3. Buscar Service Principal: 7fc4ef96-8566-4adb-a579-2030dbf71c35
-4. Asignar rol: Power Platform Administrator
-5. Esperar 15-30 min propagación
 
 
 
@@ -66,3 +30,33 @@ Pros:
 | **CI/CD integration** | ❌ No                                                                  | ✅ Excelente         | ✅ Excelente         |
 | **Curva aprendizaje** | ✅ 1 día                                                              | ⚠️ 1-2 semanas     | ❌ 2-4 semanas       |
 | **Ideal para**        | ✅ Backups automáticos                                                | ✅ ALM de soluciones | ⚠️ Orgs enterprise |
+
+
+
+5 personas aprox en el sharepoint
+
+Máquina Virtual en Azure (100% Cloud)
+
+Si no tienes servidores físicos y quieres todo en la nube:
+
+Creas una VM pequeña en Azure (ej. Standard_B2s o B2ms).
+
+Windows Server.
+
+2 vCPUs, 4-8 GB RAM.
+
+Costo de la VM: Aprox. $30 - $40 USD/mes (si la dejas encendida 24/7).
+
+Truco de Ingeniero: Como son solo 10 usuarios, el backup tarda 30 minutos. Usas Azure Automation para encender la VM a las 3 AM, correr el backup, y apagarla a las 4 AM.
+
+Costo optimizado: ~$5 USD/mes en cómputo.~$15-18 USD/mes (Cómputo + Disco OS + Blob), no $5.
+
+
+
+
+
+
+
+1. Ejecuta el restore ahora - Debe completar exitosamente en 25-30 min
+2. Una vez que funcione perfectamente, volveremos al problema de fileattachment
+3. El código de File Upload API sigue en el runbook pero no se ejecutará

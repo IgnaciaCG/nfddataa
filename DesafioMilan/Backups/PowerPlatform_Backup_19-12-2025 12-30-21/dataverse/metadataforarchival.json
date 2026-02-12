@@ -1,0 +1,32 @@
+﻿{
+    "solutionid":  "fe319f75-19be-4fc7-b807-0e8eab78a708",
+    "overriddencreatedon":  null,
+    "_modifiedby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3",
+    "importsequencenumber":  null,
+    "_organizationid_value":  "660b64c6-c0d9-f011-89f6-002248e0aee4",
+    "isavailableforarchival":  true,
+    "overwritetime":  "1900-01-01T00:00:00Z",
+    "@odata.etag":  "W/\"2118514\"",
+    "versionnumber":  2118514,
+    "componentidunique":  "6fac8e42-71bd-42b1-a4a6-969c9e961a6a",
+    "componentstate":  0,
+    "metadataforarchivalid":  "f5eda8d6-a3a4-487d-bb3c-40a57721b0dc",
+    "modifiedon":  "2025-12-14T18:10:52Z",
+    "isreadyforarchival":  null,
+    "_extensionofrecordid_value":  "d7ece96f-06eb-4e21-9ac4-9b637bd41165",
+    "name":  "retentionsuccessdetail",
+    "utcconversiontimezonecode":  null,
+    "createdon":  "2025-12-14T18:10:52Z",
+    "ismanaged":  true,
+    "_createdby_value":  "358958c0-52b4-4386-8edd-e9b07d4af6d3",
+    "statuscode":  1,
+    "timezoneruleversionnumber":  null,
+    "statecode":  0,
+    "_modifiedonbehalfby_value":  null,
+    "iscustomizable":  {
+                           "Value":  true,
+                           "CanBeChanged":  true,
+                           "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                       },
+    "_createdonbehalfby_value":  null
+}

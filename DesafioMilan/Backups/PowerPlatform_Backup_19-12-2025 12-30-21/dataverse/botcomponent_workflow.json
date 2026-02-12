@@ -1,0 +1,16 @@
+﻿{
+    "componentstate":  0,
+    "ismanaged":  true,
+    "versionnumber":  1028093,
+    "solutionid":  "0ad90b79-6955-426e-b85f-5194a0361eb2",
+    "iscustomizable":  {
+                           "Value":  true,
+                           "CanBeChanged":  true,
+                           "ManagedPropertyLogicalName":  "iscustomizableanddeletable"
+                       },
+    "botcomponent_workflowid":  "5f1a6e30-10d9-f011-8543-002248384659",
+    "workflowid":  "87023c69-962c-ec11-b6e6-000d3a574957",
+    "componentidunique":  "471490de-9f8b-4432-81e4-907633996d49",
+    "overwritetime":  "1900-01-01T00:00:00Z",
+    "botcomponentid":  "ca072532-0847-4bc4-a52d-ad80955f36f5"
+}
